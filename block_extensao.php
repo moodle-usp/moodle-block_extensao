@@ -1,5 +1,7 @@
 <?php
 
+require_once('src/Service/Query.php');
+require_once('src/turmas.php');
 require_once('vendor/autoload.php');
 
 class block_extensao extends block_base {

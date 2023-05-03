@@ -21,7 +21,7 @@ define('CLI_SCRIPT', true);
 
 require(__DIR__.'/../../../config.php');
 
-require_once(__DIR__ . '/../Service/Query.php');
+require_once(__DIR__ . '/../src/Service/Query.php');
 use block_extensao\Service\Query;
 
 class Sincronizar {
