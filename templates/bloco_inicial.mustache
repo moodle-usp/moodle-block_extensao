@@ -1,0 +1,32 @@
+{{#inicio}}
+  <h5>Seus cursos</h5>
+  {{^cursos_docente}}
+    <p>Nenhum curso foi encontrado.</p>
+  {{/cursos_docente}}
+
+  {{#cursos_docente}}
+  <div class="card">
+    <div class="card-body">
+      <h6 class="card-title">({{ codofeatvceu }}) {{ nome_curso_apolo }}</h6>
+      
+      {{{ formulario }}}
+    </div>  
+  </div>
+  {{/cursos_docente}}
+{{/inicio}}
+{{^inicio}}
+  <h5>Alunos matriculados</h5>
+  {{^inscritos}}
+    <p>Nenhum aluno inscrito no curso foi encontrado.</p>
+  {{/inscritos}}
+
+  <table class="table">
+    {{#inscritos}}
+      <tr>
+        <td>{{ nome  }}</td>
+        <td>{{ email }}</td>
+      </tr>
+    {{/inscritos}}
+  </table>
+  
+{{/inicio}}
