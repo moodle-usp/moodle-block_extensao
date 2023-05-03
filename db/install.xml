@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<XMLDB PATH="blocks/extensao/db" VERSION="20230208" COMMENT="XMLDB file for Moodle blocks/extensao"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:noNamespaceSchemaLocation="../../../lib/xmldb/xmldb.xsd"
+>
+  <TABLES>
+    <TABLE NAME="block_extensao" COMMENT="Default comment for block_extensao, please edit me">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="16" NOTNULL="true" SEQUENCE="true"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+      </KEYS>
+    </TABLE>
+    <TABLE NAME="extensao_turma" COMMENT="Para armazenar informacoes de turma e curso.">
+      <FIELDS>
+        <FIELD NAME="codofeatvceu" TYPE="int" LENGTH="16" NOTNULL="true" SEQUENCE="false" COMMENT="Codigo de oferecimento da atividade no Apolo."/>
+        <FIELD NAME="nome_curso_apolo" TYPE="text" NOTNULL="true" SEQUENCE="false" COMMENT="Nome do curso no Apolo."/>
+        <FIELD NAME="id_moodle" TYPE="int" LENGTH="16" NOTNULL="false" SEQUENCE="false" COMMENT="Identificador do curso no Moodle"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="codofeatvceu"/>
+      </KEYS>
+    </TABLE>
+    <TABLE NAME="extensao_ministrante" COMMENT="Para relacionar os ministrantes com os cursos.">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="16" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="codpes" TYPE="text" NOTNULL="true" SEQUENCE="false" COMMENT="Numero USP do usuario."/>
+        <FIELD NAME="codofeatvceu" TYPE="INT" LENGTH="16" NOTNULL="true" SEQUENCE="false" COMMENT="Codigo de oferecimento da atividade no Apolo."/>
+        <FIELD NAME="papel_usuario" TYPE="int" LENGTH="16" NOTNULL="true" SEQUENCE="false" COMMENT="Papel do usuario (i.e., se eh docente, monitor, etc)."/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+      </KEYS>
+    </TABLE>
+  </TABLES>
+</XMLDB>
