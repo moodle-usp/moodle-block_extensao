@@ -60,6 +60,8 @@ class Ambiente {
     $curso->enddate = $info_curso_apolo->enddate;
     $curso->timemodified = time();
 
+    // o codigo da reuniao 5.5 vem aqui
+
     $curso->category = 1; //?
 
     return $curso;

@@ -23,13 +23,13 @@ class Turmas {
     global $DB;
     
     // captura as turmas relacionadas ao usuario
-    $query = "SELECT codofeatvceu FROM {extensao_ministrante} WHERE codpes = $nusp_docente AND papel_usuario IN (1,2,5)";
+    $query = "SELECT codofeatvceu FROM {block_extensao_ministrante} WHERE codpes = $nusp_docente AND papel_usuario IN (1,2,5)";
     $usuario_turma = $DB->get_records_sql($query, ['codpes' => $nusp_docente]);
 
     $cursos_usuario = array();
     // captura os nomes dos cursos relacionados
     foreach ($usuario_turma as $turma) {
-      $busca = $DB->get_record('extensao_turma', ['codofeatvceu' => $turma->codofeatvceu]);
+      $busca = $DB->get_record('block_extensao_turma', ['codofeatvceu' => $turma->codofeatvceu]);
 
       if ($busca->id_moodle) continue;
 
@@ -52,7 +52,7 @@ class Turmas {
    */
   public static function info_turma_id_extensao ($codofeatvceu) {
     global $DB;
-    $infos = $DB->get_record('extensao_turma', ['codofeatvceu' => $codofeatvceu]);
+    $infos = $DB->get_record('block_extensao_turma', ['codofeatvceu' => $codofeatvceu]);
     return $infos;
   }
 
@@ -68,9 +68,9 @@ class Turmas {
   public static function usuario_docente_turma ($nusp_usuario, $codofeatvceu) {
     global $DB;
     // captura o id apolo da turma na base do extensao
-    $info_turma = $DB->get_record('extensao_turma', ['codofeatvceu' => $codofeatvceu]);
+    $info_turma = $DB->get_record('block_extensao_turma', ['codofeatvceu' => $codofeatvceu]);
     // agora ve se esta associada ao usuario
-    $query = "SELECT * FROM {extensao_ministrante} WHERE codofeatvceu = $info_turma->codofeatvceu AND codpes = $nusp_usuario";
+    $query = "SELECT * FROM {block_extensao_ministrante} WHERE codofeatvceu = $info_turma->codofeatvceu AND codpes = $nusp_usuario";
     $turma_associada = $DB->get_record_sql($query);
     return !empty($turma_associada);
   }
@@ -85,7 +85,7 @@ class Turmas {
    */
   public static function ambiente_criado_turma ($codofeatvceu) {
     global $DB;
-    $query = $DB->get_record('extensao_turma', ['codofeatvceu' => $codofeatvceu]);
+    $query = $DB->get_record('block_extensao_turma', ['codofeatvceu' => $codofeatvceu]);
     return $query->id_moodle;
   }
 
@@ -103,7 +103,7 @@ class Turmas {
    */
   public static function atualizar_id_moodle_turma ($codofeatvceu, $id_moodle) {
     global $DB;
-    $query = "UPDATE {extensao_turma} SET id_moodle = $id_moodle WHERE codofeatvceu = $codofeatvceu";
+    $query = "UPDATE {block_extensao_turma} SET id_moodle = $id_moodle WHERE codofeatvceu = $codofeatvceu";
     $query = $DB->execute($query);
     return $query;
   }
@@ -118,28 +118,6 @@ class Turmas {
    */
   public static function codofeatvceu($id_moodle) {
     global $DB;
-    return $DB->get_record('extensao_turma', ['id_moodle' => $id_moodle]);
-  }
-
-  /**
-   * Captura os alunos inscritos em uma turma na tabela extensao_aluno a
-   * partir do codigo de oferecimento da atividade.
-   * 
-   * @param string|integer $codofeatvceu Codigo de oferecimento da atividade
-   * 
-   * @return array
-   */
-  public static function inscritos_turma ($codofeatvceu) {
-    global $DB;
-
-    $inscritos_obj = $DB->get_records('extensao_aluno', ['codofeatvceu' => $codofeatvceu]);
-    $lista_inscritos = [];
-    foreach ($inscritos_obj as $inscrito) {
-      $lista_inscritos[] = array(
-        'nome' => $inscrito->nome,
-        'email' => $inscrito->email
-      );
-    }
-    return $lista_inscritos;
+    return $DB->get_record('block_extensao_turma', ['id_moodle' => $id_moodle]);
   }
 }

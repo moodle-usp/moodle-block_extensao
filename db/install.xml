@@ -12,7 +12,7 @@
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
       </KEYS>
     </TABLE>
-    <TABLE NAME="extensao_turma" COMMENT="Para armazenar informacoes de turma e curso.">
+    <TABLE NAME="block_extensao_turma" COMMENT="Para armazenar informacoes de turma e curso.">
       <FIELDS>
         <FIELD NAME="codofeatvceu" TYPE="int" LENGTH="16" NOTNULL="true" SEQUENCE="false" COMMENT="Codigo de oferecimento da atividade no Apolo."/>
         <FIELD NAME="nome_curso_apolo" TYPE="text" NOTNULL="true" SEQUENCE="false" COMMENT="Nome do curso no Apolo."/>
@@ -22,7 +22,7 @@
         <KEY NAME="primary" TYPE="primary" FIELDS="codofeatvceu"/>
       </KEYS>
     </TABLE>
-    <TABLE NAME="extensao_ministrante" COMMENT="Para relacionar os ministrantes com os cursos.">
+    <TABLE NAME="block_extensao_ministrante" COMMENT="Para relacionar os ministrantes com os cursos.">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="16" NOTNULL="true" SEQUENCE="true"/>
         <FIELD NAME="codpes" TYPE="text" NOTNULL="true" SEQUENCE="false" COMMENT="Numero USP do usuario."/>
