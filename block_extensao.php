@@ -1,7 +1,7 @@
 <?php
 require_once('src/Service/Query.php');
 require_once('src/turmas.php');
-require_once('src/Service/vendor/autoload.php');
+require_once('vendor/autoload.php');
 require_once('utils/forms.php');
 
 class block_extensao extends block_base {

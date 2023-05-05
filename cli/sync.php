@@ -188,7 +188,6 @@ class Sincronizar {
 
     $DB->delete_records('extensao_turma', array('id_moodle' => NULL));
     $DB->delete_records('extensao_ministrante');
-    $DB->delete_records('extensao_aluno');
   }
 }
 
