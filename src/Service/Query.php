@@ -68,18 +68,38 @@ class Query
      * 
      * [ a query sera posta aqui posteriormente ]
      */
+    $query = "
+      SELECT
+        codund
+      FROM OFERECIMENTOATIVIDADECEU
+      WHERE codofeatvceu = $codofeatvceu        
+    ";
+    $infos_curso = USPDatabase::fetch($query);
     $info_curso = new stdClass;
+    $info_curso->codund = $infos_curso['codund'];
     $info_curso->codofeatvceu = $codofeatvceu;
     $info_curso->startdate = strtotime("now");
     $info_curso->enddate = strtotime("+1 year");
     return $info_curso;
   }
   
-   // Obtem o objetivo do curso explicitado 
+  // Obtem o objetivo do curso explicitado 
   public static function objetivo_extensao($codofeatvceu) {
     $obj = "
     SELECT c.objcur FROM OFERECIMENTOATIVIDADECEU o LEFT JOIN CURSOCEU c ON c.codcurceu = o.codcurceu 
     WHERE codofeatvceu = $codofeatvceu";
     return USPDatabase::fetch($obj);
+  }
+
+  // Obtem as informacoes de uma unidade
+  public static function informacoes_unidade ($codund) {
+    return USPDatabase::fetch("
+      SELECT
+        codund,
+        sglund,
+        nomund
+      FROM UNIDADE
+      WHERE codund = $codund
+    ");
   }
 }

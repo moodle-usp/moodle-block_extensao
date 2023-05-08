@@ -47,7 +47,7 @@ class Ambiente {
     
     $curso->shortname = $info_forms->shortname;
     $curso->fullname = $info_forms->fullname;
-    $curso->idnumber = ''; //?
+    $curso->idnumber = $info_forms->codofeatvceu; //?
     $curso->visible = 1;
     
     $curso->format = 'topics'; //?
@@ -60,11 +60,75 @@ class Ambiente {
     $curso->enddate = $info_curso_apolo->enddate;
     $curso->timemodified = time();
 
-    // o codigo da reuniao 5.5 vem aqui
-
+    // gera ou captura a categoria
+    $categoria = Ambiente::turma_categoria($info_curso_apolo);
     $curso->category = 1; //?
-
+    die();
     return $curso;
+  }
+
+  /**
+   * Define de um curso. Se a categoria nao existir, sera criada.
+   * 
+   * @param object $info_curso_apolo Informacoes do curso extraidas do Apolo
+   * 
+   * @return object Objeto de curso.
+   */
+  public static function turma_categoria ($info_curso_apolo) {
+    global $DB;
+
+    // captura as informaoces da unidade do curso
+    $info_unidade = Apolo::informacoes_unidade($info_curso_apolo->codund);
+
+    // captura a categoria de faculdade dentro do Moodle
+    $categoria_faculdade = Ambiente::categoria(array(
+      'name'        => $info_unidade->sglund,
+      'parent'      => 0,
+      'description' => $info_unidade->nomund,
+      'sortorder'   => $info_unidade->codund
+    ));
+
+    // agora a categoria do ano
+    $ano = '2023'; // PROVISORIO
+
+    $categoria_ano = Ambiente::categoria(array(
+      'name'        => $ano,
+      'parent'      => $categoria_faculdade->id,
+      'description' => $ano,
+      'sortorder'   => $ano
+    ));
+
+    echo 'aqui:';
+    var_dump($categoria_faculdade);
+    die();
+  }
+
+  /**
+   * Retorna uma categoria a partir de informacoes basicas. Se a categoria
+   * nao for encontrada, ela sera criada.
+   * 
+   * @param object $info_categoria Informacoes da categoria.
+   * 
+   * @return object A categoria encontrada ou criada.
+   */
+  public static function categoria ($info_categoria) {
+    global $DB;
+
+    // verifica se a categoria ja esta na base
+    $categoria = $DB->get_record('course_categories', array('name'=>$info_categoria['name'], 'parent'=>$info_categoria['parent']));
+
+    // se estiver vazio, precisa criar a categoria
+    if (empty($categoria) or !$categoria) {
+      $nova_categoria = new \stdClass();
+      $nova_categoria->name        = $info_categoria['name'];
+      $nova_categoria->description = $info_categoria['description'];
+      $nova_categoria->sortorder   = $info_categoria['sortorder'];
+      $nova_categoria->parent      = $info_categoria['parent']; // filha da categoria base
+      core_course_category::create($nova_categoria);
+      return Ambiente::categoria($info_categoria);
+    }
+
+    return $categoria;
   }
 
 }

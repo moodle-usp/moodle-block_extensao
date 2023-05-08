@@ -37,4 +37,15 @@ class Apolo {
   public static function objetivo_extensao ($codofeatvceu) {
     return Query::objetivo_extensao($codofeatvceu)['objcur'];
   }
+
+  /**
+   * Obtem as informacoes de uma unidade da USP a partir de seu codund.
+   * 
+   * @param integer $codund Codigo doa unidade do curso.
+   * 
+   * @return object Objeto com informacoes da unidade.
+   */ 
+  public static function informacoes_unidade ($codund) {
+    return Query::informacoes_unidade($codund);
+  }
 }
