@@ -19,11 +19,28 @@ class Sincronizar {
   public function __construct() {}
 
   /**
+   * Tenta conectar na base do Apolo para ver se as
+   * credenciais foram informadas e se estao corretas.
+   * 
+   * @return bool 
+   */
+  private function conexao_apolo () {
+    return Query::testar_conexao();
+  }
+
+  /**
    * Sincronizacao dos dados entre Apolo e Moodle
    * 
    * @param bool $apagar Para apagar os dados atuais antes de sincronizar
    */
   public function sincronizar ($parametros) {
+    // verifica se as credenciais da base foram passadas
+    $this->conexao_apolo();
+
+    cli_writeln(PHP_EOL."/*********************************/");
+    cli_writeln("/    SINCRONIZACAO COM O APOLO    /");
+    cli_writeln("/*********************************/");
+
     // se quiser substituir, precisa apagar os dados de agora
     if ($parametros['apagar']) $this->apagar();
 
@@ -39,6 +56,10 @@ class Sincronizar {
 
     // retorna a pagina de sincronizar
     cli_writeln(PHP_EOL . "Atualizado com sucesso!");
+
+    cli_writeln(PHP_EOL."/*********************************/");
+    cli_writeln("/     SINCRONIZACAO CONCLUIDA     /");
+    cli_writeln("/*********************************/");
   }
 
   /**

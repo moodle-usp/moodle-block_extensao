@@ -8,10 +8,11 @@ require_once('USPDatabase.php');
 
 class Query 
 {
-  public static function coursesFromThispYear(){
-    $year = date('Y');
-    $query = "SELECT codcurceu,nomcurceu,dtainc FROM CURSOCEU WHERE dtainc LIKE '%{$year}%'";
-    return USPDatabase::fetchAll($query);
+  /**
+   * Para testar a conexao com o Apolo.
+   */
+  public static function testar_conexao () {
+    return USPDatabase::fetch("SELECT 1");
   }
 
   public static function turmasAbertas () {
