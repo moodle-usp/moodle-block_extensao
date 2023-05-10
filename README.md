@@ -18,3 +18,17 @@ Projeto desenvolvido pela equipe de Moodle da USP.
 Referências:
 
 - https://gitlab.uspdigital.usp.br/atp/moodle/-/tree/edisc/blocks/usp_cursos
+
+## Sincronização com o Apolo
+
+Para sincronizar com o Sistema Apolo, basta rodar
+
+    php cli/sync.php
+
+Caso a base já esteja sincronizada e deseje ainda assim capturar os dados, é possível limpar a base e fazer a sincronização. Basta rodar:
+
+    php cli/sync.php --apagar
+
+Para mais informações, há a opção de ajuda:
+
+    php cli/sync.php -h
