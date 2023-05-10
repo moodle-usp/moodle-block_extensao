@@ -47,7 +47,7 @@ class Ambiente {
     
     $curso->shortname = $info_forms->shortname;
     $curso->fullname = $info_forms->fullname;
-    $curso->idnumber = $info_forms->codofeatvceu; //?
+    $curso->idnumber = $info_forms->codofeatvceu;
     $curso->visible = 1;
     
     $curso->format = 'topics'; //?
@@ -62,8 +62,8 @@ class Ambiente {
 
     // gera ou captura a categoria
     $categoria = Ambiente::turma_categoria($info_curso_apolo);
-    $curso->category = 1; //?
-    die();
+    $curso->category = $categoria->id;
+    
     return $curso;
   }
 
@@ -82,10 +82,10 @@ class Ambiente {
 
     // captura a categoria de faculdade dentro do Moodle
     $categoria_faculdade = Ambiente::categoria(array(
-      'name'        => $info_unidade->sglund,
+      'name'        => $info_unidade["sglund"],
       'parent'      => 0,
-      'description' => $info_unidade->nomund,
-      'sortorder'   => $info_unidade->codund
+      'description' => $info_unidade["nomund"],
+      'sortorder'   => $info_unidade["codund"]
     ));
 
     // agora a categoria do ano
@@ -98,9 +98,7 @@ class Ambiente {
       'sortorder'   => $ano
     ));
 
-    echo 'aqui:';
-    var_dump($categoria_faculdade);
-    die();
+    return $categoria_ano;
   }
 
   /**
@@ -124,7 +122,10 @@ class Ambiente {
       $nova_categoria->description = $info_categoria['description'];
       $nova_categoria->sortorder   = $info_categoria['sortorder'];
       $nova_categoria->parent      = $info_categoria['parent']; // filha da categoria base
-      core_course_category::create($nova_categoria);
+      if(!$categoria = \core_course_category::create($nova_categoria))
+        \core\notification::error("Erro ao criar a categoria '{$nova_categoria->name}'!");
+      else
+        \core\notification::success("Categoria '{$nova_categoria->name}' criada!");
       return Ambiente::categoria($info_categoria);
     }
 
