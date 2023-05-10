@@ -20,8 +20,8 @@ class USPDatabase
         $pass = get_config('block_extensao','password');
 
         if (empty($host) or empty($port) or empty($db) or empty($user) or empty($pass)) {
-            echo "As credenciais de conexão estão vazias.";
-            return false;
+            echo "ERRO: As credenciais de conexão estão vazias." . PHP_EOL;
+            die();
         } 
         if (!self::$instance) {
             try {
@@ -30,7 +30,7 @@ class USPDatabase
                 self::$instance->setAttribute(PDO::ATTR_ERRMODE,PDO::ERRMODE_EXCEPTION);
             } catch (\Throwable $t) {
                 // print_r($t->getMessage()) . '<br>';
-                echo "Erro na conexão com o database do replicado! Contate o suporte";
+                echo "Erro na conexão com o database do replicado! Contate o suporte" . PHP_EOL;
                 die();
             }
         }
