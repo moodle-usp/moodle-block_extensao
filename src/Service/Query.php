@@ -94,13 +94,28 @@ class Query
 
   // Obtem as informacoes de uma unidade
   public static function informacoes_unidade ($codund) {
-    return USPDatabase::fetch("
+    // captura a unidade
+    $info_unidade = USPDatabase::fetch("
       SELECT
         codund,
         sglund,
-        nomund
+        nomund,
+        codcam
       FROM UNIDADE
       WHERE codund = $codund
     ");
+
+    // captura o campus
+    $info_campus = USPDatabase::fetch("
+      SELECT
+        codcam,
+        nomcam
+      FROM CAMPUS
+      WHERE codcam = " . $info_unidade['codcam']);
+
+    return array(
+      'unidade' => $info_unidade,
+      'campus' => $info_campus
+    );
   }
 }
