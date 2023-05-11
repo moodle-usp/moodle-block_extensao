@@ -80,7 +80,7 @@ class Query
     $info_curso->codund = $infos_curso['codund'];
     $info_curso->codofeatvceu = $codofeatvceu;
     $info_curso->startdate = strtotime("now");
-    $info_curso->enddate = strtotime("+1 year");
+    $info_curso->enddate = strtotime("+7 months");
     return $info_curso;
   }
   
@@ -102,5 +102,21 @@ class Query
       FROM UNIDADE
       WHERE codund = $codund
     ");
+  }
+
+  // Obtem as datas de inicio e final dos cursos
+  public static function datas_curso ($codofeatvceu){
+  $query = "
+       SELECT 
+        dtainiofeatv, 
+        dtafimofeatv 
+      FROM OFERECIMENTOATIVIDADECEU 
+      WHERE codofeatvceu = $codofeatvceu
+      ORDER BY codofeatvceu";
+    $info_datas = USPDatabase::fetch($query);
+    $datas = new stdClass();
+    $datas->startdate = $info_datas['dtainiofeatv'];
+    $datas->enddate = $info_datas['dtafimofeatv'];
+    return $datas;
   }
 }

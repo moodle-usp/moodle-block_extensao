@@ -48,4 +48,20 @@ class Apolo {
   public static function informacoes_unidade ($codund) {
     return Query::informacoes_unidade($codund);
   }
+
+  /**
+   * Obtem o o periodo do curso, de modo que retorna a data de 
+   * inicio e fim do curso, sendo o final um espaço de 7 meses após o seu inicio.
+   * 
+   * @param string $codofeatvceu Codigo de oferecimento da atividade.
+   * 
+   * @return object Resultado da busca na base.
+   */
+
+   public static function periodo_curso($codofeatvceu) {
+    $data_curso = Query::datas_curso($codofeatvceu);
+    return $data_curso;
+}
+
+
 }

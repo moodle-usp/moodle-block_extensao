@@ -47,10 +47,36 @@ class criar_ambiente_moodle extends moodleform {
     $this->_form->setDefault('fullname', $fullname);
     $this->_form->setType('fullname', PARAM_TEXT);
     // $this->_form->addRule('fullname', null, 'required');
+
+
+    // data de inicio do curso
+    $init_date = $this->define_campo('startdate');
+    $init_date_formatted = date('d/m/Y', strtotime($init_date));
+    $this->_form->addElement('text', 'start_date', 'Data de início do curso');
+    $this->_form->setDefault('start_date', $init_date_formatted);
+    $this->_form->setType('start_date', PARAM_TEXT);
+    // $this->_form->addRule('init_date', null, 'required');
+
+    // data do fim do curso
+    $end_date = $this->define_campo('enddate');
+    $end_date_formatted = date('d/m/Y', strtotime($end_date));
+    $this->_form->addElement('text', 'end_date', 'Data do fim do curso');
+    $this->_form->setDefault('end_date', $end_date_formatted);
+    $this->_form->setType('end_date', PARAM_TEXT);
+    // $this->_form->addRule('end_date', null, 'required');
+
+
+    // Para definir um estilo 
     
+    $end_date_element = $this->_form->getElement('end_date');
+    $end_date_element->setLabel('Data do fim do curso <span style="color: #ff0000; font-weight: bold;">' . $end_date_formatted . '</span>');
+
     // sumario (descricao) do curso
     $summary = $this->define_campo('summary');
     $this->_form->addElement('textarea', 'summary', 'Descrição do curso'); // devemos usar 'editor' ou 'textarea'?
+    $this->_form->getElement('summary')->setRows(3); // numero de linhas
+    $this->_form->getElement('summary')->setCols(50); // numero de colunas
+    $this->_form->setDefault('summary', $summary);
     $this->_form->setDefault('summary', $summary);
     $this->_form->setType('summary', PARAM_TEXT);
     // $this->_form->addRule('summary', null, 'required');
