@@ -27,8 +27,6 @@ class Query
       SELECT
         o.codofeatvceu
         ,c.nomcurceu
-        ,o.dtainiofeatv
-        ,o.dtafimofeatv
       FROM OFERECIMENTOATIVIDADECEU o
           LEFT JOIN CURSOCEU c
             ON c.codcurceu = o.codcurceu
@@ -66,12 +64,12 @@ class Query
     /**
      * A partir do codofeatvceu, captura as informacoes de uma
      * turma, como a data de inicio e tal.
-     * 
-     * [ a query sera posta aqui posteriormente ]
      */
     $query = "
       SELECT
-        codund
+        codund,
+        dtainiofeatv,
+        dtafimofeatv
       FROM OFERECIMENTOATIVIDADECEU
       WHERE codofeatvceu = $codofeatvceu        
     ";
@@ -79,8 +77,8 @@ class Query
     $info_curso = new stdClass;
     $info_curso->codund = $infos_curso['codund'];
     $info_curso->codofeatvceu = $codofeatvceu;
-    $info_curso->startdate = strtotime("now");
-    $info_curso->enddate = strtotime("+1 year");
+    $info_curso->startdate = strtotime($infos_curso['dtainiofeatv']);
+    $info_curso->enddate = strtotime($infos_curso['dtafimofeatv']);
     return $info_curso;
   }
   
