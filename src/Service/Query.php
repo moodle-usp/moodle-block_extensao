@@ -131,20 +131,5 @@ class Query
     $datas->enddate = $info_datas['dtafimofeatv'];
     return $datas;
   }
-
-  // Obtem as datas de inicio e final dos cursos
-  public static function datas_curso ($codofeatvceu){
-    $query = "
-       SELECT 
-        dtainiofeatv, 
-        dtafimofeatv 
-      FROM OFERECIMENTOATIVIDADECEU 
-      WHERE codofeatvceu = $codofeatvceu
-      ORDER BY codofeatvceu";
-    $info_datas = USPDatabase::fetch($query);
-    $datas = new stdClass();
-    $datas->startdate = $info_datas['dtainiofeatv'];
-    $datas->enddate = $info_datas['dtafimofeatv'];
-    return $datas;
-  }
+  
 }
