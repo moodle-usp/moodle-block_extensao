@@ -26,8 +26,6 @@ class Query
       SELECT
         o.codofeatvceu
         ,c.nomcurceu
-        ,o.dtainiofeatv
-        ,o.dtafimofeatv
       FROM OFERECIMENTOATIVIDADECEU o
           LEFT JOIN CURSOCEU c
             ON c.codcurceu = o.codcurceu
@@ -65,12 +63,12 @@ class Query
     /**
      * A partir do codofeatvceu, captura as informacoes de uma
      * turma, como a data de inicio e tal.
-     * 
-     * [ a query sera posta aqui posteriormente ]
      */
     $query = "
       SELECT
-        codund
+        codund,
+        dtainiofeatv,
+        dtafimofeatv
       FROM OFERECIMENTOATIVIDADECEU
       WHERE codofeatvceu = $codofeatvceu        
     ";
@@ -78,8 +76,8 @@ class Query
     $info_curso = new stdClass;
     $info_curso->codund = $infos_curso['codund'];
     $info_curso->codofeatvceu = $codofeatvceu;
-    $info_curso->startdate = strtotime("now");
-    $info_curso->enddate = strtotime("+7 months");
+    $info_curso->startdate = strtotime($infos_curso['dtainiofeatv']);
+    $info_curso->enddate = strtotime($infos_curso['dtafimofeatv']);
     return $info_curso;
   }
   
@@ -93,14 +91,45 @@ class Query
 
   // Obtem as informacoes de uma unidade
   public static function informacoes_unidade ($codund) {
-    return USPDatabase::fetch("
+    // captura a unidade
+    $info_unidade = USPDatabase::fetch("
       SELECT
         codund,
         sglund,
-        nomund
+        nomund,
+        codcam
       FROM UNIDADE
       WHERE codund = $codund
     ");
+
+    // captura o campus
+    $info_campus = USPDatabase::fetch("
+      SELECT
+        codcam,
+        nomcam
+      FROM CAMPUS
+      WHERE codcam = " . $info_unidade['codcam']);
+
+    return array(
+      'unidade' => $info_unidade,
+      'campus' => $info_campus
+    );
+  }
+
+  // Obtem as datas de inicio e final dos cursos
+  public static function datas_curso ($codofeatvceu){
+    $query = "
+       SELECT 
+        dtainiofeatv, 
+        dtafimofeatv 
+      FROM OFERECIMENTOATIVIDADECEU 
+      WHERE codofeatvceu = $codofeatvceu
+      ORDER BY codofeatvceu";
+    $info_datas = USPDatabase::fetch($query);
+    $datas = new stdClass();
+    $datas->startdate = $info_datas['dtainiofeatv'];
+    $datas->enddate = $info_datas['dtafimofeatv'];
+    return $datas;
   }
 
   // Obtem as datas de inicio e final dos cursos

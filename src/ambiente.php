@@ -78,12 +78,21 @@ class Ambiente {
     global $DB;
 
     // captura as informaoces da unidade do curso
-    $info_unidade = Apolo::informacoes_unidade($info_curso_apolo->codund);
+    $infos = Apolo::informacoes_unidade($info_curso_apolo->codund);
+
+    $info_campus = $infos['campus'];
+    $categoria_campus = Ambiente::categoria(array(
+      'name'        => $info_campus["nomcam"],
+      'parent'      => 0,
+      'description' => $info_campus["nomcam"],
+      'sortorder'   => $info_campus["codcam"]
+    ));
 
     // captura a categoria de faculdade dentro do Moodle
+    $info_unidade = $infos['unidade'];
     $categoria_faculdade = Ambiente::categoria(array(
       'name'        => $info_unidade["sglund"],
-      'parent'      => 0,
+      'parent'      => $categoria_campus->id,
       'description' => $info_unidade["nomund"],
       'sortorder'   => $info_unidade["codund"]
     ));
