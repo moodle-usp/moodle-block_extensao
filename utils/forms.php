@@ -67,15 +67,12 @@ class criar_ambiente_moodle extends moodleform {
     $end_date_element = $this->_form->getElement('enddate');
     $end_date_element->setLabel('Data do fim do curso <span style="color: #ff0000; font-weight: bold;">' . $end_date_formatted . '</span>');
 
-    // sumario (descricao) do curso
+    // // sumario (descricao) do curso
     $summary = $this->define_campo('summary');
-    $this->_form->addElement('textarea', 'summary', 'Descrição do curso'); // devemos usar 'editor' ou 'textarea'?
-    $this->_form->getElement('summary')->setRows(3); // numero de linhas
-    $this->_form->getElement('summary')->setCols(50); // numero de colunas
-    $this->_form->setDefault('summary', $summary);
-    $this->_form->setDefault('summary', $summary);
-    $this->_form->setType('summary', PARAM_TEXT);
-    
+    $this->_form->addElement('editor', 'summary', 'Descrição do curso')->setValue(array('text'=>$summary));
+    $this->_form->setType('summary', PARAM_RAW);
+    // $this->_form->setDefault('summary', $summary);
+
     // botao de submit
     $this->_form->addElement('submit', 'criar_ambiente_moodle_submit', 'Criar ambiente');
   }

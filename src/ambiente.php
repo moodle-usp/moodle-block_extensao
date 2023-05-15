@@ -26,7 +26,7 @@ class Ambiente {
   public static function criar_ambiente ($info_forms) {
     // eh preciso capturar outras informacoes do curso, como a unidade
     $info_curso_apolo = Apolo::informacoesTurma($info_forms->codofeatvceu);
-    
+
     // transforma o enviado em um objeto de curso
     $curso = self::criar_objeto_curso($info_forms, $info_curso_apolo);
 
@@ -59,7 +59,7 @@ class Ambiente {
     $curso->format = 'topics'; //?
     $curso->numsections = ''; //?
 
-    $curso->summary = $info_forms->summary; 
+    $curso->summary = $info_forms->summary['text']; 
     $curso->summaryfomart = FORMAT_HTML;
 
     $curso->startdate = $info_forms->startdate;
