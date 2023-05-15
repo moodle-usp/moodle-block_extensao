@@ -7,8 +7,10 @@
  * necessario.
  */
 
-require_once(dirname(__FILE__) . '/../../../config.php');
+require_once(__DIR__ . '/../../../config.php');
 require_once($CFG->libdir . '/formslib.php');
+require_once(__DIR__ . '/../src/ambiente.php');
+require_once(__DIR__ . '/../src/turmas.php');
 
 // formulario escondido para os docentes criarem um ambiente para um curso
 class redirecionamento_criacao_ambiente extends moodleform {
@@ -36,7 +38,7 @@ class criar_ambiente_moodle extends moodleform {
 
     // nome curto do curso
     $shortname = $this->define_campo('shortname');
-    $this->_form->addElement('text', 'shortname', 'Nome curto do curso', array('readonly' => 'true'));
+    $this->_form->addElement('text', 'shortname', 'Nome curto do curso');
     $this->_form->setDefault('shortname', $shortname);
     $this->_form->setType('shortname', PARAM_TEXT);
     
@@ -82,5 +84,26 @@ class criar_ambiente_moodle extends moodleform {
   private function define_campo ($nome) {
     if (isset($this->_customdata[$nome])) return $this->_customdata[$nome];
     else return "";
+  }
+
+  // validacao do formulario
+  public function validation($data, $files) {
+    $errors= array();
+    
+    // validacao do shortname
+    if (Ambiente::shortname_em_uso($data['shortname'])) {
+      $msg_shortname = 'O nome curto "' . $data['shortname'] . '" já está em uso. Por favor, escolha outro.';
+      \core\notification::error($msg_shortname);
+      $errors['shortname'] = $msg_shortname;
+    }
+
+    // validacao do codofeatvceu
+    if (Turmas::ambiente_criado_turma($data['codofeatvceu'])) {
+      $msg_codofeatvceu = 'O curso de código de oferecimento ' . $data['codofeatvceu'] . '" já tem um ambiente Moodle associado.';
+      \core\notification::error($msg_codofeatvceu);
+      $errors['codofeatvceu'] = $msg_codofeatvceu;  
+    }
+    
+    return $errors;
   }
 }

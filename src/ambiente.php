@@ -11,6 +11,7 @@
 require_once(__DIR__ . '/../../../config.php');
 require_once($CFG->dirroot.'/course/lib.php'); // biblioteca de cursos
 require_once(__DIR__ . '/turmas.php');
+require_once(__DIR__ . '/apolo.php');
 
 class Ambiente {
 
@@ -18,20 +19,25 @@ class Ambiente {
    * Para criar um curso usando a api do Moodle, passado um objeto de 
    * curso.
    * 
-   * @param string $codofeatvceu Codigo de oferecimento da atividade.
    * @param object $curso Objeto de curso criado por $this->criar_objeto_curso.
    * 
    * @return bool|object Erro ou curso criado.
    */
-  public static function criar_ambiente ($codofeatvceu, $curso) {
-    // verifica se o curso ja esta na base
-    if (Turmas::ambiente_criado_turma($codofeatvceu)) {
-      return false;
-    }
+  public static function criar_ambiente ($info_forms) {
+    // eh preciso capturar outras informacoes do curso, como a unidade
+    $info_curso_apolo = Apolo::informacoesTurma($info_forms->codofeatvceu);
+    
+    // transforma o enviado em um objeto de curso
+    $curso = self::criar_objeto_curso($info_forms, $info_curso_apolo);
 
     // cria o curso
     $moodle_curso = \create_course($curso);
-    return $moodle_curso;
+
+    // se der certo, eh necessario salvar isso na base
+    Turmas::atualizar_id_moodle_turma($info_forms->codofeatvceu, $moodle_curso->id);
+    \core\notification::success('Ambiente criado com sucesso!');
+
+    return $moodle_curso->id;
   }
 
   /**
@@ -61,7 +67,7 @@ class Ambiente {
     $curso->timemodified = time();
 
     // gera ou captura a categoria
-    $categoria = Ambiente::turma_categoria($info_curso_apolo);
+    $categoria = self::turma_categoria($info_curso_apolo);
     $curso->category = $categoria->id;
     
     return $curso;
@@ -81,7 +87,7 @@ class Ambiente {
     $infos = Apolo::informacoes_unidade($info_curso_apolo->codund);
 
     $info_campus = $infos['campus'];
-    $categoria_campus = Ambiente::categoria(array(
+    $categoria_campus = self::categoria(array(
       'name'        => $info_campus["nomcam"],
       'parent'      => 0,
       'description' => $info_campus["nomcam"],
@@ -90,7 +96,7 @@ class Ambiente {
 
     // captura a categoria de faculdade dentro do Moodle
     $info_unidade = $infos['unidade'];
-    $categoria_faculdade = Ambiente::categoria(array(
+    $categoria_faculdade = self::categoria(array(
       'name'        => $info_unidade["sglund"],
       'parent'      => $categoria_campus->id,
       'description' => $info_unidade["nomund"],
@@ -98,9 +104,9 @@ class Ambiente {
     ));
 
     // agora a categoria do ano
-    $ano = '2023'; // PROVISORIO
-
-    $categoria_ano = Ambiente::categoria(array(
+    $ano = date('Y', $info_curso_apolo->startdate);
+    
+    $categoria_ano = self::categoria(array(
       'name'        => $ano,
       'parent'      => $categoria_faculdade->id,
       'description' => $ano,
@@ -135,10 +141,22 @@ class Ambiente {
         \core\notification::error("Erro ao criar a categoria '{$nova_categoria->name}'!");
       else
         \core\notification::success("Categoria '{$nova_categoria->name}' criada!");
-      return Ambiente::categoria($info_categoria);
+      return self::categoria($info_categoria);
     }
 
     return $categoria;
   }
 
+  /**
+   * Verifica se um nome curto ("shortname") ja esta sendo utilizado por 
+   * algum outro curso.
+   * 
+   * @param string $shortname Nome curto digitado.
+   * 
+   * @return bool Se esta ou nao sendo utilizado.
+   */
+  public static function shortname_em_uso ($shortname) {
+    global $DB;
+    return $DB->record_exists('course', array('shortname'=>$shortname));
+  }
 }

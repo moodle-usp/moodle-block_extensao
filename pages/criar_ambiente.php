@@ -18,12 +18,27 @@ require_login();
 require_once(__DIR__ . '/../utils/forms.php');
 require_once(__DIR__ . '/../src/turmas.php');
 require_once(__DIR__ . '/../src/apolo.php');
+require_once(__DIR__ . '/../src/ambiente.php');
+
+
+// captura os dados vindos do formulario
+$forms = new criar_ambiente_moodle();
+$info_forms = $forms->get_data();
+// se tiver algo, entao sao dados validados e pode criar o curso
+if ($info_forms) {
+  $novo_curso_id = Ambiente::criar_ambiente($info_forms);
+  unset($_SESSION['codofeatvceu']);
+  redirect(new moodle_url($CFG->wwwroot) . "/course/view.php?id={$novo_curso_id}");
+}
+
 
 // capturando o codfeatvceu
 $forms = new redirecionamento_criacao_ambiente();
 $info_forms = $forms->get_data();
-if (!empty($info_forms))
+if (!empty($info_forms)) {
   $codofeatvceu = $info_forms->codofeatvceu;
+  $_SESSION['codofeatvceu'] = $codofeatvceu;
+}
 
 // se estiver vazio, tenta pegar via sessao
 else {
@@ -32,7 +47,7 @@ else {
 }
 
 // verifica se a turma enviada eh do usuario logado
-if (! Turmas::usuario_docente_turma($USER->idnumber, $codofeatvceu) ) {
+if (!Turmas::usuario_docente_turma($USER->idnumber, $codofeatvceu) ) {
   \core\notification::error('A turma solicitada não está na sua lista de turmas!');
   $url = new moodle_url($CFG->wwwroot);
   redirect($url);
@@ -48,8 +63,7 @@ $informacoes_turma->fim = $data_curso->enddate;
 
 
 // cria o formulario
-// TODO: capturar informacoes reais
-$formulario = new criar_ambiente_moodle('/blocks/extensao/pages/criando_ambiente.php', array(
+$formulario = new criar_ambiente_moodle('', array(
   'codofeatvceu' => $codofeatvceu,
   'shortname' => $codofeatvceu,
   'fullname' => $informacoes_turma->nome_curso_apolo,
