@@ -21,8 +21,7 @@ class Query
      * Sao consideradas como turmas abertas somente as turmas com
      * data de encerramento posterior a data de hoje.
      */
-    //$hoje = date("Y-m-d");
-    $hoje = date('Y-m-d', strtotime('10 January 2023'));
+    $hoje = date("Y-m-d");
     $query = "
       SELECT
         o.codofeatvceu
@@ -106,7 +105,7 @@ class Query
 
   // Obtem as datas de inicio e final dos cursos
   public static function datas_curso ($codofeatvceu){
-  $query = "
+    $query = "
        SELECT 
         dtainiofeatv, 
         dtafimofeatv 

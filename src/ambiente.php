@@ -56,8 +56,8 @@ class Ambiente {
     $curso->summary = $info_forms->summary; 
     $curso->summaryfomart = FORMAT_HTML;
 
-    $curso->startdate = $info_curso_apolo->startdate;
-    $curso->enddate = $info_curso_apolo->enddate;
+    $curso->startdate = $info_forms->startdate;
+    $curso->enddate = $info_forms->enddate;
     $curso->timemodified = time();
 
     // gera ou captura a categoria
