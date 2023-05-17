@@ -67,11 +67,20 @@ class criar_ambiente_moodle extends moodleform {
     $end_date_element = $this->_form->getElement('enddate');
     $end_date_element->setLabel('Data do fim do curso <span style="color: #ff0000; font-weight: bold;">' . $end_date_formatted . '</span>');
 
-    // // sumario (descricao) do curso
+    // sumario (descricao) do curso
     $summary = $this->define_campo('summary');
     $this->_form->addElement('editor', 'summary', 'Descrição do curso')->setValue(array('text'=>$summary));
     $this->_form->setType('summary', PARAM_RAW);
-    // $this->_form->setDefault('summary', $summary);
+
+    // opcao para acesso de visitantes
+    $guest = $this->define_campo('guest');
+    $options = array(0 => 'Não', 1 => 'Sim');
+    $this->_form->addelement(
+      'select',
+      'guest',
+      'Deseja que seu curso seja aberto ao público? Caso não, o conteúdo estará disponível somente aos alunos matriculados na disciplina.',
+      $options
+    ); 
 
     // botao de submit
     $this->_form->addElement('submit', 'criar_ambiente_moodle_submit', 'Criar ambiente');

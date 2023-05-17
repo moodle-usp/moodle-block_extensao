@@ -12,6 +12,7 @@ require_once(__DIR__ . '/../../../config.php');
 require_once($CFG->dirroot.'/course/lib.php'); // biblioteca de cursos
 require_once(__DIR__ . '/turmas.php');
 require_once(__DIR__ . '/apolo.php');
+require_once(__DIR__ . '/usuario.php');
 
 class Ambiente {
 
@@ -32,6 +33,11 @@ class Ambiente {
 
     // cria o curso
     $moodle_curso = \create_course($curso);
+    
+    // se a opcao de visitantes estiver habilitada, precisa adicionar o usuario guest 
+    if ($info_forms->guest) {
+      Usuario::libera_visitantes($moodle_curso->id);
+    }
 
     // se der certo, eh necessario salvar isso na base
     Turmas::atualizar_id_moodle_turma($info_forms->codofeatvceu, $moodle_curso->id);

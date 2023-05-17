@@ -3,9 +3,9 @@
 /**
  * Turmas
  * 
- * A ideia desse arquivo eh mexer com turmas dentro da base do Moodle. Tambem nao sei
- * bem onde deixa-lo, entao por hora vai ficar aqui. Ele vai vasculhar na base de dados
- * do Moodle e trazer informacoes relevantes, a depender da funcao.
+ * A ideia desse arquivo eh mexer com turmas dentro da base do Moodle. Ele vai 
+ * vasculhar na base de dados do Moodle e trazer informacoes relevantes, a 
+ * depender da funcao.
  */
 
 // require_once('../../../config.php');
