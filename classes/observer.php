@@ -18,15 +18,12 @@ class block_extensao_observer {
    */
   public static function curso_deletado(\core\event\course_deleted $evento) {
     global $DB;
-    
-    // id do curso deletado
-    $id_curso = (integer) $evento->get_data()["objectid"];
 
     // altera na tabela mdl_block_extensao_turma
     $query = "
       UPDATE {block_extensao_turma} 
       SET id_moodle = NULL
-      WHERE id_moodle = $id_curso
+      WHERE id_moodle = {$evento->get_data()["objectid"]}
       ";
     $query = $DB->execute($query);
     
