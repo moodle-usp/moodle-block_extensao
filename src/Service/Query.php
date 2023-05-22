@@ -15,12 +15,12 @@ class Query
     return USPDatabase::fetch("SELECT 1");
   }
 
+  /**
+   * Captura as turmas abertas.
+   * Sao consideradas como turmas abertas somente as turmas com
+   * data de encerramento posterior a data de hoje.
+   */
   public static function turmasAbertas () {
-    /**
-     * Captura as turmas abertas.
-     * Sao consideradas como turmas abertas somente as turmas com
-     * data de encerramento posterior a data de hoje.
-     */
     $hoje = date("Y-m-d");
     $query = "
       SELECT
@@ -38,12 +38,23 @@ class Query
     return USPDatabase::fetchAll($query);
   }
 
+  /**
+   * Captura os ministrantes das turmas abertas.
+   * Sao consideradas como turmas abertas somente as turmas com
+   * data de encerramento posterior a data de hoje.
+   * 
+   * Os codigos de atuacao (coadtc) conforme ATUACAOCEU sao:
+   * 1 - Professor USP
+   * 2 - Especialista
+   * 3 - Monitor
+   * 4 - Servidor
+   * 5 - Professor HC - FM-USP
+   * 6 - Tutor
+   * 7 - Docente
+   * 8 - Preceptor
+   * 9 - Tutor
+   */
   public static function ministrantesTurmasAbertas () {
-    /**
-     * Captura os ministrantes das turmas abertas.
-     * Sao consideradas como turmas abertas somente as turmas com
-     * data de encerramento posterior a data de hoje.
-     */
     $hoje = date("Y-m-d");
     $query = "
       SELECT
@@ -59,11 +70,13 @@ class Query
     return USPDatabase::fetchAll($query);
   }
 
+  /**
+   * A partir do codofeatvceu, captura as informacoes de uma
+   * turma, como a data de inicio e tal.
+   * 
+   * @param int|string $codofeatvceu Codigo de oferecimento da atividade.
+   */
   public static function informacoesTurma ($codofeatvceu) {
-    /**
-     * A partir do codofeatvceu, captura as informacoes de uma
-     * turma, como a data de inicio e tal.
-     */
     $query = "
       SELECT
         codund,
@@ -81,15 +94,32 @@ class Query
     return $info_curso;
   }
   
-  // Obtem o objetivo do curso explicitado 
+  /**
+   * Obtem o objetivo de um curso a partir de seu codigo
+   * de oferecimento.
+   * 
+   * @param int|string $codofeatvceu Codigo de oferecimento da atividade.
+   * 
+   * @return object
+   */
   public static function objetivo_extensao($codofeatvceu) {
     $obj = "
-    SELECT c.objcur FROM OFERECIMENTOATIVIDADECEU o LEFT JOIN CURSOCEU c ON c.codcurceu = o.codcurceu 
-    WHERE codofeatvceu = $codofeatvceu";
+      SELECT 
+        c.objcur 
+      FROM OFERECIMENTOATIVIDADECEU o 
+      LEFT JOIN CURSOCEU c 
+        ON c.codcurceu = o.codcurceu 
+      WHERE codofeatvceu = $codofeatvceu";
     return USPDatabase::fetch($obj);
   }
 
-  // Obtem as informacoes de uma unidade
+  /**
+   * Obtem as informacoes de uma unidade a partir de seu codigo.
+   * 
+   * @param int|string $codund Codigo da unidade.
+   * 
+   * @return object
+   */
   public static function informacoes_unidade ($codund) {
     // captura a unidade
     $info_unidade = USPDatabase::fetch("
@@ -116,7 +146,13 @@ class Query
     );
   }
 
-  // Obtem as datas de inicio e final dos cursos
+  /**
+   * Obtem as datas de inicio e final dos cursos.
+   * 
+   * @param int|string $codofeatvceu Codigo de oferecimento da atividade.
+   * 
+   * @return object
+   */
   public static function datas_curso ($codofeatvceu){
     $query = "
        SELECT 
