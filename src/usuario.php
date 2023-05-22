@@ -49,4 +49,22 @@ class Usuario {
     // inscreve o usuario 'guest'
     self::inscreve_usuario($id_curso, $usuario_guest->id, $papel_guest->id);
   }
+
+  /**
+   * Para inscrever o usuario logado como "editingteacher".
+   * 
+   * @param integer $id_curso Identificador do curso.
+   */
+  public static function inscreve_criador ($id_curso) {
+    global $DB, $USER;
+
+    // captura o usuario que esta logado
+    $id_usuario = $USER->id;
+
+    // captura o papel do editingteacher
+    $editingteacher = $DB->get_record('role', ['shortname' => 'editingteacher']);
+
+    // inscreve o usuario logado
+    self::inscreve_usuario($id_curso, $id_usuario, $editingteacher->id);
+  }
 }

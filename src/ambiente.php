@@ -25,6 +25,8 @@ class Ambiente {
    * @return bool|object Erro ou curso criado.
    */
   public static function criar_ambiente ($info_forms) {
+    global $USER;
+
     // eh preciso capturar outras informacoes do curso, como a unidade
     $info_curso_apolo = Apolo::informacoesTurma($info_forms->codofeatvceu);
 
@@ -42,6 +44,10 @@ class Ambiente {
     // se der certo, eh necessario salvar isso na base
     Turmas::atualizar_id_moodle_turma($info_forms->codofeatvceu, $moodle_curso->id);
     \core\notification::success('Ambiente criado com sucesso!');
+
+    // inscreve o usuario logado no curso
+    Usuario::inscreve_criador($moodle_curso->id);
+    \core\notification::success('Usuário criador matriculado como "professor".');
 
     return $moodle_curso->id;
   }
