@@ -85,7 +85,8 @@ class criar_ambiente_moodle extends moodleform {
     $ministrantes = $this->define_campo('ministrantes');
     
     $this->_form->addElement('header', 'header_ministrantes', 'Outros ministrantes');
-    if (!isset($ministrantes['moodle']))
+
+    if (!isset($ministrantes['moodle']) or $ministrantes == "")
       $this->_form->addElement(
         'static',
         'aviso_ministrantes',
@@ -129,8 +130,6 @@ class criar_ambiente_moodle extends moodleform {
   public function validation($data, $files) {
     $errors= array();
     
-    echo '<pre>'; var_dump($data); die();
-
     // validacao do shortname
     if (Ambiente::shortname_em_uso($data['shortname'])) {
       $msg_shortname = 'O nome curto "' . $data['shortname'] . '" já está em uso. Por favor, escolha outro.';

@@ -22,16 +22,23 @@ require_once(__DIR__ . '/../src/ambiente.php');
 
 
 // captura os dados vindos do formulario
-$forms = new criar_ambiente_moodle();
-$info_forms = $forms->get_data();
-// se tiver algo, entao sao dados validados e pode criar o curso
-if ($info_forms) {
-  $novo_curso_id = Ambiente::criar_ambiente($info_forms);
-  unset($_SESSION['codofeatvceu']);
-  redirect(new moodle_url($CFG->wwwroot) . "/course/view.php?id={$novo_curso_id}");
+if (isset($_SESSION['codofeatvceu'])) {
+  // captura os outros ministrantes a partir do codofeatvceu
+  $ministrantes = Usuario::ministrantes_turma($_SESSION['codofeatvceu'], $USER->idnumber);
+
+  // cria o formulario para capturar as informacoes
+  $forms = new criar_ambiente_moodle('', array('ministrantes' => $ministrantes));
+  $info_forms = $forms->get_data();
+
+  // se tiver algo, entao sao dados validados e pode criar o curso
+  if ($info_forms) {
+    $novo_curso_id = Ambiente::criar_ambiente($info_forms);
+    unset($_SESSION['codofeatvceu']);
+    redirect(new moodle_url($CFG->wwwroot) . "/course/view.php?id={$novo_curso_id}");
+  }
 }
 
-
+// caso contrario, entao ainda vai preencher o forms
 // capturando o codfeatvceu
 $forms = new redirecionamento_criacao_ambiente();
 $info_forms = $forms->get_data();
@@ -43,7 +50,6 @@ if (!empty($info_forms)) {
 // se estiver vazio, tenta pegar via sessao
 else {
   $codofeatvceu = $_SESSION['codofeatvceu'];
-  unset($_SESSION['codofeatvceu']);
 }
 
 // verifica se a turma enviada eh do usuario logado
@@ -61,15 +67,7 @@ $data_curso = Apolo::periodo_curso($codofeatvceu);
 $informacoes_turma->inicio = $data_curso->startdate;
 $informacoes_turma->fim = $data_curso->enddate;
 
-// captura os outros ministrantes a partir do codofeatvceu
-$ministrantes = Turmas::codpes_ministrantes_turma($codofeatvceu);
-// remove o seu proprio
-unset($ministrantes[$USER->idnumber]);
-
-// captura as infos caso a lista nao seja vazia
-if (count($ministrantes) > 0)
-  $ministrantes = Usuario::informacoes_usuarios($ministrantes);
-
+$ministrantes = Usuario::ministrantes_turma($codofeatvceu, $USER->idnumber);
 
 // cria o formulario
 $formulario = new criar_ambiente_moodle('', array(

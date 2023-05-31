@@ -9,6 +9,7 @@
 
 require_once(__DIR__ . '/../../../config.php');
 require_once($CFG->dirroot . '/user/lib.php');
+require_once(__DIR__ . '/turmas.php');
 
 class Usuario {
 
@@ -98,5 +99,29 @@ class Usuario {
       }
     }
     return $usuarios;
+  }
+
+  /**
+   * Captura os ministrantes de uma turma, removendo, se informado,
+   * o usuario logado.
+   * 
+   * @param string|integer $codofeatvceu Codigo de oferecimento da atividade.
+   * @param string|integer $logado       Identificador do usuario logado.
+   * 
+   * @return array Lista com os ministrantes da turma buscada.
+   */
+  public static function ministrantes_turma ($codofeatvceu, $logado="") {
+    // captura os ministrnates a partir do codofeatvceu
+    $ministrantes = Turmas::codpes_ministrantes_turma($codofeatvceu);
+
+    // remove o seu proprio se for o caso
+    if ($logado != "")
+      unset($ministrantes[$logado]);
+    
+    // captura as infos caso a lista nao seja vazia
+    if (count($ministrantes) > 0)
+      $ministrantes = self::informacoes_usuarios($ministrantes);
+    
+    return $ministrantes;
   }
 }
