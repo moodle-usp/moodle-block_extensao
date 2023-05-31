@@ -27,6 +27,8 @@ class Ambiente {
   public static function criar_ambiente ($info_forms) {
     global $USER;
 
+    echo '<pre>'; var_dump($info_forms); die();
+
     // eh preciso capturar outras informacoes do curso, como a unidade
     $info_curso_apolo = Apolo::informacoesTurma($info_forms->codofeatvceu);
 
@@ -48,6 +50,15 @@ class Ambiente {
     // inscreve o usuario logado no curso
     Usuario::inscreve_criador($moodle_curso->id);
     \core\notification::success('Usuário criador matriculado como "professor".');
+
+    // caso tenham sido passados outros usuarios, eh preciso inscreve-los
+    $codpes_ministrantes = Turmas::codpes_ministrantes_turma($info_forms->codofeatvceu);
+    foreach ($codpes_ministrante as $codpes) {
+      // verifica se o codpes foi passado
+      if (isset($info_forms)) {
+
+      }
+    }
 
     return $moodle_curso->id;
   }

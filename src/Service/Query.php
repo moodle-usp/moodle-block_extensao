@@ -168,4 +168,20 @@ class Query
     return $datas;
   }
   
+  /**
+   * Captura informacoes basicas de um usuario a partir de seu 'codpes'
+   * 
+   * @param string $codpes Codigo de pessoa (NUSP).
+   * 
+   * @return object
+   */
+  public static function info_usuario ($codpes) {
+    return USPDatabase::fetch("
+      SELECT
+        codpes,
+        nompes
+      FROM PESSOA
+      WHERE codpes = $codpes
+    ");
+  }
 }

@@ -120,4 +120,23 @@ class Turmas {
     global $DB;
     return $DB->get_record('block_extensao_turma', ['id_moodle' => $id_moodle]);
   }
+
+  /**
+   * Retorna os 'codpes' (NUSP) dos ministrantes de uma determinada
+   * turma a partir de seu codofeatvceu.
+   * 
+   * @param string|integer $codofeatvceu Codigo de oferecimento da atividade
+   * 
+   * @return array Resultado da Query
+   */
+  public static function codpes_ministrantes_turma ($codofeatvceu) {
+    global $DB;
+    $lista_codpes = $DB->get_records('block_extensao_ministrante', [
+      'codofeatvceu' => $codofeatvceu
+    ]);
+    // gera uma lista cujos indices sao o codpes
+    $lista = array();
+    foreach ($lista_codpes as $usuario) $lista[$usuario->codpes] = $usuario;
+    return $lista;
+  }
 }

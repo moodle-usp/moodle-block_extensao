@@ -61,6 +61,15 @@ $data_curso = Apolo::periodo_curso($codofeatvceu);
 $informacoes_turma->inicio = $data_curso->startdate;
 $informacoes_turma->fim = $data_curso->enddate;
 
+// captura os outros ministrantes a partir do codofeatvceu
+$ministrantes = Turmas::codpes_ministrantes_turma($codofeatvceu);
+// remove o seu proprio
+unset($ministrantes[$USER->idnumber]);
+
+// captura as infos caso a lista nao seja vazia
+if (count($ministrantes) > 0)
+  $ministrantes = Usuario::informacoes_usuarios($ministrantes);
+
 
 // cria o formulario
 $formulario = new criar_ambiente_moodle('', array(
@@ -69,7 +78,8 @@ $formulario = new criar_ambiente_moodle('', array(
   'fullname' => $informacoes_turma->nome_curso_apolo,
   'summary' => $informacoes_turma->objetivo,
   'startdate' => $informacoes_turma->inicio,
-  'enddate' => $informacoes_turma->fim
+  'enddate' => $informacoes_turma->fim,
+  'ministrantes' => $ministrantes
 ));
 
 

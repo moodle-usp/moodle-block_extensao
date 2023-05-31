@@ -62,7 +62,6 @@ class criar_ambiente_moodle extends moodleform {
     $this->_form->setDefault('enddate', $end_date_timestamp);
 
     // Para definir um estilo 
-    
     $end_date_formatted = date('d/m/Y', $end_date_timestamp);
     $end_date_element = $this->_form->getElement('enddate');
     $end_date_element->setLabel('Data do fim do curso <span style="color: #ff0000; font-weight: bold;">' . $end_date_formatted . '</span>');
@@ -75,12 +74,46 @@ class criar_ambiente_moodle extends moodleform {
     // opcao para acesso de visitantes
     $guest = $this->define_campo('guest');
     $options = array(0 => 'Não', 1 => 'Sim');
-    $this->_form->addelement(
+    $this->_form->addElement(
       'select',
       'guest',
       'Deseja que seu curso seja aberto ao público? Caso não, o conteúdo estará disponível somente aos alunos matriculados na disciplina.',
       $options
     ); 
+
+    // opcao para inscrever outros ministrantes
+    $ministrantes = $this->define_campo('ministrantes');
+    
+    $this->_form->addElement('header', 'header_ministrantes', 'Outros ministrantes');
+    if (!isset($ministrantes['moodle']))
+      $this->_form->addElement(
+        'static',
+        'aviso_ministrantes',
+        'Você é o(a) único(a) ministrante da turma.'
+      );
+    else {
+      $moodle = $ministrantes['moodle'];
+      foreach ($moodle as $ministrante){
+        $this->_form->addElement(
+          'advcheckbox', 
+          "checkbox_$ministrante->idnumber", 
+          null,
+          "$ministrante->firstname $ministrante->lastname",
+          array('group' => 1),
+          array(0, 1)
+        );
+      }
+      foreach ($ministrantes['apolo'] as $ministrante) {
+        $this->_form->addElement(
+          'advcheckbox', 
+          'checkbox_'.$ministrante['codpes'], 
+          '<span style="color: #ff0000; font-weight: bold;">Sem conta Moodle</span>', 
+          $ministrante['nompes'],
+          array('disabled'=>true, 'group'=>1),
+          array(0,1)
+        );
+      }
+    }
 
     // botao de submit
     $this->_form->addElement('submit', 'criar_ambiente_moodle_submit', 'Criar ambiente');
@@ -96,6 +129,8 @@ class criar_ambiente_moodle extends moodleform {
   public function validation($data, $files) {
     $errors= array();
     
+    echo '<pre>'; var_dump($data); die();
+
     // validacao do shortname
     if (Ambiente::shortname_em_uso($data['shortname'])) {
       $msg_shortname = 'O nome curto "' . $data['shortname'] . '" já está em uso. Por favor, escolha outro.';

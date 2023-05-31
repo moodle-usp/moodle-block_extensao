@@ -67,4 +67,36 @@ class Usuario {
     // inscreve o usuario logado
     self::inscreve_usuario($id_curso, $id_usuario, $editingteacher->id);
   }
+
+  /**
+   * Captura as informacoes de uma lista de usuarios, procurando
+   * primeiro no Moodle e, em caso de nao encontrar, depois no Apolo.
+   * A busca eh feita atraves do 'codpes' (NUSP) e se retorna o proprio
+   * 'codpes', o nome ('firstname' + 'fullname' no Moodle, 'nompes' no 
+   * Apolo) e o 'id' no Moodle se for o caso.
+   * 
+   * @param array $lista_usuarios Lista de usuarios.
+   * 
+   * @return array Lista com informacoes de cada usuario.
+   */
+  public static function informacoes_usuarios ($lista_usuarios) {
+    global $DB;
+
+    // para separar usuarios que estao no Moodle dos que nao estao
+    $usuarios = array('moodle' => array(), 'apolo' => array());
+
+    foreach ($lista_usuarios as $usuario) {
+      // tenta capturar o usuario no Moodle
+      $info_usuario = $DB->get_record('user', ['idnumber' => $usuario->codpes]);
+      if ($info_usuario)
+        $usuarios['moodle'][] = $info_usuario;
+      else {
+        // nesse caso precisa buscar no Apolo
+        $info_usuario = Apolo::info_usuario($usuario->codpes);
+        if ($info_usuario)
+          $usuarios['apolo'][] = $info_usuario;
+      }
+    }
+    return $usuarios;
+  }
 }

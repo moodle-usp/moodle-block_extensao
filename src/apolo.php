@@ -57,11 +57,20 @@ class Apolo {
    * 
    * @return object Resultado da busca na base.
    */
-
    public static function periodo_curso($codofeatvceu) {
     $data_curso = Query::datas_curso($codofeatvceu);
     return $data_curso;
-}
+  }
 
+  /**
+   * Captura as informacoes de um usuario.
+   * 
+   * @param int|string $codpes Codigo de pessoa (NUSP)
+   * 
+   * @return object Informacoes do usuario.
+   */
+  public static function info_usuario ($codpes) {
+    return Query::info_usuario($codpes);
+  } 
 
 }
