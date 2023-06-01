@@ -24,9 +24,12 @@ class Ambiente {
    * 
    * @return bool|object Erro ou curso criado.
    */
-  public static function criar_ambiente ($info_forms) {
+  public static function criar_ambiente ($info_forms, $ministrantes) {
     global $USER;
 
+    // faz uma versao em array dos dados do forms
+    $info_forms_array = json_decode(json_encode($info_forms), true);
+    
     // eh preciso capturar outras informacoes do curso, como a unidade
     $info_curso_apolo = Apolo::informacoesTurma($info_forms->codofeatvceu);
 
@@ -50,11 +53,14 @@ class Ambiente {
     \core\notification::success('Usuário criador matriculado como "professor".');
 
     // caso tenham sido passados outros usuarios, eh preciso inscreve-los
-    $codpes_ministrantes = Turmas::codpes_ministrantes_turma($info_forms->codofeatvceu);
-    foreach ($codpes_ministrantes as $codpes) {
-      // verifica se o codpes foi passado
-      if (isset($info_forms)) {
-        
+    foreach ($ministrantes['moodle'] as $ministrante) {
+      // nome do checkbox
+      $checkbox_ministrante = "checkbox_" . $ministrante->idnumber;
+
+      // verifica se o ministrante foi selecionado
+      if ($info_forms_array[$checkbox_ministrante]) {
+        Usuario::matricula_professor($moodle_curso->id, $ministrante->id);
+        \core\notification::success("Professor auxiliar '$ministrante->firstname' matriculado como 'professor'.");
       }
     }
 

@@ -28,11 +28,11 @@ if (isset($_SESSION['codofeatvceu'])) {
 
   // cria o formulario para capturar as informacoes
   $forms = new criar_ambiente_moodle('', array('ministrantes' => $ministrantes));
-  $info_forms = $forms->get_data();
-
+  $info_forms = $forms->get_data();  
+  
   // se tiver algo, entao sao dados validados e pode criar o curso
   if ($info_forms) {
-    $novo_curso_id = Ambiente::criar_ambiente($info_forms);
+    $novo_curso_id = Ambiente::criar_ambiente($info_forms, $ministrantes);
     unset($_SESSION['codofeatvceu']);
     redirect(new moodle_url($CFG->wwwroot) . "/course/view.php?id={$novo_curso_id}");
   }

@@ -62,12 +62,24 @@ class Usuario {
     // captura o usuario que esta logado
     $id_usuario = $USER->id;
 
+    // inscreve o usuario logado
+    self::matricula_professor($id_curso, $id_usuario);
+  }
+
+  /**
+   * Para inscrever o professor ao curso
+   * 
+   * @param integer $id_curso para indicar o curso ao qual o professor sera matriculado.
+   * @param integer $id_professor para identificar o professor por seu id.
+   */
+  public static function matricula_professor ($id_curso, $id_professor) {
+    global $DB;
+
     // captura o papel do editingteacher
     $editingteacher = $DB->get_record('role', ['shortname' => 'editingteacher']);
 
-    // inscreve o usuario logado
-    self::inscreve_usuario($id_curso, $id_usuario, $editingteacher->id);
-  }
+    self::inscreve_usuario($id_curso, $id_professor, $editingteacher->id);
+  } 
 
   /**
    * Captura as informacoes de uma lista de usuarios, procurando
