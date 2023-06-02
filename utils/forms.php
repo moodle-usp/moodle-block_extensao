@@ -86,35 +86,49 @@ class criar_ambiente_moodle extends moodleform {
     
     $this->_form->addElement('header', 'header_ministrantes', 'Outros ministrantes');
 
-    if (!isset($ministrantes['moodle']) or $ministrantes == "")
+    if (!isset($ministrantes['moodle']) or $ministrantes == "") {
       $this->_form->addElement(
         'static',
         'aviso_ministrantes',
         'Você é o(a) único(a) ministrante da turma.'
       );
-    else {
+    } else {
       $moodle = $ministrantes['moodle'];
       foreach ($moodle as $ministrante){
+        $nomeprofessor = sprintf('%s %s', $ministrante->firstname, $ministrante->lastname);
         $this->_form->addElement(
-          'advcheckbox', 
-          "checkbox_$ministrante->idnumber", 
+          'checkbox', 
+          "ministrantes[]",
           null,
-          "$ministrante->firstname $ministrante->lastname",
-          array('group' => 1),
-          array(0, 1)
+          $nomeprofessor
         );
       }
+
+        if (isset($ministrantes['apolo'])) {
+        $this->_form->addElement(
+                'checkbox',
+                'Ministrantes_apolo ' . $nomeprofessor,
+                'Ministrantes sem conta Moodle',
+                array('disabled' => true, 'group' => 1),
+          );
+        }
+      }
+
+      /*
+      if(isset($ministrantes['apolo'])) {
       foreach ($ministrantes['apolo'] as $ministrante) {
         $this->_form->addElement(
           'advcheckbox', 
-          'checkbox_'.$ministrante['codpes'], 
-          '<span style="color: #ff0000; font-weight: bold;">Sem conta Moodle</span>', 
+    //      'checkbox_'.$ministrante['codpes'], 
+          '<span style="color: #ff0000; font-weight: bold;">(Sem conta Moodle)</span>', 
           $ministrante['nompes'],
           array('disabled'=>true, 'group'=>1),
           array(0,1)
         );
       }
     }
+  }
+  */
 
     // botao de submit
     $this->_form->addElement('submit', 'criar_ambiente_moodle_submit', 'Criar ambiente');

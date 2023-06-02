@@ -10,6 +10,9 @@
 require_once(__DIR__ . '/../../../config.php');
 require_once($CFG->dirroot . '/user/lib.php');
 require_once(__DIR__ . '/turmas.php');
+require_once(__DIR__ . '/Service/Query.php');
+
+use block_extensao\Service\Query;
 
 class Usuario {
 
@@ -99,11 +102,20 @@ class Usuario {
     $usuarios = array('moodle' => array(), 'apolo' => array());
 
     foreach ($lista_usuarios as $usuario) {
+
       // tenta capturar o usuario no Moodle
       $info_usuario = $DB->get_record('user', ['idnumber' => $usuario->codpes]);
       if ($info_usuario)
         $usuarios['moodle'][] = $info_usuario;
       else {
+        // buscando se existe usuário pelos emails
+        $emails = Query::emails($usuario->codpes);
+        if($emails) {
+          $emails = array_column($emails, 'codema');
+          $emails = implode("','",$emails);
+          $sql = "SELECT id FROM {user} WHERE email IN ('{$emails}')"; 
+          //$info_usuario = $DB->get_record_sql($sql);
+        }
         // nesse caso precisa buscar no Apolo
         $info_usuario = Apolo::info_usuario($usuario->codpes);
         if ($info_usuario)

@@ -184,4 +184,20 @@ class Query
       WHERE codpes = $codpes
     ");
   }
+
+  /**
+   * Captura emails de uma pessoa dado um 'codpes'
+   * 
+   * @param string $codpes Codigo de pessoa (NUSP).
+   * 
+   * @return object
+   */
+  public static function emails ($codpes) {
+    return USPDatabase::fetchAll("
+      SELECT
+        codema
+      FROM EMAILPESSOA
+      WHERE codpes = $codpes
+    ");
+  }
 }
