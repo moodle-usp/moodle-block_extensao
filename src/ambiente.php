@@ -29,7 +29,7 @@ class Ambiente {
 
     // faz uma versao em array dos dados do forms
     $info_forms_array = json_decode(json_encode($info_forms), true);
-    
+
     // eh preciso capturar outras informacoes do curso, como a unidade
     $info_curso_apolo = Apolo::informacoesTurma($info_forms->codofeatvceu);
 
@@ -53,15 +53,13 @@ class Ambiente {
     \core\notification::success('Usuário criador matriculado como "professor".');
 
     // caso tenham sido passados outros usuarios, eh preciso inscreve-los
-    foreach ($ministrantes['moodle'] as $ministrante) {
-      // nome do checkbox
-      $checkbox_ministrante = "checkbox_" . $ministrante->idnumber;
-
-      // verifica se o ministrante foi selecionado
-      if ($info_forms_array[$checkbox_ministrante]) {
-        Usuario::matricula_professor($moodle_curso->id, $ministrante->id);
-        \core\notification::success("Professor auxiliar '$ministrante->firstname' matriculado como 'professor'.");
-      }
+    foreach ($info_forms_array['ministrantes'] as $id_ministrante=>$nome) {
+      // se o nome for 0 entao nao foi selecionado
+      if (!$nome) continue;
+      
+      // matricula o professor
+      Usuario::matricula_professor($moodle_curso->id, $id_ministrante);
+      \core\notification::success('Professor auiliar ' . $nome . ' matriculado como "professor".');
     }
 
     return $moodle_curso->id;

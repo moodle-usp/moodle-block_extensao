@@ -114,9 +114,11 @@ class Usuario {
           $emails = array_column($emails, 'codema');
           $emails = implode("','",$emails);
           $sql = "SELECT id FROM {user} WHERE email IN ('{$emails}')"; 
-          //$info_usuario = $DB->get_record_sql($sql);
+          $info_usuario = $DB->get_record_sql($sql);
+          if ($info_usuario)
+            $usuarios['moodle'][] = $info_usuario;
         }
-        // nesse caso precisa buscar no Apolo
+        // se nao existir, precisa buscar no Apolo
         $info_usuario = Apolo::info_usuario($usuario->codpes);
         if ($info_usuario)
           $usuarios['apolo'][] = $info_usuario;

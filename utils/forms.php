@@ -99,10 +99,12 @@ class criar_ambiente_moodle extends moodleform {
       foreach ($moodle as $ministrante){
         $nomeprofessor = sprintf('%s %s', $ministrante->firstname, $ministrante->lastname);
         $this->_form->addElement(
-          'checkbox', 
-          "ministrantes[]",
+          'advcheckbox', 
+          "ministrantes[{$ministrante->id}]",
           null,
-          $nomeprofessor
+          $nomeprofessor,
+          array(),
+          array(0, $ministrante->firstname)
         );
       }
       // para ministrantes que nao tem conta no Moodle ainda
@@ -110,10 +112,9 @@ class criar_ambiente_moodle extends moodleform {
         foreach ($ministrantes['apolo'] as $ministrante) {
           $this->_form->addElement(
             'checkbox',
-            'ministrantes_semconta[]',
+            "ministrantes_semconta[{$ministrante->codpes}]",
             '<span style="color: #ff0000; font-weight: bold;">Ministrantes sem conta Moodle</span>',
-            $ministrante['nompes'],
-            array('disabled' => true, 'group' => 1),
+            $ministrante['nompes']
           );
         }
       }

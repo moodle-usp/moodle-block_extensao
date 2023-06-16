@@ -25,7 +25,6 @@ require_once(__DIR__ . '/../src/ambiente.php');
 if (isset($_SESSION['codofeatvceu'])) {
   // captura os outros ministrantes a partir do codofeatvceu
   $ministrantes = Usuario::ministrantes_turma($_SESSION['codofeatvceu'], $USER->idnumber);
-
   // cria o formulario para capturar as informacoes
   $forms = new criar_ambiente_moodle('', array('ministrantes' => $ministrantes));
   $info_forms = $forms->get_data();  
