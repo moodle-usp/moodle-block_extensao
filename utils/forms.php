@@ -115,7 +115,7 @@ class criar_ambiente_moodle extends moodleform {
         foreach ($ministrantes['apolo'] as $ministrante) {
           $this->_form->addElement(
             'checkbox',
-            "ministrantes_semconta[{$ministrante->codpes}]",
+            "ministrantes_semconta[{$ministrante['codpes']}]",
             '<span style="color: #ff0000; font-weight: bold;">Ministrantes sem conta Moodle</span>',
             $ministrante['nompes']
           );

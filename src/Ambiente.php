@@ -63,7 +63,7 @@ class Ambiente {
       
       // matricula o professor
       Usuario::matricula_professor($moodle_curso->id, $id_ministrante);
-      \core\notification::success('Professor auiliar ' . $nome . ' matriculado como "professor".');
+      \core\notification::success('Professor auxiliar ' . $nome . ' matriculado como "professor".');
     }
 
     return $moodle_curso->id;
