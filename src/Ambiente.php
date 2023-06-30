@@ -57,13 +57,15 @@ class Ambiente {
     \core\notification::success('Usuário criador matriculado como "professor".');
 
     // caso tenham sido passados outros usuarios, eh preciso inscreve-los
-    foreach ($info_forms_array['ministrantes'] as $id_ministrante=>$nome) {
-      // se o nome for 0 entao nao foi selecionado
-      if (!$nome) continue;
-      
-      // matricula o professor
-      Usuario::matricula_professor($moodle_curso->id, $id_ministrante);
-      \core\notification::success('Professor auxiliar ' . $nome . ' matriculado como "professor".');
+    if (isset($info_forms_array['ministrantes'])) {
+      foreach ($info_forms_array['ministrantes'] as $id_ministrante=>$nome) {
+        // se o nome for 0 entao nao foi selecionado
+        if (!$nome) continue;
+        
+        // matricula o professor
+        Usuario::matricula_professor($moodle_curso->id, $id_ministrante);
+        \core\notification::success('Professor auxiliar ' . $nome . ' matriculado como "professor".');
+      }
     }
 
     return $moodle_curso->id;

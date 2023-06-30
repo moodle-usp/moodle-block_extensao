@@ -1,0 +1,11 @@
+Duvidas:
+1 - iremos diferenciar os cargos? como?
+
+
+Corrigir:
+1. Ambiente.php L60: colocar um if para verificar quando o campo existe
+2. Desabilitar os campos de ministrantes sem conta no Moodle
+
+
+Falar com eles:
+1. Desabilitamos professores sem conta ou criamos a conta na hora?

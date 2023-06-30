@@ -117,7 +117,8 @@ class criar_ambiente_moodle extends moodleform {
             'checkbox',
             "ministrantes_semconta[{$ministrante['codpes']}]",
             '<span style="color: #ff0000; font-weight: bold;">Ministrantes sem conta Moodle</span>',
-            $ministrante['nompes']
+            $ministrante['nompes'],
+            array('disabled' => true)
           );
         }
       }
