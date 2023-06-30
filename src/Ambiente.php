@@ -16,6 +16,7 @@ require_once($CFG->dirroot.'/course/lib.php'); // biblioteca de cursos
 require_once(__DIR__ . '/Turmas.php');
 require_once(__DIR__ . '/Service/Query.php');
 require_once(__DIR__ . '/Usuario.php');
+use block_extensao\Service\Query;
 
 class Ambiente {
 

@@ -119,7 +119,7 @@ class Query
       LEFT JOIN CURSOCEU c 
         ON c.codcurceu = o.codcurceu 
       WHERE codofeatvceu = $codofeatvceu";
-    return USPDatabase::fetch($obj);
+    return USPDatabase::fetch($obj)['objcur'];
   }
 
   /**

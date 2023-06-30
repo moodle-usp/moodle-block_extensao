@@ -23,6 +23,7 @@ require_once(__DIR__ . '/../utils/forms.php');
 require_once(__DIR__ . '/../src/Turmas.php');
 require_once(__DIR__ . '/../src/Service/Query.php');
 require_once(__DIR__ . '/../src/Ambiente.php');
+use block_extensao\Service\Query;
 
 
 // captura os dados vindos do formulario
