@@ -1,15 +1,17 @@
 <?php
-
 /**
- * Usuario
+ * Cursos de Extensao (Bloco)
+ * Equipe de Moodle da USP
+ * https://github.com/moodle-usp
  * 
+ * # Usuario
  * A ideia desse arquivo eh mexer com usuarios do Moodle, como na inscricao de
  * usuarios em cursos, atribuicao de papeis, etc.
  */
 
 require_once(__DIR__ . '/../../../config.php');
 require_once($CFG->dirroot . '/user/lib.php');
-require_once(__DIR__ . '/turmas.php');
+require_once(__DIR__ . '/Turmas.php');
 require_once(__DIR__ . '/Service/Query.php');
 
 use block_extensao\Service\Query;
@@ -119,7 +121,7 @@ class Usuario {
             $usuarios['moodle'][] = $info_usuario;
         }
         // se nao existir, precisa buscar no Apolo
-        $info_usuario = Apolo::info_usuario($usuario->codpes);
+        $info_usuario = Query::info_usuario($usuario->codpes);
         if ($info_usuario)
           $usuarios['apolo'][] = $info_usuario;
       }

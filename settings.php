@@ -15,7 +15,7 @@ if ($ADMIN->fulltree) {
     $setting = new admin_setting_configtext('block_extensao/user', 'User','', '', PARAM_TEXT);
     $settings->add($setting);
 
-    $setting = new admin_setting_configtext('block_extensao/password', 'Password','', '', PARAM_TEXT);
+    $setting = new admin_setting_configpasswordunmask('block_extensao/password', 'Password','', '', PARAM_TEXT);
     $settings->add($setting);
 
 }

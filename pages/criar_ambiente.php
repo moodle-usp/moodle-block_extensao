@@ -1,5 +1,9 @@
 <?php
 /**
+ * Cursos de Extensao (Bloco)
+ * Equipe de Moodle da USP
+ * https://github.com/moodle-usp
+ * 
  * Aqui eh necessario capturar as informacoes que vieram do forms atraves
  * do campo hidden 'id_turma_extensao' e mostrar ao usuario/docente as 
  * informacoes basicas do ambiente que esta criando.
@@ -16,9 +20,9 @@ require_login();
 
 // requerimentos
 require_once(__DIR__ . '/../utils/forms.php');
-require_once(__DIR__ . '/../src/turmas.php');
-require_once(__DIR__ . '/../src/apolo.php');
-require_once(__DIR__ . '/../src/ambiente.php');
+require_once(__DIR__ . '/../src/Turmas.php');
+require_once(__DIR__ . '/../src/Service/Query.php');
+require_once(__DIR__ . '/../src/Ambiente.php');
 
 
 // captura os dados vindos do formulario
@@ -61,8 +65,8 @@ if (!Turmas::usuario_docente_turma($USER->idnumber, $codofeatvceu) ) {
 // aqui precisamos capturar as informacoes basicas do curso
 // foi adicionado o inicio e fim do curso 
 $informacoes_turma = Turmas::info_turma_id_extensao($codofeatvceu);
-$informacoes_turma->objetivo = Apolo::objetivo_extensao($codofeatvceu);
-$data_curso = Apolo::periodo_curso($codofeatvceu);
+$informacoes_turma->objetivo = Query::objetivo_extensao($codofeatvceu);
+$data_curso = Query::datas_curso($codofeatvceu);
 $informacoes_turma->inicio = $data_curso->startdate;
 $informacoes_turma->fim = $data_curso->enddate;
 

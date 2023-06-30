@@ -1,6 +1,18 @@
 <?php
+/**
+ * Cursos de Extensao (Bloco)
+ * Equipe de Moodle da USP
+ * https://github.com/moodle-usp
+ * 
+ * Este eh o bloco. Se verifica se o usuario possui um numero USP em seu 
+ * cadastro no Moodle (idnumber), e se possuir verifica se tem algum
+ * curso associado na base sincronizada com o Apolo, apresentando botoes
+ * de criacao de ambiente ao usuario para os cursos para o qual este for
+ * ministrante.
+ */
+
 require_once('src/Service/Query.php');
-require_once('src/turmas.php');
+require_once('src/Turmas.php');
 require_once('vendor/autoload.php');
 require_once('utils/forms.php');
 

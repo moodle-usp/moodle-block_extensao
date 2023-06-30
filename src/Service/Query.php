@@ -1,4 +1,13 @@
 <?php
+/**
+ * Cursos de Extensao (Bloco)
+ * Equipe de Moodle da USP
+ * https://github.com/moodle-usp
+ * 
+ * # Query
+ * Aqui ficam as queries que fazem a conexao com o Sistema Apolo.
+ */
+
 
 namespace block_extensao\Service;
 

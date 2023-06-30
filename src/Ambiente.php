@@ -1,8 +1,11 @@
 <?php
 
 /**
- * Ambientes Moodle
+ * Cursos de Extensao (Bloco)
+ * Equipe de Moodle da USP
+ * https://github.com/moodle-usp
  * 
+ * # Ambientes Moodle
  * Neste arquivo ficam as questoes relativas a criacao de ambientes
  * Moodle (cursos). Isso eh usado pelos docentes quando ha turmas
  * abertas em seu nome, por exemplo.
@@ -10,9 +13,9 @@
 
 require_once(__DIR__ . '/../../../config.php');
 require_once($CFG->dirroot.'/course/lib.php'); // biblioteca de cursos
-require_once(__DIR__ . '/turmas.php');
-require_once(__DIR__ . '/apolo.php');
-require_once(__DIR__ . '/usuario.php');
+require_once(__DIR__ . '/Turmas.php');
+require_once(__DIR__ . '/Service/Query.php');
+require_once(__DIR__ . '/Usuario.php');
 
 class Ambiente {
 
@@ -31,7 +34,7 @@ class Ambiente {
     $info_forms_array = json_decode(json_encode($info_forms), true);
 
     // eh preciso capturar outras informacoes do curso, como a unidade
-    $info_curso_apolo = Apolo::informacoesTurma($info_forms->codofeatvceu);
+    $info_curso_apolo = Query::informacoesTurma($info_forms->codofeatvceu);
 
     // transforma o enviado em um objeto de curso
     $curso = self::criar_objeto_curso($info_forms, $info_curso_apolo);
@@ -109,7 +112,7 @@ class Ambiente {
     global $DB;
 
     // captura as informaoces da unidade do curso
-    $infos = Apolo::informacoes_unidade($info_curso_apolo->codund);
+    $infos = Query::informacoes_unidade($info_curso_apolo->codund);
 
     $info_campus = $infos['campus'];
     $categoria_campus = self::categoria(array(

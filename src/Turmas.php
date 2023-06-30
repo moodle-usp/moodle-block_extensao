@@ -1,8 +1,10 @@
 <?php
-
 /**
- * Turmas
+ * Cursos de Extensao (Bloco)
+ * Equipe de Moodle da USP
+ * https://github.com/moodle-usp
  * 
+ * # Turmas
  * A ideia desse arquivo eh mexer com turmas dentro da base do Moodle. Ele vai 
  * vasculhar na base de dados do Moodle e trazer informacoes relevantes, a 
  * depender da funcao.

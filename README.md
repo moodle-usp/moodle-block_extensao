@@ -9,7 +9,7 @@ Instruções de instalação:
 
 Projeto desenvolvido pela equipe de Moodle da USP.
 
-- [Talita Ventura](https://github.com/TalitaVentura16) ;
+- [Talita Ventura](https://github.com/TalitaVentura16);
 - [Thiago Gomes Veríssimo](https://github.com/thiagogomesverissimo);
 - [Ricardo Fontoura](https://github.com/ricardfo);
 - [Octavio Augusto Potalej](https://github.com/Potalej).

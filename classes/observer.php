@@ -1,13 +1,16 @@
 <?php
 /**
- * Observer
+ * Cursos de Extensao (Bloco)
+ * Equipe de Moodle da USP
+ * https://github.com/moodle-usp
  * 
+ * # Observer
  * Funcoes que sao chamadas quando um gatilho eh acionado.
  */
 
 defined('MOODLE_INTERNAL') || die();
 require_once(__DIR__ . '/../../../config.php');
-require_once(__DIR__ . '/../src/turmas.php');
+require_once(__DIR__ . '/../src/Turmas.php');
 
 class block_extensao_observer {
   /**

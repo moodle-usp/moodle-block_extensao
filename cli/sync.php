@@ -1,7 +1,10 @@
 <?php
 /**
- * Sincronizacao
+ * Cursos de Extensao (Bloco)
+ * Equipe de Moodle da USP
+ * https://github.com/moodle-usp
  * 
+ * #Sincronizacao
  * Para sincronizar os dados do Moodle Extensao com os do Apolo.
  *
  * Uso:

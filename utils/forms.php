@@ -1,7 +1,10 @@
 <?php
 /**
- * Forms
+ * Cursos de Extensao (Bloco)
+ * Equipe de Moodle da USP
+ * https://github.com/moodle-usp
  * 
+ * # Forms
  * Para facilitar o trabalho com formularios, este arquivo os centraliza. Assim eh
  * mais facil de encontrar a origem dos formularios e fazer alteracoes quando
  * necessario.
@@ -9,8 +12,8 @@
 
 require_once(__DIR__ . '/../../../config.php');
 require_once($CFG->libdir . '/formslib.php');
-require_once(__DIR__ . '/../src/ambiente.php');
-require_once(__DIR__ . '/../src/turmas.php');
+require_once(__DIR__ . '/../src/Ambiente.php');
+require_once(__DIR__ . '/../src/Turmas.php');
 
 // formulario escondido para os docentes criarem um ambiente para um curso
 class redirecionamento_criacao_ambiente extends moodleform {
@@ -124,13 +127,27 @@ class criar_ambiente_moodle extends moodleform {
     $this->_form->addElement('submit', 'criar_ambiente_moodle_submit', 'Criar ambiente');
   }
 
-  // funcao para diminuir a verbosidade
+  /**
+   * Funcao para diminuir a verbosidade.
+   * Dado um $nome, captura o $mforms->_customdata associado.
+   * 
+   * @param string $nome Nome do campo buscado.
+   * @return string Valor no campo buscado ou vazio se nao for encontrado.
+   */
   private function define_campo ($nome) {
     if (isset($this->_customdata[$nome])) return $this->_customdata[$nome];
     else return "";
   }
 
-  // validacao do formulario
+  /**
+   * Validacao do formulario
+   * Faz as verificacoes necessarias para garantir que a criacao do ambiente
+   * sera feita corretamente.
+   * 
+   * @param array $data Dados preenchidos no formulario
+   * @param array $files Arquivos
+   * @return array Erros na validacao
+   */ 
   public function validation($data, $files) {
     $errors= array();
     

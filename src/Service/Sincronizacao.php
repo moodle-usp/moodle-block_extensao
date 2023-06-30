@@ -1,6 +1,9 @@
 <?php
-
 /**
+ * Cursos de Extensao (Bloco)
+ * Equipe de Moodle da USP
+ * https://github.com/moodle-usp
+ * 
  * Aqui eh feita a sincronizacao de fato, constam as funcoes de
  * salvar dados, gerar objetos, buscar na Query, etc.
  * 
