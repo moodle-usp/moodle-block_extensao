@@ -93,11 +93,12 @@ class Usuario {
    * 'codpes', o nome ('firstname' + 'fullname' no Moodle, 'nompes' no 
    * Apolo) e o 'id' no Moodle se for o caso.
    * 
-   * @param array $lista_usuarios Lista de usuarios.
+   * @param array   $lista_usuarios Lista de usuarios.
+   * @param integer $logado         Id do usuario logado, se for o caso
    * 
    * @return array Lista com informacoes de cada usuario.
    */
-  public static function informacoes_usuarios ($lista_usuarios) {
+  public static function informacoes_usuarios ($lista_usuarios, $logado="") {
     global $DB;
 
     // para separar usuarios que estao no Moodle dos que nao estao
@@ -110,14 +111,17 @@ class Usuario {
       if ($info_usuario)
         $usuarios['moodle'][] = $info_usuario;
       else {
-        // buscando se existe usuário pelos emails
+        // buscando se existe usuario pelos emails
         $emails = Query::emails($usuario->codpes);
         if($emails) {
+          // pega os e-mails
           $emails = array_column($emails, 'codema');
           $emails = implode("','",$emails);
-          $sql = "SELECT id FROM {user} WHERE email IN ('{$emails}')"; 
+          // faz a query
+          $sql = "SELECT * FROM {user} WHERE email IN ('{$emails}')"; 
           $info_usuario = $DB->get_record_sql($sql);
-          if ($info_usuario)
+          // verifica se encontrou algo e se o encontrado nao eh o usuario logado
+          if ($info_usuario && $info_usuario->idnumber != $logado)
             $usuarios['moodle'][] = $info_usuario;
         }
         // se nao existir, precisa buscar no Apolo
@@ -145,10 +149,10 @@ class Usuario {
     // remove o seu proprio se for o caso
     if ($logado != "")
       unset($ministrantes[$logado]);
-    
+
     // captura as infos caso a lista nao seja vazia
     if (count($ministrantes) > 0)
-      $ministrantes = self::informacoes_usuarios($ministrantes);
+      $ministrantes = self::informacoes_usuarios($ministrantes, $logado);
     
     return $ministrantes;
   }

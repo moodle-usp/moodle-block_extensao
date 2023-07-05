@@ -100,7 +100,6 @@ class criar_ambiente_moodle extends moodleform {
       // para ministrantes que ja tem conta no Moodle
       $moodle = $ministrantes['moodle'];
       foreach ($moodle as $ministrante){
-        if (isset($ministrante->firstname) && isset($ministrante->lastname)) {  // verificacao de que as variavies serao passadas.
         $nomeprofessor = sprintf('%s %s', $ministrante->firstname, $ministrante->lastname);
         $this->_form->addElement(
           'advcheckbox', 
@@ -110,7 +109,6 @@ class criar_ambiente_moodle extends moodleform {
           array(),
           array(0, $ministrante->firstname)
         );
-      }
       }
       // para ministrantes que nao tem conta no Moodle ainda
       if (isset($ministrantes['apolo'])) {
