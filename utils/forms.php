@@ -41,19 +41,21 @@ class criar_ambiente_moodle extends moodleform {
 
     // nome curto do curso
     $shortname = $this->define_campo('shortname');
-    $this->_form->addElement('text', 'shortname', 'Nome curto do curso');
+    $this->_form->addElement('text', 'shortname', 'Nome curto do curso', array('readonly' => 'true'));
     $this->_form->setDefault('shortname', $shortname);
     $this->_form->setType('shortname', PARAM_TEXT);
     
-    // nome completo do curso
-    $fullname = $this->define_campo('fullname');
-    $this->_form->addElement('text', 'fullname', 'Nome completo do curso');
-    $this->_form->setDefault('fullname', $fullname);
-    $this->_form->setType('fullname', PARAM_TEXT);
-
-
     // data de inicio do curso
     $init_date = $this->define_campo('startdate');
+
+    // nome completo do curso
+    $fullname = $this->define_campo('fullname');
+    $this->_form->addElement('text', 'fullname', 'Nome completo do curso', array('readonly' => 'true'));
+    $ano_curso = date('Y', strtotime($init_date));
+    $this->_form->setDefault('fullname', "{$fullname} ({$ano_curso})");
+    $this->_form->setType('fullname', PARAM_TEXT);
+
+    // data de inicio do curso
     $init_date_timestamp = strtotime($init_date);
     $this->_form->addElement('date_selector', 'startdate', 'Data de início do curso');
     $this->_form->setDefault('startdate', $init_date_timestamp);
@@ -116,7 +118,7 @@ class criar_ambiente_moodle extends moodleform {
           $this->_form->addElement(
             'checkbox',
             "ministrantes_semconta[{$ministrante['codpes']}]",
-            '<span style="color: #ff0000; font-weight: bold;">Ministrantes sem conta Moodle</span>',
+            '<span style="color: #ff0000; font-weight: bold;">Ministrante sem conta Moodle</span>',
             $ministrante['nompes'],
             array('disabled' => true)
           );
