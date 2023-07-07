@@ -76,6 +76,9 @@ class Sincronizar {
     // captura as turmas
     $turmas = Query::turmasAbertas();
 
+    // se der erro na busca, ja para por aqui
+    if (!$turmas) die(PHP_EOL);
+
     // monta o array que sera adicionado na mdl_extensao_turma
     $infos_turma = $this->filtrarInfosTurmas($turmas);
 
