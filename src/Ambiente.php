@@ -66,7 +66,32 @@ class Ambiente {
         Usuario::matricula_professor($moodle_curso->id, $id_ministrante);
         \core\notification::success('Professor auxiliar ' . $nome . ' matriculado como "professor".');
       }
+    
+    // caso seja selecionado um professor sem conta moodle, eh criada a sua conta
+    if (isset($info_forms_array['ministrantes_semconta'])) {
+      foreach ($info_forms_array['ministrantes_semconta'] as $id_ministrante => $ministrante_semconta) {
+        $info_ministrante = Query::info_usuario($id_ministrante);
+        if (!isset($info_ministrante['nompes'])) {
+          // caso o nome nao esteja definido nas informacoes do usuario
+          \core\notification::error('Nome do professor ausente. Não foi possível cadastrar a conta do professor sem conta Moodle.');
+          continue;
+        }
+  
+        //Nome do professor
+        $nome = $info_ministrante['nompes']; 
+        //Para criar a conta do professor 
+        $ministrante = Usuario::cadastra_usuario($info_ministrante);
+        if (!$ministrante) {
+          // Caso ocorra um problema ao cadastrar a conta do professor
+          \core\notification::error('Não foi possível cadastrar a conta do professor ' . $nome);
+        }
+
+        // matricula o professor
+        Usuario::matricula_professor($moodle_curso->id, $ministrante["id"]);
+        \core\notification::success('Professor auxiliar ' . $nome . ' matriculado como "professor".');
+      }
     }
+  }
 
     return $moodle_curso->id;
   }
