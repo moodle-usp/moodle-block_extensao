@@ -118,9 +118,9 @@ class criar_ambiente_moodle extends moodleform {
           $this->_form->addElement(
             'checkbox',
             "ministrantes_semconta[{$ministrante['codpes']}]",
-            '<span style="color: #ff0000; font-weight: bold;">Ministrante sem conta Moodle</span>',
+            '<span style="text-align: justify; color: #ff0000; font-weight: bold;">Ministrantes sem conta Moodle, ao selecionar esta opção, 
+            uma conta será criada automaticamente.</span>',
             $ministrante['nompes'],
-            array('disabled' => true)
           );
         }
       }
