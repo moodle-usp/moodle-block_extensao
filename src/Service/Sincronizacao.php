@@ -179,10 +179,10 @@ class Sincronizar {
     // percorre as turmas e vai procurando na base
     foreach($turmas as $turma) {
       // procura pela turma na base
-      $resultado_busca = $DB->record_exists('block_extensao_turma', array('codofeatvceu' => $turma->codofeatvceu));
+      $resultado_busca = $DB->get_record('block_extensao_turma', array('codofeatvceu' => $turma->codofeatvceu));
 
-      // se existir, vamos apenas remover do $turmas...
-      if (!$resultado_busca)
+      // se nao existir ou se o campo 'id_moodle' for NULL, adiciona na lista
+      if (!$resultado_busca || is_null($resultado['id_moodle']))
         $turmas_fora_base[] = $turma;
     }
     
