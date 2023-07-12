@@ -66,6 +66,7 @@ class Ambiente {
         Usuario::matricula_professor($moodle_curso->id, $id_ministrante);
         \core\notification::success('Professor auxiliar ' . $nome . ' matriculado como "professor".');
       }
+    }
     
     // caso seja selecionado um professor sem conta moodle, eh criada a sua conta
     if (isset($info_forms_array['ministrantes_semconta'])) {
@@ -91,7 +92,6 @@ class Ambiente {
         \core\notification::success('Professor auxiliar ' . $nome . ' matriculado como "professor".');
       }
     }
-  }
 
     return $moodle_curso->id;
   }
