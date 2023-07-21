@@ -15,6 +15,7 @@ require_once(__DIR__ . '/Turmas.php');
 require_once(__DIR__ . '/Service/Query.php');
 
 use block_extensao\Service\Query;
+use core\message\message;
 
 class Usuario {
 
@@ -197,4 +198,29 @@ class Usuario {
       return false;
     }
   }
+
+  /**
+   * Essa funcao possui como objetivo enviar um email para o professor de modo a notifica-lo
+   * que a sua conta foi criada, e que foi atribuido a ele o papel de professor em um curso
+   * @param array usuario eh o individuo que sera inscrito no Moodle.
+   * @return void o retorno eh o envio do email.
+   */
+  public static function notificacao_incricao($usuario) {
+    // Criar uma instancia de core\message\message
+    $mensagem = new message();
+
+    // Configurar os dados da mensagem
+    $mensagem->component = 'moodle';
+    $mensagem->userfrom = core_user::get_noreply_user();
+    $mensagem->userto = $usuario['codema'];
+    $mensagem->subject = "Sua conta no Moodle foi criada";
+    $mensagem->fullmessage = "Olá " . $usuario['nompes'] . ",\n\n a sua conta no Moodle foi criada com sucesso!";
+    $mensagem->fullmessageformat = FORMAT_PLAIN;
+    $mensagem->notification = 1;
+
+    // Envia a mensagem
+    message_send($mensagem);
 }
+
+}
+ 
