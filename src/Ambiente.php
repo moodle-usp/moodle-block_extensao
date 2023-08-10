@@ -88,16 +88,16 @@ class Ambiente {
         }
 
         // matricula o professor
-        Usuario::matricula_professor($moodle_curso->id, $ministrante["id"]);
+        Usuario::matricula_professor($moodle_curso->id, $ministrante->id);
         \core\notification::success('Professor auxiliar ' . $nome . ' matriculado como "professor".');
         try {
           // Tente executar a função de notificação de inscrição do usuário
-          Usuario::notificacao_incricao($ministrante);
+          Notificacoes::notificacao_inscricao($ministrante);
           \core\notification::success('Professor auxiliar ' . $nome . ' notificado sobre a inscrição no Moodle, 
           um e-mail foi enviado.'
         );
       } catch (Exception $e) {
-          // Se ocorrer um erro, ele será capturado aqui e podemos lidar com ele
+          // Se ocorrer um erro, ele sera capturado aqui e podemos lidar com ele
           // Por exemplo, podemos exibir uma mensagem de erro ou registrar o erro em um arquivo de log.
           echo "Ocorreu um erro: " . $e->getMessage();
       }

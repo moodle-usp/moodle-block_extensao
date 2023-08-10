@@ -13,6 +13,8 @@ require_once(__DIR__ . '/../../../config.php');
 require_once($CFG->dirroot . '/user/lib.php');
 require_once(__DIR__ . '/Turmas.php');
 require_once(__DIR__ . '/Service/Query.php');
+//require_once(__DIR__ . '/../../../local/Notificacoes.php');
+require_once(__DIR__ . '/Notificacoes.php');
 
 use block_extensao\Service\Query;
 use core\message\message;
@@ -190,37 +192,15 @@ class Usuario {
 
     try {
       // Chama a funcao user_create_user() para cadastrar o novo usuario
-      $usuario["id"] = user_create_user($novoUsuario);
+      $usuario_id = user_create_user($novoUsuario);
+      $usuarioObj = $DB->get_record("user", ["id" => $usuario_id]);
       \core\notification::success("O usuário " . $nomeCompleto . " foi cadastrado no Moodle com sucesso!");
-      return $usuario;
+      return $usuarioObj;
     } catch (\Exception $e) {
       \core\notification::error("Erro ao cadastrar o usuário: " . $e->getMessage());
       return false;
     }
   }
-
-  /**
-   * Essa funcao possui como objetivo enviar um email para o professor de modo a notifica-lo
-   * que a sua conta foi criada, e que foi atribuido a ele o papel de professor em um curso
-   * @param array usuario eh o individuo que sera inscrito no Moodle.
-   * @return void o retorno eh o envio do email.
-   */
-  public static function notificacao_incricao($usuario) {
-    // Criar uma instancia de core\message\message
-    $mensagem = new message();
-
-    // Configurar os dados da mensagem
-    $mensagem->component = 'moodle';
-    $mensagem->userfrom = core_user::get_noreply_user();
-    $mensagem->userto = $usuario['codema'];
-    $mensagem->subject = "Sua conta no Moodle foi criada";
-    $mensagem->fullmessage = "Olá " . $usuario['nompes'] . ",\n\n a sua conta no Moodle foi criada com sucesso!";
-    $mensagem->fullmessageformat = FORMAT_PLAIN;
-    $mensagem->notification = 1;
-
-    // Envia a mensagem
-    message_send($mensagem);
 }
 
-}
  
