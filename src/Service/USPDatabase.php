@@ -10,6 +10,8 @@ class USPDatabase
     /**
      * Singleton sybase connection
      */
+    // para exibir as mensagens de erro
+    const DEBUG = true;
     public static function getInstance(){
         global $CFG;
 
@@ -29,8 +31,9 @@ class USPDatabase
                 self::$instance = new PDO($dsn,$user,$pass);
                 self::$instance->setAttribute(PDO::ATTR_ERRMODE,PDO::ERRMODE_EXCEPTION);
             } catch (\Throwable $t) {
-                // print_r($t->getMessage()) . '<br>';
-                echo "Erro na conexão com o database do replicado! Contate o suporte" . PHP_EOL;
+                echo "Erro na conexão com o database do replicado! Contate o suporte" . PHP_EOL . PHP_EOL;
+                if (self::DEBUG)
+                    print_r($t->getMessage()) . '<br>';
                 die();
             }
         }
@@ -60,8 +63,9 @@ class USPDatabase
             }
             $stmt->execute();
         } catch (\Throwable $t) {
-            #print_r($t->getMessage());
-            echo "Erro Interno no replicado: contate o suporte!";
+            echo "Erro Interno no replicado: contate o suporte!" . PHP_EOL . PHP_EOL;
+            if (self::DEBUG)
+                print_r($t->getMessage());
             return false;
         }
 
@@ -84,8 +88,9 @@ class USPDatabase
             }
             $stmt->execute();
         } catch (\Throwable $t) {
-            // print_r($t->getMessage());
-            echo "Erro Interno no replicado: contate o suporte!";
+            echo "Erro Interno no replicado: contate o suporte!" . PHP_EOL . PHP_EOL;
+            if (self::DEBUG)
+                print_r($t->getMessage());
             return false;
         }
 

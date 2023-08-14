@@ -70,10 +70,12 @@ class Query
         m.codofeatvceu
         ,m.codpes
         ,m.codatc
+        ,e.codema
       FROM dbo.MINISTRANTECEU m
-      WHERE codpes IS NOT NULL
-        AND m.dtainimisatv >= '$hoje'
-      ORDER BY codofeatvceu
+      LEFT JOIN EMAILPESSOA e ON m.codpes = e.codpes
+      WHERE m.codpes IS NOT NULL
+          AND m.dtainimisatv >= '$hoje'
+      ORDER BY m.codofeatvceu;
     ";
 
     return USPDatabase::fetchAll($query);
@@ -187,11 +189,13 @@ class Query
   public static function info_usuario ($codpes) {
     return USPDatabase::fetch("
       SELECT
-        codpes,
-        nompes
-      FROM PESSOA
-      WHERE codpes = $codpes
-    ");
+        p.codpes,
+        p.nompes,
+        e.codema
+      FROM PESSOA p
+      LEFT JOIN EMAILPESSOA e ON p.codpes = e.codpes
+      WHERE p.codpes = $codpes
+   ");
   }
 
   /**

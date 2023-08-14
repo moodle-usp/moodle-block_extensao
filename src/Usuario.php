@@ -13,8 +13,11 @@ require_once(__DIR__ . '/../../../config.php');
 require_once($CFG->dirroot . '/user/lib.php');
 require_once(__DIR__ . '/Turmas.php');
 require_once(__DIR__ . '/Service/Query.php');
+//require_once(__DIR__ . '/../../../local/Notificacoes.php');
+require_once(__DIR__ . '/Notificacoes.php');
 
 use block_extensao\Service\Query;
+use core\message\message;
 
 class Usuario {
 
@@ -156,4 +159,48 @@ class Usuario {
     
     return $ministrantes;
   }
+
+  /**
+   * Essa funcao tem como objetivo criar uma conta para um usuario que ainda nao possui. 
+   * @param array $usuario eh o individuo que sera inscrito no Moodle.
+   * @return array|boolean 
+   */
+  public static function cadastra_usuario($usuario) {
+    global $DB;
+ 
+    // Verificar se o usuario ja possui conta no Moodle
+    $existeUsuario = $DB->get_record('user', ['username' => $usuario['codpes']]);
+    if (!empty($existeUsuario)) {
+        \core\notification::warning("O usuário " . $usuario['nompes']. " já possui uma conta no Moodle. O cadastro não sera realizado.");
+        return false; 
+    }
+
+    // Criando objeto do usuario
+    $nomeCompleto = $usuario['nompes'];
+    $partesNome = explode(' ', $nomeCompleto); 
+    $primeiroNome = $partesNome[0];
+    $segundoNome = end($partesNome);
+
+    $novoUsuario = new stdClass();
+    $novoUsuario->username = (string) $usuario['codpes'];
+    $novoUsuario->idnumber = $usuario['codpes'];
+    $novoUsuario->password = "Euamoausp*555";
+    $novoUsuario->firstname = $primeiroNome;
+    $novoUsuario->lastname = $segundoNome;
+    $novoUsuario->email = $usuario['codema'];
+    $novoUsuario->auth = 'manual';
+
+    try {
+      // Chama a funcao user_create_user() para cadastrar o novo usuario
+      $usuario_id = user_create_user($novoUsuario);
+      $usuarioObj = $DB->get_record("user", ["id" => $usuario_id]);
+      \core\notification::success("O usuário " . $nomeCompleto . " foi cadastrado no Moodle com sucesso!");
+      return $usuarioObj;
+    } catch (\Exception $e) {
+      \core\notification::error("Erro ao cadastrar o usuário: " . $e->getMessage());
+      return false;
+    }
+  }
 }
+
+ 
