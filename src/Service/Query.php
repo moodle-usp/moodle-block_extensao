@@ -34,10 +34,10 @@ class Query
       SELECT
         o.codofeatvceu
         ,c.nomcurceu
-      FROM OFERECIMENTOATIVIDADECEU o
-          LEFT JOIN CURSOCEU c
+      FROM " . USPDatabase::OFERECIMENTOATIVIDADECEU . " o
+          LEFT JOIN " . USPDatabase::CURSOCEU . " c
             ON c.codcurceu = o.codcurceu
-          LEFT JOIN EDICAOCURSOOFECEU e
+          LEFT JOIN " . USPDatabase::EDICAOCURSOOFECEU . " e
             ON o.codcurceu = e.codcurceu AND o.codedicurceu = e.codedicurceu
       WHERE e.dtainiofeedi >= '$hoje'
       ORDER BY codofeatvceu 
@@ -73,8 +73,8 @@ class Query
         m.codpes,
         m.codatc,
         e.codema
-      FROM dbo.MINISTRANTECEU m
-      LEFT JOIN EMAILPESSOA e ON m.codpes = e.codpes
+      FROM " . USPDatabase::MINISTRANTECEU . " m
+      LEFT JOIN " . USPDatabase::EMAILPESSOA . " e ON m.codpes = e.codpes
       WHERE m.codpes IS NOT NULL
         AND m.codofeatvceu IN ($turmas)
         AND m.dtainimisatv >= '$hoje'
@@ -96,7 +96,7 @@ class Query
         codund,
         dtainiofeatv,
         dtafimofeatv
-      FROM OFERECIMENTOATIVIDADECEU
+      FROM " . USPDatabase::OFERECIMENTOATIVIDADECEU . "
       WHERE codofeatvceu = $codofeatvceu        
     ";
     $infos_curso = USPDatabase::fetch($query);
@@ -120,8 +120,8 @@ class Query
     $obj = "
       SELECT 
         c.objcur 
-      FROM OFERECIMENTOATIVIDADECEU o 
-      LEFT JOIN CURSOCEU c 
+      FROM " . USPDatabase::OFERECIMENTOATIVIDADECEU . " o 
+      LEFT JOIN " . USPDatabase::CURSOCEU . " c 
         ON c.codcurceu = o.codcurceu 
       WHERE codofeatvceu = $codofeatvceu";
     return USPDatabase::fetch($obj)['objcur'];
@@ -142,7 +142,7 @@ class Query
         sglund,
         nomund,
         codcam
-      FROM UNIDADE
+      FROM " . USPDatabase::UNIDADE . "
       WHERE codund = $codund
     ");
 
@@ -151,7 +151,7 @@ class Query
       SELECT
         codcam,
         nomcam
-      FROM CAMPUS
+      FROM " . USPDatabase::CAMPUS . "
       WHERE codcam = " . $info_unidade['codcam']);
 
     return array(
@@ -172,7 +172,7 @@ class Query
        SELECT 
         dtainiofeatv, 
         dtafimofeatv 
-      FROM OFERECIMENTOATIVIDADECEU 
+      FROM " . USPDatabase::OFERECIMENTOATIVIDADECEU . " 
       WHERE codofeatvceu = $codofeatvceu
       ORDER BY codofeatvceu";
     $info_datas = USPDatabase::fetch($query);
@@ -195,8 +195,8 @@ class Query
         p.codpes,
         p.nompes,
         e.codema
-      FROM PESSOA p
-      LEFT JOIN EMAILPESSOA e ON p.codpes = e.codpes
+      FROM " . USPDatabase::PESSOA . " p
+      LEFT JOIN " . USPDatabase::EMAILPESSOA . " e ON p.codpes = e.codpes
       WHERE p.codpes = $codpes
    ");
   }
@@ -212,7 +212,7 @@ class Query
     return USPDatabase::fetchAll("
       SELECT
         codema
-      FROM EMAILPESSOA
+      FROM " . USPDatabase::EMAILPESSOA . "
       WHERE codpes = $codpes
     ");
   }
