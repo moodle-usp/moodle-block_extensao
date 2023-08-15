@@ -37,27 +37,24 @@ class Sincronizar {
    * @param bool $apagar Para apagar os dados atuais antes de sincronizar
    */
   public function sincronizar ($parametros) {
-    // verifica se as credenciais da base foram passadas
+    // Verifica se as credenciais da base foram passadas
     $this->conexao_apolo();
 
     cli_writeln(PHP_EOL."/*********************************/");
     cli_writeln("/    SINCRONIZACAO COM O APOLO    /");
     cli_writeln("/*********************************/");
 
-    // se quiser substituir, precisa apagar os dados de agora
-    if ($parametros['apagar']) $this->apagar();
-
-    // sincronizando as turmas
+    // Sincronizando as turmas
     $turmas = $this->sincronizarTurmas();
-    // se $turmas for false, eh que a base ja esta sincronizada
+    // Se $turmas for false, eh que a base ja esta sincronizada
     if (!$turmas) return;
   
     if (!$parametros['pular_ministrantes']) {
-      // sincronizando os ministrantes
-      $this->sincronizarMinistrantes();
+      // Sincronizando os ministrantes
+      $this->sincronizarMinistrantes(array_keys($turmas));
     }
 
-    // retorna a pagina de sincronizar
+    // Retorna a pagina de sincronizar
     cli_writeln(PHP_EOL . "Atualizado com sucesso!");
 
     cli_writeln(PHP_EOL."/*********************************/");
@@ -73,19 +70,19 @@ class Sincronizar {
   private function sincronizarTurmas () {
     cli_writeln(PHP_EOL . '[TURMAS]' . PHP_EOL . '# Capturando turmas...');
 
-    // captura as turmas
+    // Captura as turmas
     $turmas = Query::turmasAbertas();
 
-    // se der erro na busca, ja para por aqui
+    // Se der erro na busca, ja para por aqui
     if (!$turmas) die(PHP_EOL);
 
-    // monta o array que sera adicionado na mdl_extensao_turma
-    $infos_turma = $this->filtrarInfosTurmas($turmas);
+    // Monta o array que sera adicionado na mdl_extensao_turma
+    $infos_turma = $this->objetoTurmas($turmas);
 
-    // pega as turmas que nao estao na base
+    // Pega as turmas que nao estao na base
     $infos_turma = $this->turmasNaBase($infos_turma);
 
-    // se estiver vazio nao tem por que continuar
+    // Se estiver vazio nao tem por que continuar
     if (empty($infos_turma)) {
       cli_writeln('(X) A base já estava sincronizada!');
       return false;
@@ -93,7 +90,7 @@ class Sincronizar {
 
     try {
       cli_writeln('* Foram encontradas ' . count($infos_turma) . ' turmas!');
-      // salva na mdl_extensao_turma
+      // Salva na mdl_extensao_turma
       cli_writeln('# Salvando turmas...');
       $this->salvarTurmasExtensao($infos_turma);
       cli_writeln('* Turmas sincronizadas!');
@@ -104,19 +101,30 @@ class Sincronizar {
   }
 
   /**
-   * Sincronizacao dos ministrantes
+   * Sincronizacao dos ministrantes a partir das turmas informadas.
+   * Os ministrantes das turmas informadas sao listados e adicionados
+   * a tabela block_extensao_ministrante. 
+   * 
+   * @param array $turmas Lista de codofeatvceus.
+   * @return bool Se deu certo ou nao.
    */
-  private function sincronizarMinistrantes () {
+  private function sincronizarMinistrantes ($turmas) {
     cli_writeln(PHP_EOL . '[MINISTRANTES]' . PHP_EOL . '# Capturando ministrantes...');
-    // captura os ministrantes
-    $ministrantes = Query::ministrantesTurmasAbertas();
+    // Captura os ministrantes
+    $ministrantes = Query::ministrantesTurmas($turmas);
+    // Indexa o array de ministrantes, para evitar as duplicatas do e-mail
+    $ministrantes = $this->removerDuplicatasMinistrantes($ministrantes);
+
+    if (!$ministrantes) {
+      cli_writeln('* [PROVAVEL ERRO] Nenhum ministrante encontrado');
+    }
     cli_writeln('* Foram encontrados ' . count($ministrantes) . ' ministrantes!');
 
-    // monta o array que sera adicionado na mdl_extensao_ministrante
+    // Monta o array que sera adicionado na mdl_extensao_ministrante
     cli_writeln('# Criando objetos...');
     $ministrantes = $this->objetoMinistrantes($ministrantes);
     
-    // salva na mdl_extensao_ministrante
+    // Salva na mdl_extensao_ministrante
     try {
       cli_writeln('# Salvando ministrantes...');
       $this->salvarMinistrantesTurmas($ministrantes);
@@ -128,6 +136,24 @@ class Sincronizar {
   }
 
   /**
+   * Gera um indice unico a partir do codpes e do codofeatvceu para
+   * eliminar duplicatas (oriundas do 'left join' com a tabela de
+   * e-mails).
+   * 
+   * @param array $ministrantes Lista de ministrantes obtidas do Apolo.
+   * @return array Lista filtrada e indexada.
+   */
+  private function removerDuplicatasMinistrantes ($ministrantes) {
+    $lista = array();
+    foreach ($ministrantes as $ministrante) {
+      $indice = $ministrante['codpes'] . "_" . $ministrante['codofeatvceu'];
+      if (!array_key_exists($indice, $lista))
+        $lista[$indice] = $ministrante;
+    }
+    return $lista;
+  }
+
+  /**
    * Filtra as infos das turmas, condensando somente algumas em 
    * outro array
    * 
@@ -135,7 +161,7 @@ class Sincronizar {
    * 
    * @return array
    */
-  private function filtrarInfosTurmas ($turmas) {
+  private function objetoTurmas ($turmas) {
     return array_map(function($turma) {
       $obj = new stdClass;
       $obj->codofeatvceu = $turma['codofeatvceu'];
@@ -176,14 +202,20 @@ class Sincronizar {
 
     $turmas_fora_base = array();
 
-    // percorre as turmas e vai procurando na base
+    // Percorre as turmas e vai procurando na base
     foreach($turmas as $turma) {
-      // procura pela turma na base
+      // Procura pela turma na base
       $resultado_busca = $DB->get_record('block_extensao_turma', array('codofeatvceu' => $turma->codofeatvceu));
 
-      // se nao existir ou se o campo 'id_moodle' for NULL, adiciona na lista
-      if (!$resultado_busca || is_null($resultado['id_moodle']))
-        $turmas_fora_base[] = $turma;
+      // Se nao existir ou se o campo 'id_moodle' for NULL, adiciona na lista
+      if (!$resultado_busca)
+        $turmas_fora_base[$turma->codofeatvceu] = $turma;
+      else if (is_null($resultado_busca->id_moodle)) {
+        // Se o ambiente nao existir, entao apaga os registros para adicionar novamente
+        $DB->delete_records('block_extensao_turma', array('codofeatvceu' => $turma->codofeatvceu));
+        $DB->delete_records('block_extensao_ministrante', array('codofeatvceu' => $turma->codofeatvceu));
+        $turmas_fora_base[$turma->codofeatvceu] = $turma;
+      }
     }
     
     return $turmas_fora_base;
@@ -210,17 +242,6 @@ class Sincronizar {
   }
 
   /**
-   * Para apgar as informacoes existentes na base do
-   * Moodle.
-   */
-  private function apagar () {
-    global $DB;
-
-    $DB->delete_records('block_extensao_turma', array('id_moodle' => NULL));
-    $DB->delete_records('block_extensao_ministrante');
-}
-
-  /**
    * Para exibir mensagens de erro.
    * @param string $aviso Aviso que precede a mensagem de erro.
    * @param string $erro  Excecao de erro gerada pelo PHP.
@@ -228,9 +249,7 @@ class Sincronizar {
    */
   private function mensagemErro ($aviso, $erro, $parar) {
     $msg = 'XXXXXXX' . PHP_EOL . $aviso . PHP_EOL . $erro . PHP_EOL . 'XXXXXXX' . PHP_EOL;
-    if ($parar)
-      die($msg);
-    else
-      echo $msg;
+    if ($parar) die($msg);
+    else echo $msg;
   }
 }

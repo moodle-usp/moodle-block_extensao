@@ -8,7 +8,6 @@
  * Aqui ficam as queries que fazem a conexao com o Sistema Apolo.
  */
 
-
 namespace block_extensao\Service;
 
 use stdClass;
@@ -48,9 +47,7 @@ class Query
   }
 
   /**
-   * Captura os ministrantes das turmas abertas.
-   * Sao consideradas como turmas abertas somente as turmas com
-   * data de encerramento posterior a data de hoje.
+   * Captura os ministrantes das turmas informadas.
    * 
    * Os codigos de atuacao (coadtc) conforme ATUACAOCEU sao:
    * 1 - Professor USP
@@ -62,22 +59,27 @@ class Query
    * 7 - Docente
    * 8 - Preceptor
    * 9 - Tutor
+   * 
+   * @param array $codofeatvceu_turmas Lista de codigos de oferecimento
+   * das turmas.
+   * @return array|null Resultado da busca.
    */
-  public static function ministrantesTurmasAbertas () {
+  public static function ministrantesTurmas ($codofeatvceu_turmas) {
+    $turmas = implode(', ', $codofeatvceu_turmas);
     $hoje = date("Y-m-d");
     $query = "
       SELECT
-        m.codofeatvceu
-        ,m.codpes
-        ,m.codatc
-        ,e.codema
+        m.codofeatvceu,
+        m.codpes,
+        m.codatc,
+        e.codema
       FROM dbo.MINISTRANTECEU m
       LEFT JOIN EMAILPESSOA e ON m.codpes = e.codpes
       WHERE m.codpes IS NOT NULL
-          AND m.dtainimisatv >= '$hoje'
-      ORDER BY m.codofeatvceu;
+        AND m.codofeatvceu IN ($turmas)
+        AND m.dtainimisatv >= '$hoje'
+      ORDER BY m.codofeatvceu
     ";
-
     return USPDatabase::fetchAll($query);
   }
 
@@ -86,6 +88,7 @@ class Query
    * turma, como a data de inicio e tal.
    * 
    * @param int|string $codofeatvceu Codigo de oferecimento da atividade.
+   * @return stdClass Objeto do curso.
    */
   public static function informacoesTurma ($codofeatvceu) {
     $query = "

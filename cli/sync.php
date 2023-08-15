@@ -33,19 +33,17 @@ require_once(__DIR__ . '/../src/Service/Sincronizacao.php');
 $uso = "Para sincronizar os dados do Moodle Extensao com os do Apolo.
 
 Uso:
-  # php sync.php [--apagar] [--pular_ministrantes]
+  # php sync.php [--pular_ministrantes]
   # php sync.php [--help|-h]
 
 Opcoes:
   -h --help              Exibe essa ajuda.
-  --apagar               Apaga os dados da base do Moodle e sincroniza com o Apolo do zero.
   --pular_ministrantes   Nao sincroniza os ministrantes.
 ";
 
 // opcoes
 list($opcoes, $nao_reconhecidas) = cli_get_params([
   'help' => false,
-  'apagar' => false,
   'pular_ministrantes' => false
 ], [
   'h' => 'help'
@@ -66,7 +64,6 @@ if ($opcoes['help']) {
 
 // faz a sincronizacao
 $sinc = new Sincronizar();
-$apagar = $opcoes['apagar'];
 $pular_ministrantes = $opcoes['pular_ministrantes'];
 
 $sinc->sincronizar($opcoes);
