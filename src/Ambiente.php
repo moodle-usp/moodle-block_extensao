@@ -45,10 +45,22 @@ class Ambiente {
     
     // se a opcao de visitantes estiver habilitada, precisa adicionar o usuario guest 
     if ($info_forms->guest) {
-      Usuario::libera_visitantes($moodle_curso->id);
-    }
-
-    // se der certo, eh necessario salvar isso na base
+      // Obter o plugin de matricula "guest"
+      $enrol_guest = enrol_get_plugin('guest');
+  
+      // Adicionar uma instancia de matricula do tipo "guest" ao curso
+      $instance_guest_id = $enrol_guest->add_instance($moodle_curso);
+  
+      if ($instance_guest_id) {
+          \core\notification::success('Acesso de visitantes permitido com sucesso.');
+      } else {
+          \core\notification::error('Não foi possível habilitar o acesso de visitantes.');
+      }
+  } else {
+      \core\notification::error('A opção de visitantes não está habilitada.');
+  }
+  
+   // se der certo, eh necessario salvar isso na base
     Turmas::atualizar_id_moodle_turma($info_forms->codofeatvceu, $moodle_curso->id);
     \core\notification::success('Ambiente criado com sucesso!');
 
