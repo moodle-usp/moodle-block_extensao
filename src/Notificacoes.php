@@ -2,7 +2,7 @@
 defined('MOODLE_INTERNAL') || die();
 
 use core\message\message;
-use core_user;
+// use core_user;
 use core_message\api;
 
 class Notificacoes {
