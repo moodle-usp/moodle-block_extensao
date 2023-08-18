@@ -42,24 +42,6 @@ class Usuario {
   }
 
   /**
-   * Para habilitar o acesso de visitantes ("guests") a determinado
-   * curso.
-   * 
-   * @param integer $id_curso Identificador do curso.
-   */
-  public static function libera_visitantes ($id_curso) {
-    global $DB;
-
-    // captura o usuario 'guest'
-    $usuario_guest = $DB->get_record('user', ['username' => 'guest']);
-    // captura o papel 'guest'
-    $papel_guest = $DB->get_record('role', ['shortname' => 'guest']);
-
-    // inscreve o usuario 'guest'
-    self::inscreve_usuario($id_curso, $usuario_guest->id, $papel_guest->id);
-  }
-
-  /**
    * Para inscrever o usuario logado como "editingteacher".
    * 
    * @param integer $id_curso Identificador do curso.
