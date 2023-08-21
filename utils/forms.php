@@ -14,6 +14,9 @@ require_once(__DIR__ . '/../../../config.php');
 require_once($CFG->libdir . '/formslib.php');
 require_once(__DIR__ . '/../src/Ambiente.php');
 require_once(__DIR__ . '/../src/Turmas.php');
+require_once(__DIR__ . '/../src/Atuacao.php');
+require_once(__DIR__ . '/../src/Service/Query.php');
+use block_extensao\Service\Query;
 
 // formulario escondido para os docentes criarem um ambiente para um curso
 class redirecionamento_criacao_ambiente extends moodleform {
@@ -102,12 +105,13 @@ class criar_ambiente_moodle extends moodleform {
       // para ministrantes que ja tem conta no Moodle
       $moodle = $ministrantes['moodle'];
       foreach ($moodle as $ministrante){
+        $codatc = Atuacao::NOMES[$ministrante->codatc];
         $nomeprofessor = sprintf('%s %s', $ministrante->firstname, $ministrante->lastname);
         $this->_form->addElement(
           'advcheckbox', 
           "ministrantes[{$ministrante->id}]",
           null,
-          $nomeprofessor,
+          $nomeprofessor . " [{$codatc}]",
           array(),
           array(0, $ministrante->firstname)
         );
@@ -115,12 +119,13 @@ class criar_ambiente_moodle extends moodleform {
       // para ministrantes que nao tem conta no Moodle ainda
       if (isset($ministrantes['apolo'])) {
         foreach ($ministrantes['apolo'] as $ministrante) {
+          $codatc = Atuacao::NOMES[$ministrante['papel_usuario']];
           $this->_form->addElement(
             'checkbox',
             "ministrantes_semconta[{$ministrante['codpes']}]",
             '<span style="text-align: justify; color: #ff0000; font-weight: bold;">Ministrantes sem conta Moodle, ao selecionar esta opção, 
             uma conta será criada automaticamente.</span>',
-            $ministrante['nompes'],
+            $ministrante['nompes'] . " [{$codatc}]",
           );
         }
       }

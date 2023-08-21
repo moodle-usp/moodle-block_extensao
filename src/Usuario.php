@@ -13,8 +13,9 @@ require_once(__DIR__ . '/../../../config.php');
 require_once($CFG->dirroot . '/user/lib.php');
 require_once(__DIR__ . '/Turmas.php');
 require_once(__DIR__ . '/Service/Query.php');
-//require_once(__DIR__ . '/../../../local/Notificacoes.php');
 require_once(__DIR__ . '/Notificacoes.php');
+require_once(__DIR__ . '/Atuacao.php');
+
 
 use block_extensao\Service\Query;
 use core\message\message;
@@ -52,8 +53,11 @@ class Usuario {
     // captura o usuario que esta logado
     $id_usuario = $USER->id;
 
+    // captura o codigo de atuacao
+    $codatc = Usuario::codigo_atuacao_ceu($USER->idnumber);
+
     // inscreve o usuario logado
-    self::matricula_professor($id_curso, $id_usuario);
+    self::matricula_professor($id_curso, $id_usuario, $codatc);
   }
 
   /**
@@ -61,14 +65,18 @@ class Usuario {
    * 
    * @param integer $id_curso para indicar o curso ao qual o professor sera matriculado.
    * @param integer $id_professor para identificar o professor por seu id.
+   * @param integer $codatc       Codigo de atuacao (papel do usuario)
    */
-  public static function matricula_professor ($id_curso, $id_professor) {
+  public static function matricula_professor ($id_curso, $id_professor, $codatc) {
     global $DB;
 
-    // captura o papel do editingteacher
-    $editingteacher = $DB->get_record('role', ['shortname' => 'editingteacher']);
+    // captura o shortname do codigo de atuacao
+    $shortname_codatc = Atuacao::CORRESPONDENCIA_MOODLE[$codatc];
 
-    self::inscreve_usuario($id_curso, $id_professor, $editingteacher->id);
+    // captura o papel do shortname
+    $role = $DB->get_record('role', ['shortname' => $shortname_codatc]);
+
+    self::inscreve_usuario($id_curso, $id_professor, $role->id);
   } 
 
   /**
@@ -93,8 +101,12 @@ class Usuario {
 
       // tenta capturar o usuario no Moodle
       $info_usuario = $DB->get_record('user', ['idnumber' => $usuario->codpes]);
-      if ($info_usuario)
+      if ($info_usuario) {
+        // Se achar, captura o codatc no mdl_block_extensao_ministrante e salva
+        $codatc = Usuario::codigo_atuacao_ceu($usuario->codpes);
+        $info_usuario->codatc = $codatc;
         $usuarios['moodle'][] = $info_usuario;
+      }
       else {
         // buscando se existe usuario pelos emails
         $emails = Query::emails($usuario->codpes);
@@ -106,16 +118,38 @@ class Usuario {
           $sql = "SELECT * FROM {user} WHERE email IN ('{$emails}')"; 
           $info_usuario = $DB->get_record_sql($sql);
           // verifica se encontrou algo e se o encontrado nao eh o usuario logado
-          if ($info_usuario && $info_usuario->idnumber != $logado)
+          if ($info_usuario && $info_usuario->idnumber != $logado) {
+            $codatc = Usuario::codigo_atuacao_ceu($usuario->codpes);
+            $info_usuario->codatc = $codatc;
             $usuarios['moodle'][] = $info_usuario;
+          }
         }
         // se nao existir, precisa buscar no Apolo
         $info_usuario = Query::info_usuario($usuario->codpes);
-        if ($info_usuario)
+        if ($info_usuario) {
+          // captura o papel de usuario
+          $codatc = Usuario::codigo_atuacao_ceu($usuario->codpes);
+          $info_usuario['papel_usuario'] = $codatc;
           $usuarios['apolo'][] = $info_usuario;
+        }
       }
     }
     return $usuarios;
+  }
+
+  /**
+   * Captura o codatc na tabela {block_extensao_ministrante}
+   * Necessario fazer funcao separada devido ao sql_compare_text.
+   * 
+   * @param string $codpes Codigo de pessoa USP (NUSP)
+   * @return object Info do usuario correspondente.
+   */
+  public static function codigo_atuacao_ceu ($codpes, $codofeatvceu="") {
+    global $DB;
+    if ($codofeatvceu == "")
+      $codofeatvceu = $_SESSION['codofeatvceu'];
+    $comparacao = $DB->sql_compare_text('codpes') . ' = ' . $DB->sql_compare_text(':codpes_usuario') . " AND " . $DB->sql_compare_text('codofeatvceu') . ' = ' . $DB->sql_compare_text($codofeatvceu);
+    return $DB->get_record_SQL("SELECT papel_usuario FROM {block_extensao_ministrante} WHERE $comparacao", array('codpes_usuario' => $codpes))->papel_usuario;
   }
 
   /**
@@ -128,7 +162,7 @@ class Usuario {
    * @return array Lista com os ministrantes da turma buscada.
    */
   public static function ministrantes_turma ($codofeatvceu, $logado="") {
-    // captura os ministrnates a partir do codofeatvceu
+    // captura os ministrantes a partir do codofeatvceu
     $ministrantes = Turmas::codpes_ministrantes_turma($codofeatvceu);
 
     // remove o seu proprio se for o caso

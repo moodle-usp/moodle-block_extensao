@@ -49,16 +49,16 @@ class Query
   /**
    * Captura os ministrantes das turmas informadas.
    * 
-   * Os codigos de atuacao (coadtc) conforme ATUACAOCEU sao:
+   * Os codigos de atuacao (codatc) conforme ATUACAOCEU sao:
    * 1 - Professor USP
    * 2 - Especialista
    * 3 - Monitor
    * 4 - Servidor
    * 5 - Professor HC - FM-USP
    * 6 - Tutor
-   * 7 - Docente
-   * 8 - Preceptor
-   * 9 - Tutor
+   * 7 - Docente (S)
+   * 8 - Preceptor (S)
+   * 9 - Tutor (S)
    * 
    * @param array $codofeatvceu_turmas Lista de codigos de oferecimento
    * das turmas.

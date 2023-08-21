@@ -16,6 +16,7 @@ require_once($CFG->dirroot.'/course/lib.php'); // biblioteca de cursos
 require_once(__DIR__ . '/Turmas.php');
 require_once(__DIR__ . '/Service/Query.php');
 require_once(__DIR__ . '/Usuario.php');
+require_once(__DIR__ . '/Atuacao.php');
 use block_extensao\Service\Query;
 
 class Ambiente {
@@ -29,7 +30,7 @@ class Ambiente {
    * @return bool|object Erro ou curso criado.
    */
   public static function criar_ambiente ($info_forms, $ministrantes) {
-    global $USER;
+    global $USER, $DB;
 
     // faz uma versao em array dos dados do forms
     $info_forms_array = json_decode(json_encode($info_forms), true);
@@ -56,11 +57,11 @@ class Ambiente {
       } else {
           \core\notification::error('Não foi possível habilitar o acesso de visitantes.');
       }
-  } else {
+    } else {
       \core\notification::error('A opção de visitantes não está habilitada.');
-  }
+    }
   
-   // se der certo, eh necessario salvar isso na base
+    // se der certo, eh necessario salvar isso na base
     Turmas::atualizar_id_moodle_turma($info_forms->codofeatvceu, $moodle_curso->id);
     \core\notification::success('Ambiente criado com sucesso!');
 
@@ -73,10 +74,14 @@ class Ambiente {
       foreach ($info_forms_array['ministrantes'] as $id_ministrante=>$nome) {
         // se o nome for 0 entao nao foi selecionado
         if (!$nome) continue;
-        
+        // Captura o codpes do professor
+        $usuario_moodle = $DB->get_record('user', ['id' => $id_ministrante]);
+        // captura o papel do professor
+        $codatc = Usuario::codigo_atuacao_ceu($usuario_moodle->idnumber, $info_forms->codofeatvceu);
         // matricula o professor
-        Usuario::matricula_professor($moodle_curso->id, $id_ministrante);
-        \core\notification::success('Professor auxiliar ' . $nome . ' matriculado como "professor".');
+        Usuario::matricula_professor($moodle_curso->id, $id_ministrante, $codatc);
+        $shortname_adaptado = Atuacao::NOMES[$codatc];
+        \core\notification::success('Professor auxiliar ' . $nome . ' matriculado como "' . $shortname_adaptado . '".');
       }
     }
     
@@ -99,9 +104,14 @@ class Ambiente {
           \core\notification::error('Não foi possível cadastrar a conta do professor ' . $nome);
         }
 
+        // Captura o codpes do professor
+        $usuario_moodle = $DB->get_record('user', ['id' => $ministrante->id]);
+        // captura o papel do professor
+        $codatc = Usuario::codigo_atuacao_ceu($usuario_moodle->idnumber, $info_forms->codofeatvceu);
         // matricula o professor
-        Usuario::matricula_professor($moodle_curso->id, $ministrante->id);
-        \core\notification::success('Professor auxiliar ' . $nome . ' matriculado como "professor".');
+        Usuario::matricula_professor($moodle_curso->id, $ministrante->id, $codatc);
+        $shortname_adaptado = Atuacao::NOMES[$codatc];
+        \core\notification::success('Professor auxiliar ' . $nome . ' matriculado como "' . $shortname_adaptado . '".');
         try {
           // Tente executar a função de notificação de inscrição do usuário
           Notificacoes::notificacao_inscricao($ministrante);
