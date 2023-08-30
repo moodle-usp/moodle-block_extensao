@@ -13,16 +13,6 @@ class USPDatabase
     // para exibir as mensagens de erro
     const DEBUG = true;
 
-    // Nomes das tabelas
-    const OFERECIMENTOATIVIDADECEU = "OFERECIMENTOATIVIDADECEU";
-    const CURSOCEU                 = "CURSOCEU";
-    const EDICAOCURSOOFECEU        = "EDICAOCURSOOFECEU";
-    const MINISTRANTECEU           = "MINISTRANTECEU";
-    const EMAILPESSOA              = "EMAILPESSOA";
-    const UNIDADE                  = "UNIDADE";
-    const CAMPUS                   = "CAMPUS";
-    const PESSOA                   = "PESSOA";
-
     public static function getInstance(){
         global $CFG;
 

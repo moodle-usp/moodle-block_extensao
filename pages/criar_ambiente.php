@@ -24,7 +24,7 @@ require_once(__DIR__ . '/../src/Turmas.php');
 require_once(__DIR__ . '/../src/Service/Query.php');
 require_once(__DIR__ . '/../src/Ambiente.php');
 use block_extensao\Service\Query;
-
+$Query = new Query();
 
 // captura os dados vindos do formulario
 if (isset($_SESSION['codofeatvceu'])) {
@@ -66,8 +66,8 @@ if (!Turmas::usuario_docente_turma($USER->idnumber, $codofeatvceu) ) {
 // aqui precisamos capturar as informacoes basicas do curso
 // foi adicionado o inicio e fim do curso 
 $informacoes_turma = Turmas::info_turma_id_extensao($codofeatvceu);
-$informacoes_turma->objetivo = Query::objetivo_extensao($codofeatvceu);
-$data_curso = Query::datas_curso($codofeatvceu);
+$informacoes_turma->objetivo = $Query->objetivo_extensao($codofeatvceu);
+$data_curso = $Query->datas_curso($codofeatvceu);
 $informacoes_turma->inicio = $data_curso->startdate;
 $informacoes_turma->fim = $data_curso->enddate;
 

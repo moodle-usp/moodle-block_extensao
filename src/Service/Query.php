@@ -17,9 +17,24 @@ require_once('USPDatabase.php');
 class Query 
 {
   /**
+   * Construtor da classe Query.
+   * Captura as tabelas e as armazena.
+   */
+  public function __construct() {
+    $this->OFERECIMENTOATIVIDADECEU = get_config('block_extensao', 'tabela_oferecimentoatividadeceu');
+    $this->CURSOCEU                 = get_config('block_extensao', 'tabela_cursoceu');
+    $this->EDICAOCURSOOFECEU        = get_config('block_extensao', 'tabela_edicaocursoofeceu');
+    $this->MINISTRANTECEU           = get_config('block_extensao', 'tabela_ministranteceu');
+    $this->EMAILPESSOA              = get_config('block_extensao', 'tabela_emailpessoa');
+    $this->UNIDADE                  = get_config('block_extensao', 'tabela_unidade');
+    $this->CAMPUS                   = get_config('block_extensao', 'tabela_campus');
+    $this->PESSOA                   = get_config('block_extensao', 'tabela_pessoa');
+  }
+
+  /**
    * Para testar a conexao com o Apolo.
    */
-  public static function testar_conexao () {
+  public function testar_conexao () {
     return USPDatabase::fetch("SELECT 1");
   }
 
@@ -28,16 +43,16 @@ class Query
    * Sao consideradas como turmas abertas somente as turmas com
    * data de encerramento posterior a data de hoje.
    */
-  public static function turmasAbertas () {
+  public function turmasAbertas () {
     $hoje = date("Y-m-d");
     $query = "
       SELECT
         o.codofeatvceu
         ,c.nomcurceu
-      FROM " . USPDatabase::OFERECIMENTOATIVIDADECEU . " o
-          LEFT JOIN " . USPDatabase::CURSOCEU . " c
+      FROM " . $this->OFERECIMENTOATIVIDADECEU . " o
+          LEFT JOIN " . $this->CURSOCEU . " c
             ON c.codcurceu = o.codcurceu
-          LEFT JOIN " . USPDatabase::EDICAOCURSOOFECEU . " e
+          LEFT JOIN " . $this->EDICAOCURSOOFECEU . " e
             ON o.codcurceu = e.codcurceu AND o.codedicurceu = e.codedicurceu
       WHERE e.dtainiofeedi >= '$hoje'
       ORDER BY codofeatvceu 
@@ -64,7 +79,7 @@ class Query
    * das turmas.
    * @return array|null Resultado da busca.
    */
-  public static function ministrantesTurmas ($codofeatvceu_turmas) {
+  public function ministrantesTurmas ($codofeatvceu_turmas) {
     $turmas = implode(', ', $codofeatvceu_turmas);
     $hoje = date("Y-m-d");
     $query = "
@@ -73,8 +88,8 @@ class Query
         m.codpes,
         m.codatc,
         e.codema
-      FROM " . USPDatabase::MINISTRANTECEU . " m
-      LEFT JOIN " . USPDatabase::EMAILPESSOA . " e ON m.codpes = e.codpes
+      FROM " . $this->MINISTRANTECEU . " m
+      LEFT JOIN " . $this->EMAILPESSOA . " e ON m.codpes = e.codpes
       WHERE m.codpes IS NOT NULL
         AND m.codofeatvceu IN ($turmas)
         AND m.dtainimisatv >= '$hoje'
@@ -90,13 +105,13 @@ class Query
    * @param int|string $codofeatvceu Codigo de oferecimento da atividade.
    * @return stdClass Objeto do curso.
    */
-  public static function informacoesTurma ($codofeatvceu) {
+  public function informacoesTurma ($codofeatvceu) {
     $query = "
       SELECT
         codund,
         dtainiofeatv,
         dtafimofeatv
-      FROM " . USPDatabase::OFERECIMENTOATIVIDADECEU . "
+      FROM " . $this->OFERECIMENTOATIVIDADECEU . "
       WHERE codofeatvceu = $codofeatvceu        
     ";
     $infos_curso = USPDatabase::fetch($query);
@@ -116,12 +131,12 @@ class Query
    * 
    * @return object
    */
-  public static function objetivo_extensao($codofeatvceu) {
+  public function objetivo_extensao($codofeatvceu) {
     $obj = "
       SELECT 
         c.objcur 
-      FROM " . USPDatabase::OFERECIMENTOATIVIDADECEU . " o 
-      LEFT JOIN " . USPDatabase::CURSOCEU . " c 
+      FROM " . $this->OFERECIMENTOATIVIDADECEU . " o 
+      LEFT JOIN " . $this->CURSOCEU . " c 
         ON c.codcurceu = o.codcurceu 
       WHERE codofeatvceu = $codofeatvceu";
     return USPDatabase::fetch($obj)['objcur'];
@@ -134,7 +149,7 @@ class Query
    * 
    * @return object
    */
-  public static function informacoes_unidade ($codund) {
+  public function informacoes_unidade ($codund) {
     // captura a unidade
     $info_unidade = USPDatabase::fetch("
       SELECT
@@ -142,7 +157,7 @@ class Query
         sglund,
         nomund,
         codcam
-      FROM " . USPDatabase::UNIDADE . "
+      FROM " . $this->UNIDADE . "
       WHERE codund = $codund
     ");
 
@@ -151,7 +166,7 @@ class Query
       SELECT
         codcam,
         nomcam
-      FROM " . USPDatabase::CAMPUS . "
+      FROM " . $this->CAMPUS . "
       WHERE codcam = " . $info_unidade['codcam']);
 
     return array(
@@ -167,12 +182,12 @@ class Query
    * 
    * @return object
    */
-  public static function datas_curso ($codofeatvceu){
+  public function datas_curso ($codofeatvceu){
     $query = "
        SELECT 
         dtainiofeatv, 
         dtafimofeatv 
-      FROM " . USPDatabase::OFERECIMENTOATIVIDADECEU . " 
+      FROM " . $this->OFERECIMENTOATIVIDADECEU . " 
       WHERE codofeatvceu = $codofeatvceu
       ORDER BY codofeatvceu";
     $info_datas = USPDatabase::fetch($query);
@@ -189,14 +204,14 @@ class Query
    * 
    * @return object
    */
-  public static function info_usuario ($codpes) {
+  public function info_usuario ($codpes) {
     return USPDatabase::fetch("
       SELECT
         p.codpes,
         p.nompes,
         e.codema
-      FROM " . USPDatabase::PESSOA . " p
-      LEFT JOIN " . USPDatabase::EMAILPESSOA . " e ON p.codpes = e.codpes
+      FROM " . $this->PESSOA . " p
+      LEFT JOIN " . $this->EMAILPESSOA . " e ON p.codpes = e.codpes
       WHERE p.codpes = $codpes
    ");
   }
@@ -208,11 +223,11 @@ class Query
    * 
    * @return object
    */
-  public static function emails ($codpes) {
+  public function emails ($codpes) {
     return USPDatabase::fetchAll("
       SELECT
         codema
-      FROM " . USPDatabase::EMAILPESSOA . "
+      FROM " . $this->EMAILPESSOA . "
       WHERE codpes = $codpes
     ");
   }

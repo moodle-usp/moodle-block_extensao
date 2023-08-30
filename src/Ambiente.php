@@ -31,12 +31,13 @@ class Ambiente {
    */
   public static function criar_ambiente ($info_forms, $ministrantes) {
     global $USER, $DB;
+    $Query = new Query();
 
     // faz uma versao em array dos dados do forms
     $info_forms_array = json_decode(json_encode($info_forms), true);
 
     // eh preciso capturar outras informacoes do curso, como a unidade
-    $info_curso_apolo = Query::informacoesTurma($info_forms->codofeatvceu);
+    $info_curso_apolo = $Query->informacoesTurma($info_forms->codofeatvceu);
 
     // transforma o enviado em um objeto de curso
     $curso = self::criar_objeto_curso($info_forms, $info_curso_apolo);
@@ -88,7 +89,7 @@ class Ambiente {
     // caso seja selecionado um professor sem conta moodle, eh criada a sua conta
     if (isset($info_forms_array['ministrantes_semconta'])) {
       foreach ($info_forms_array['ministrantes_semconta'] as $id_ministrante => $ministrante_semconta) {
-        $info_ministrante = Query::info_usuario($id_ministrante);
+        $info_ministrante = $Query->info_usuario($id_ministrante);
         if (!isset($info_ministrante['nompes'])) {
           // caso o nome nao esteja definido nas informacoes do usuario
           \core\notification::error('Nome do professor ausente. Não foi possível cadastrar a conta do professor sem conta Moodle.');
@@ -172,9 +173,10 @@ class Ambiente {
    */
   public static function turma_categoria ($info_curso_apolo) {
     global $DB;
+    $Query = new Query();
 
     // captura as informaoces da unidade do curso
-    $infos = Query::informacoes_unidade($info_curso_apolo->codund);
+    $infos = $Query->informacoes_unidade($info_curso_apolo->codund);
 
     $info_campus = $infos['campus'];
     $categoria_campus = self::categoria(array(

@@ -94,6 +94,8 @@ class Usuario {
   public static function informacoes_usuarios ($lista_usuarios, $logado="") {
     global $DB;
 
+    $Query = new Query();
+
     // para separar usuarios que estao no Moodle dos que nao estao
     $usuarios = array('moodle' => array(), 'apolo' => array());
 
@@ -109,7 +111,7 @@ class Usuario {
       }
       else {
         // buscando se existe usuario pelos emails
-        $emails = Query::emails($usuario->codpes);
+        $emails = $Query->emails($usuario->codpes);
         if($emails) {
           // pega os e-mails
           $emails = array_column($emails, 'codema');
@@ -125,7 +127,7 @@ class Usuario {
           }
         }
         // se nao existir, precisa buscar no Apolo
-        $info_usuario = Query::info_usuario($usuario->codpes);
+        $info_usuario = $Query->info_usuario($usuario->codpes);
         if ($info_usuario) {
           // captura o papel de usuario
           $codatc = Usuario::codigo_atuacao_ceu($usuario->codpes);

@@ -28,7 +28,7 @@ class Sincronizar {
    * @return bool 
    */
   private function conexao_apolo () {
-    return Query::testar_conexao();
+    return (new Query())->testar_conexao();
   }
 
   /**
@@ -71,7 +71,7 @@ class Sincronizar {
     cli_writeln(PHP_EOL . '[TURMAS]' . PHP_EOL . '# Capturando turmas...');
 
     // Captura as turmas
-    $turmas = Query::turmasAbertas();
+    $turmas = (new Query())->turmasAbertas();
 
     // Se der erro na busca, ja para por aqui
     if (!$turmas) die(PHP_EOL);
@@ -111,7 +111,7 @@ class Sincronizar {
   private function sincronizarMinistrantes ($turmas) {
     cli_writeln(PHP_EOL . '[MINISTRANTES]' . PHP_EOL . '# Capturando ministrantes...');
     // Captura os ministrantes
-    $ministrantes = Query::ministrantesTurmas($turmas);
+    $ministrantes = (new Query())->ministrantesTurmas($turmas);
     // Indexa o array de ministrantes, para evitar as duplicatas do e-mail
     $ministrantes = $this->removerDuplicatasMinistrantes($ministrantes);
 
