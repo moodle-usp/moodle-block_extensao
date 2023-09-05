@@ -19,6 +19,12 @@ if ($ADMIN->fulltree) {
     $setting = new admin_setting_configpasswordunmask('block_extensao/password', 'Senha','', '', PARAM_TEXT);
     $settings->add($setting);
 
+    $setting = new admin_setting_configtextarea('block_extensao/email_body_new_user', 
+            'Corpo do e-mail para novos usuários',
+            'Token de substituição: %firstname, %urlmoodle, %curso e %turma',
+            'Prezado <b>__firstname__</b>,<br>Sua conta foi criada no sistema moodle da USP %urlmoodle. Acesse %urlmoodle para criar uma senha no campo de recuperação de senha. <br>Você é ministrante do curso %curso e turma %turma.',  
+            PARAM_RAW);
+    $settings->add($setting);
 
     // Configuracoes de nomes de tabela
     // Por padrao vem com os valores do replicado

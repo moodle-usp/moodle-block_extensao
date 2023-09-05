@@ -202,7 +202,7 @@ class Usuario {
     $novoUsuario = new stdClass();
     $novoUsuario->username = (string) $usuario['codpes'];
     $novoUsuario->idnumber = $usuario['codpes'];
-    $novoUsuario->password = "Euamoausp*555";
+    $novoUsuario->password = 'A'.md5(date('now')).'*' ;
     $novoUsuario->firstname = $primeiroNome;
     $novoUsuario->lastname = $segundoNome;
     $novoUsuario->email = $usuario['codema'];
