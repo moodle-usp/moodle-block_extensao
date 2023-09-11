@@ -20,6 +20,11 @@ class Notificacoes {
         try {
             $userfrom = core_user::get_noreply_user();
             $userto = $usuario->id;
+            
+            // Ler a configuração do campo block_extensao/email_body_new_user
+            // Substituir os tokens: %firstname, %urlmoodle, %curso e %turma
+            // Dica str_replace, %firstname port por $usuario->firstname
+            
             $msg = "Olá " . $usuario->firstname . ",\n\nA sua conta no Moodle foi criada com sucesso!";
 
             // Verifique se ja existe uma conversa entre os usuarios

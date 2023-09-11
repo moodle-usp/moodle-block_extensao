@@ -17,7 +17,7 @@
         <FIELD NAME="codofeatvceu" TYPE="int" LENGTH="16" NOTNULL="true" SEQUENCE="false" COMMENT="Codigo de oferecimento da atividade no Apolo."/>
         <FIELD NAME="nome_curso_apolo" TYPE="text" NOTNULL="true" SEQUENCE="false" COMMENT="Nome do curso no Apolo."/>
         <FIELD NAME="id_moodle" TYPE="int" LENGTH="16" NOTNULL="false" SEQUENCE="false" COMMENT="Identificador do curso no Moodle"/>
-        <FIELD NAME="data_importacao" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Data em que foi importada a turma."/>
+        <FIELD NAME="data_importacao" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="Data em que foi importada a turma."/>
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="codofeatvceu"/>
