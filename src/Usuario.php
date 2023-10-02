@@ -189,8 +189,13 @@ class Usuario {
     // Verificar se o usuario ja possui conta no Moodle
     $existeUsuario = $DB->get_record('user', ['username' => $usuario['codpes']]);
     if (!empty($existeUsuario)) {
-        \core\notification::warning("O usuário " . $usuario['nompes']. " já possui uma conta no Moodle. O cadastro não sera realizado.");
         return false; 
+    }
+
+       // Verifica se o usuario possui e-mail cadastrado no banco de dados, caso nao, a conta nao eh criada.
+       if (empty($usuario['codema'])) {
+        \core\notification::error("O usuário " . $usuario['nompes']. " não possui um endereço de e-mail válido. A matrícula não será realizada.");
+        return false;
     }
 
     // Criando objeto do usuario
@@ -211,12 +216,18 @@ class Usuario {
     try {
       // Chama a funcao user_create_user() para cadastrar o novo usuario
       $usuario_id = user_create_user($novoUsuario);
-      $usuarioObj = $DB->get_record("user", ["id" => $usuario_id]);
-      \core\notification::success("O usuário " . $nomeCompleto . " foi cadastrado no Moodle com sucesso!");
-      return $usuarioObj;
-    } catch (\Exception $e) {
-      \core\notification::error("Erro ao cadastrar o usuário: " . $e->getMessage());
-      return false;
+
+      // Verificar se o id do usuario foi criado com exito
+      if ($usuario_id) {
+        $usuarioObj = $DB->get_record("user", ["id" => $usuario_id]);
+        return $usuarioObj;
+    } else {
+        \core\notification::error("Erro ao inscrever o usuário. Por favor contate o suporte.");
+        return false;
+    }
+} catch (\Exception $e) {
+    \core\notification::error("Erro ao cadastrar o usuário: " . $e->getMessage());
+    return false;
     }
   }
 }

@@ -19,12 +19,28 @@ if ($ADMIN->fulltree) {
     $setting = new admin_setting_configpasswordunmask('block_extensao/password', 'Senha','', '', PARAM_TEXT);
     $settings->add($setting);
 
-    $setting = new admin_setting_configtextarea('block_extensao/email_body_new_user', 
+     $setting = new admin_setting_configtextarea('block_extensao/email_body_new_user', 
             'Corpo do e-mail para novos usuários',
-            'Token de substituição: %firstname, %urlmoodle, %curso e %turma',
-            'Prezado <b>__firstname__</b>,<br>Sua conta foi criada no sistema moodle da USP %urlmoodle. Acesse %urlmoodle para criar uma senha no campo de recuperação de senha. <br>Você é ministrante do curso %curso e turma %turma.',  
+            "<p>Prezado(a) %profAux,</p>
+    
+            <p>Esta é uma notificação da criação do ambiente virtual do seu curso <strong>%curso</strong>, turma <strong>%turma</strong> na plataforma de 
+            Cultura e Extensão da USP. Foi atribuído a você o papel de ministrante nesta plataforma pelo professor 
+            <strong>%profTit</strong>. Para acessá-lo, clique no seguinte link:</p>
+            <p><a href=http://0.0.0.0:8888>Acessar o Ambiente Virtual</a></p>
+            
+            <p>Atenciosamente,</p>
+            <p>Equipe Moodle USP Extensão</p>",
+            'Token de substituição: %profAux, %profTit, %curso e %turma',
             PARAM_RAW);
+
     $settings->add($setting);
+
+    // Adicionado a configuração que permite a edição do texto através do editor Atto
+    $setting->set_updatedcallback('editor::update_definition', array('email', 'block_extensao/email_body_new_user'));
+
+    // Adicionado a configuração ao administrador
+    $ADMIN->add('blocksettings', $setting);
+
 
     // Configuracoes de nomes de tabela
     // Por padrao vem com os valores do replicado
