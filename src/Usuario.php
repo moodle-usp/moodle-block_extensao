@@ -199,6 +199,7 @@ class Usuario {
     }
 
     // Criando objeto do usuario
+    // Nao sera definida senha
     $nomeCompleto = $usuario['nompes'];
     $partesNome = explode(' ', $nomeCompleto); 
     $primeiroNome = $partesNome[0];
