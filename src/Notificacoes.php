@@ -27,7 +27,8 @@ class Notificacoes {
             }
             $userfrom = core_user::get_noreply_user();
             $userto = $usuario->id;
-            
+            date_default_timezone_set('America/Sao_Paulo');
+            $data = date('d/m/Y H:i:s', time());
             // Ler a configuração do campo block_extensao/email_body_new_user
             // Substituir os tokens: %profTit, %profAux, %curso e %turma
             // Dica str_replace, %firstname port por $usuario->firstname
@@ -38,6 +39,8 @@ class Notificacoes {
             $msg = str_replace('%curso', $moodle_curso->fullname, $msg); 
             $msg = str_replace('%profAux', $usuario->firstname, $msg);
             $msg = str_replace('%turma', $moodle_curso->shortname, $msg);
+            $msg = str_replace('%data', $data, $msg);
+
 
             // Verifique se ja existe uma conversa entre os usuarios
             if (!api::get_conversation_between_users([$userfrom->id, $userto])) {

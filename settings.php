@@ -19,18 +19,18 @@ if ($ADMIN->fulltree) {
     $setting = new admin_setting_configpasswordunmask('block_extensao/password', 'Senha','', '', PARAM_TEXT);
     $settings->add($setting);
 
-     $setting = new admin_setting_configtextarea('block_extensao/email_body_new_user', 
+    $setting = new admin_setting_configtextarea('block_extensao/email_body_new_user', 
             'Corpo do e-mail para novos usuários',
             "<p>Prezado(a) %profAux,</p>
     
-            <p>Esta é uma notificação da criação do ambiente virtual do seu curso <strong>%curso</strong>, turma <strong>%turma</strong> na plataforma de 
+            <p>Esta é uma notificação da criação do ambiente virtual  em <strong>%data</strong>, do seu curso <strong>%curso</strong>, turma <strong>%turma</strong> na plataforma de 
             Cultura e Extensão da USP. Foi atribuído a você o papel de ministrante nesta plataforma pelo professor 
             <strong>%profTit</strong>. Para acessá-lo, clique no seguinte link:</p>
             <p><a href=http://0.0.0.0:8888>Acessar o Ambiente Virtual</a></p>
             
             <p>Atenciosamente,</p>
             <p>Equipe Moodle USP Extensão</p>",
-            'Token de substituição: %profAux, %profTit, %curso e %turma',
+            'Token de substituição: %profAux, %profTit, %curso e %turma, %data',
             PARAM_RAW);
 
     $settings->add($setting);

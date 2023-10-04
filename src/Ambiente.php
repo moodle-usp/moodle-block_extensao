@@ -83,6 +83,8 @@ class Ambiente {
         Usuario::matricula_professor($moodle_curso->id, $id_ministrante, $codatc);
         $shortname_adaptado = Atuacao::NOMES[$codatc];
         \core\notification::success('Professor auxiliar ' . $nome . ' matriculado como "' . $shortname_adaptado . '".');
+        Notificacoes::notificacao_inscricao($usuario_moodle, $moodle_curso);
+
       }
     }
     
@@ -120,7 +122,6 @@ class Ambiente {
         $shortname_adaptado = Atuacao::NOMES[$codatc];
         \core\notification::success('Professor auxiliar ' . $nome . ' matriculado como "' . $shortname_adaptado . '".');
         try {
-          // Tente executar a função de notificação de inscrição do usuário
           Notificacoes::notificacao_inscricao($ministrante, $moodle_curso);
       } catch (Exception $e) {
           // Se ocorrer um erro, ele sera capturado aqui e podemos lidar com ele
