@@ -199,7 +199,7 @@ class Usuario {
     }
 
     // Criando objeto do usuario
-    // Nao sera definida senha
+    //
     $nomeCompleto = $usuario['nompes'];
     $partesNome = explode(' ', $nomeCompleto); 
     $primeiroNome = $partesNome[0];
@@ -211,7 +211,7 @@ class Usuario {
     $novoUsuario->firstname = $primeiroNome;
     $novoUsuario->lastname = $segundoNome;
     $novoUsuario->email = $usuario['codema'];
-    $novoUsuario->auth = 'manual';
+    $novoUsuario->auth = 'shibboleth';
 
     try {
       // Chama a funcao user_create_user() para cadastrar o novo usuario
