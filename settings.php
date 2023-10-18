@@ -16,8 +16,6 @@ if ($ADMIN->fulltree) {
     $setting = new admin_setting_configtext('block_extensao/user', 'Usuário','', '', PARAM_TEXT);
     $settings->add($setting);
 
-    $setting = new admin_setting_configpasswordunmask('block_extensao/password', 'Senha','', '', PARAM_TEXT);
-    $settings->add($setting);
 
     $setting = new admin_setting_configtextarea('block_extensao/email_body_new_user', 
             'Corpo do e-mail para novos usuários',
@@ -73,5 +71,21 @@ if ($ADMIN->fulltree) {
 
     // Campo para a tabela de "PESSOA"
     $setting = new admin_setting_configtext('block_extensao/tabela_pessoa', 'PESSOA', '', 'PESSOA', PARAM_TEXT);
+    $settings->add($setting);
+
+    // Campo de configuracao para busca de curso
+    $options = array(
+        '3' => '3 meses',
+        '6' => '6 meses',
+        '9' => '9 meses',
+        '1' => '1 ano',
+    );
+    $setting = new admin_setting_configselect(
+    'block_extensao/periodo_curso',
+    'Selecione o período para pesquisa de cursos abertos. ', 
+    'Escolha o período desejado: ', 
+    '3',
+    $options
+);
     $settings->add($setting);
 }
