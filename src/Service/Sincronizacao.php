@@ -216,6 +216,10 @@ class Sincronizar {
         $DB->delete_records('block_extensao_ministrante', array('codofeatvceu' => $turma->codofeatvceu));
         $turmas_fora_base[$turma->codofeatvceu] = $turma;
       }
+
+      // Data de importacao
+      date_default_timezone_set('America/Sao_Paulo');
+      $turma->data_importacao = time();
     }
     
     return $turmas_fora_base;
