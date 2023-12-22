@@ -40,6 +40,9 @@ class block_extensao extends block_base {
                 $form = new redirecionamento_criacao_ambiente('/blocks/extensao/pages/criar_ambiente.php', array('codofeatvceu' => $codofeatvceu));
     
                 $cursos_usuario[$i]['formulario'] = $form->render();
+                
+                // Remove as quebras no nome
+                $cursos_usuario[$i]['nome_curso_apolo'] = str_replace(array("\r", "\n"), '', $cursos_usuario[$i]['nome_curso_apolo']);
             }
         } else
             $cursos_usuario = []; // para nao dar erro de variavel indefinida
