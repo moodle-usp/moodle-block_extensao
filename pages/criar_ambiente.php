@@ -5,8 +5,8 @@
  * https://github.com/moodle-usp
  * 
  * Aqui eh necessario capturar as informacoes que vieram do forms atraves
- * do campo hidden 'id_turma_extensao' e mostrar ao usuario/docente as 
- * informacoes basicas do ambiente que esta criando.
+ * do autocomplete e mostrar ao usuario/docente as informacoes basicas do 
+ * ambiente que esta criando.
  */
 
 require_once(__DIR__ . '/../../../config.php');
@@ -18,7 +18,6 @@ $PAGE->set_context(context_system::instance());
 $PAGE->set_heading(get_string('pluginname', 'block_extensao'));
 require_login();
 
-// requerimentos
 require_once(__DIR__ . '/../utils/forms.php');
 require_once(__DIR__ . '/../src/Turmas.php');
 require_once(__DIR__ . '/../src/Service/Query.php');
@@ -26,6 +25,7 @@ require_once(__DIR__ . '/../src/Ambiente.php');
 use block_extensao\Service\Query;
 $Query = new Query();
 
+// TENTA CAPTURAR AS INFORMACOES VINDAS DO FORMULARIO DE CRIACAO DE CURSO
 // captura os dados vindos do formulario
 if (isset($_SESSION['codofeatvceu'])) {
   // captura os outros ministrantes a partir do codofeatvceu
@@ -42,25 +42,34 @@ if (isset($_SESSION['codofeatvceu'])) {
   }
 }
 
-// caso contrario, entao ainda vai preencher o forms
+// CASO CONTRARIO, TENTA CAPTURAR AS INFORMACOES VINDAS DO FORMULARIO DA PAGINA INICIAL
+// precisamos capturar na base Moodle os cursos nos quais o usuario eh docente e
+// cujo ambiente ainda nao foi criado para poder gerar o forms
+$cursos = Turmas::cursos_formatados($USER->idnumber);
 // capturando o codfeatvceu
-$forms = new redirecionamento_criacao_ambiente();
+$forms = new redirecionamento_criacao_ambiente('', array('cursos'=>$cursos));
 $info_forms = $forms->get_data();
 if (!empty($info_forms)) {
-  $codofeatvceu = $info_forms->codofeatvceu;
+  if (!isset($info_forms->select_ambiente)) {
+    \core\notification::error('Nenhuma turma selecionada');
+    redirect($_SERVER['HTTP_REFERER']);
+  }
+  $codofeatvceu = $info_forms->select_ambiente;
+  // Se for vazio, volta para a pagina
+  if ($codofeatvceu == 0)
+    redirect($_SERVER['HTTP_REFERER']);
+  // Caso contrario, salva
   $_SESSION['codofeatvceu'] = $codofeatvceu;
 }
-
 // se estiver vazio, tenta pegar via sessao
-else {
+else
   $codofeatvceu = $_SESSION['codofeatvceu'];
-}
+
 
 // verifica se a turma enviada eh do usuario logado
 if (!Turmas::usuario_docente_turma($USER->idnumber, $codofeatvceu) ) {
   \core\notification::error('A turma solicitada não está na sua lista de turmas!');
-  $url = new moodle_url($CFG->wwwroot);
-  redirect($url);
+  redirect($_SERVER['HTTP_REFERER']);
 }
 
 // aqui precisamos capturar as informacoes basicas do curso

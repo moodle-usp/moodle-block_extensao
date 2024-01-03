@@ -18,16 +18,18 @@ require_once(__DIR__ . '/../src/Atuacao.php');
 require_once(__DIR__ . '/../src/Service/Query.php');
 use block_extensao\Service\Query;
 
-// formulario escondido para os docentes criarem um ambiente para um curso
+// formulario para os docentes criarem um ambiente para um curso
 class redirecionamento_criacao_ambiente extends moodleform {
   public function definition () {
-    // input hidden com o id da turma no plugin Extensao
-    $codofeatvceu = "";
-    if (isset($this->_customdata['codofeatvceu']))
-      $codofeatvceu = $this->_customdata['codofeatvceu'];  
-    $this->_form->addElement('hidden', 'codofeatvceu', $codofeatvceu);
-    $this->_form->setType('codofeatvceu', PARAM_TEXT);
-    
+    // Captura a lista de cursos
+    if (isset($this->_customdata['cursos'])) $cursos = $this->_customdata['cursos'];
+    else $cursos = [];
+
+    $options = array(
+      'placeholder' => "Buscar"
+    );
+    $this->_form->addElement('autocomplete', 'select_ambiente', 'busca', [0=>''] + $cursos, $options);
+
     // botao de submit
     $this->_form->addElement('submit', 'redirecionar_criar_ambiente', 'Criar ambiente');
   }
