@@ -28,7 +28,7 @@ class redirecionamento_criacao_ambiente extends moodleform {
     $options = array(
       'placeholder' => "Buscar"
     );
-    $this->_form->addElement('autocomplete', 'select_ambiente', 'busca', [0=>''] + $cursos, $options);
+    $this->_form->addElement('autocomplete', 'select_ambiente', 'Buscar por turma', [0=>''] + $cursos, $options);
 
     // botao de submit
     $this->_form->addElement('submit', 'redirecionar_criar_ambiente', 'Criar ambiente');
