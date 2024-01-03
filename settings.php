@@ -16,6 +16,8 @@ if ($ADMIN->fulltree) {
     $setting = new admin_setting_configtext('block_extensao/user', 'Usuário','', '', PARAM_TEXT);
     $settings->add($setting);
 
+    $setting = new admin_setting_configpasswordunmask('block_extensao/password', 'Senha','', '', PARAM_TEXT);
+    $settings->add($setting);
 
     $setting = new admin_setting_configtextarea('block_extensao/email_body_new_user', 
             'Corpo do e-mail para novos usuários',
