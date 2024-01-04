@@ -5,8 +5,11 @@
  * https://github.com/moodle-usp
  * 
  * Aqui eh necessario capturar as informacoes que vieram do forms atraves
- * do campo hidden 'id_turma_extensao' e mostrar ao usuario/docente as 
- * informacoes basicas do ambiente que esta criando.
+ * do autocomplete e mostrar ao usuario/docente as informacoes basicas do 
+ * ambiente que esta criando.
+ * 
+ * Esta pagina processa tanto o formulario da pagina inicial quanto o
+ * formulario para a criacao do ambiente de fato.
  */
 
 require_once(__DIR__ . '/../../../config.php');
@@ -18,7 +21,6 @@ $PAGE->set_context(context_system::instance());
 $PAGE->set_heading(get_string('pluginname', 'block_extensao'));
 require_login();
 
-// requerimentos
 require_once(__DIR__ . '/../utils/forms.php');
 require_once(__DIR__ . '/../src/Turmas.php');
 require_once(__DIR__ . '/../src/Service/Query.php');
@@ -26,7 +28,17 @@ require_once(__DIR__ . '/../src/Ambiente.php');
 use block_extensao\Service\Query;
 $Query = new Query();
 
-// captura os dados vindos do formulario
+/**
+ * Tratamento do formulario de criacao de curso
+ * 
+ * Este eh o formulario para visualizacao e alteracao das informacoes para a
+ * criacao de um curso que foi selecionado na pagina inicial do bloco.
+ * 
+ * Este formulario so eh tratado (gerado e processado) se a chave "codofeatvceu"
+ * estiver definida na sessao. Ela eh definida na proxima sessao da pagina,
+ * quando o usuario vem pelo formulario do bloco inicial.
+ */
+
 if (isset($_SESSION['codofeatvceu'])) {
   // captura os outros ministrantes a partir do codofeatvceu
   $ministrantes = Usuario::ministrantes_turma($_SESSION['codofeatvceu'], $USER->idnumber);
@@ -42,38 +54,64 @@ if (isset($_SESSION['codofeatvceu'])) {
   }
 }
 
-// caso contrario, entao ainda vai preencher o forms
-// capturando o codfeatvceu
-$forms = new redirecionamento_criacao_ambiente();
+
+/**
+ * Tratamento do formulario do bloco inicial
+ * 
+ * O formulario com o select buscavel na pagina inicial eh tratado aqui. Eh
+ * capturado o curso selecionado e seu codigo eh salvo na sessao, para que a secao
+ * acima possa gerar o formulario de criacao de ambiente.
+ */
+
+// Eh preciso capturar na base do Moodle os cursos nos quais o usuario eh docente e 
+// cujo ambiente ianda nao foi criado para poder gerar o forms.
+$cursos = Turmas::cursos_formatados($USER->idnumber);
+
+// Gera o formulario para capturar o codfeatvceu
+$forms = new redirecionamento_criacao_ambiente('', array('cursos'=>$cursos));
 $info_forms = $forms->get_data();
 if (!empty($info_forms)) {
-  $codofeatvceu = $info_forms->codofeatvceu;
+  // Se o select nao estiver definido, deu algum problema e volta para o inicio
+  if (!isset($info_forms->select_ambiente)) {
+    \core\notification::error('Nenhuma turma selecionada');
+    redirect($_SERVER['HTTP_REFERER']);
+  }
+  $codofeatvceu = $info_forms->select_ambiente;
+  
+  // Se for vazio, volta para a pagina
+  if ($codofeatvceu == 0) redirect($_SERVER['HTTP_REFERER']);
+  
+  // Caso contrario, salva
   $_SESSION['codofeatvceu'] = $codofeatvceu;
 }
+// Se estiver vazio, tenta pegar via sessao
+else $codofeatvceu = $_SESSION['codofeatvceu'];
 
-// se estiver vazio, tenta pegar via sessao
-else {
-  $codofeatvceu = $_SESSION['codofeatvceu'];
-}
-
-// verifica se a turma enviada eh do usuario logado
+// Verifica se a turma enviada eh do usuario logado
 if (!Turmas::usuario_docente_turma($USER->idnumber, $codofeatvceu) ) {
   \core\notification::error('A turma solicitada não está na sua lista de turmas!');
-  $url = new moodle_url($CFG->wwwroot);
-  redirect($url);
+  redirect($_SERVER['HTTP_REFERER']);
 }
 
-// aqui precisamos capturar as informacoes basicas do curso
-// foi adicionado o inicio e fim do curso 
+
+/**
+ * Visualizacao do formulario
+ * 
+ * Aqui sao capturadas informacoes adicionais para a criacao do formulario
+ * de criacao de ambiente, exibido no final da pagina.
+ */
+
+// Aqui precisamos capturar as informacoes basicas do curso
+// Foi adicionado o inicio e fim do curso 
 $informacoes_turma = Turmas::info_turma_id_extensao($codofeatvceu);
 $informacoes_turma->objetivo = $Query->objetivo_extensao($codofeatvceu);
 $data_curso = $Query->datas_curso($codofeatvceu);
 $informacoes_turma->inicio = $data_curso->startdate;
 $informacoes_turma->fim = $data_curso->enddate;
-
+// Lista de ministrantes
 $ministrantes = Usuario::ministrantes_turma($codofeatvceu, $USER->idnumber);
 
-// cria o formulario
+// Cria o formulario
 $formulario = new criar_ambiente_moodle('', array(
   'codofeatvceu' => $codofeatvceu,
   'shortname' => $codofeatvceu,
@@ -84,17 +122,12 @@ $formulario = new criar_ambiente_moodle('', array(
   'ministrantes' => $ministrantes
 ));
 
-
-// EXIBINDO
-
+// Exibicao da pagina
 // cabecalho
 print $OUTPUT->header();
-
 // template
 print $OUTPUT->render_from_template('block_extensao/criar_ambiente', array(
   'formulario' => $formulario->render()
 ));
-
 // rodape
 print $OUTPUT->footer();
-

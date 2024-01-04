@@ -139,4 +139,28 @@ class Turmas {
     foreach ($lista_codpes as $usuario) $lista[$usuario->codpes] = $usuario;
     return $lista;
   }
+
+  /**
+   * Captura os cursos de um usuario a partir de seu id, formata o
+   * nome e retorna no formato de Array indexado pelo codofeatvceu.
+   * 
+   * @param string|integer $id_usuario Identificador do usuario.
+   * 
+   * @return array Array de cursos.
+   */
+  public static function cursos_formatados ($id_usuario) {
+    // Captura os cursos a partir do id de usuario
+    $cursos_usuario = Turmas::docente_turmas($id_usuario);
+    $cursos=[];
+    
+    foreach ($cursos_usuario as $curso) {
+      // Captura o id da turma no plugin de extensao (codofeatvceu)
+      $codofeatvceu = $curso['codofeatvceu'];
+      // Remove as quebras no nome
+      $nome_curso = str_replace(array("\r", "\n"), '', $curso['nome_curso_apolo']);
+      // salva
+      $cursos[$codofeatvceu] = $nome_curso;
+    }
+    return $cursos;
+  }
 }
