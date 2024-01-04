@@ -43,8 +43,30 @@ class Query
    * Sao consideradas como turmas abertas somente as turmas com
    * data de encerramento posterior a data de hoje.
    */
+
+  
   public function turmasAbertas () {
-    $hoje = date("Y-m-d");
+    
+    $periodo = get_config('block_extensao', 'periodo_curso');
+    $diaAtual = date("Y-m-d");
+
+    // opcoes para a pesquisa do inicio da busca por curso, coloquei as opcoes de 3, 6, 9 meses 
+    // e 1 ano, no entanto esse valor pode ser alterado caso seja pertinente.
+
+    if($periodo == "3"){
+        $inicio_curso =  date("Y-m-d", strtotime("-3 months", strtotime($diaAtual)));
+    } elseif ($periodo == "6") {
+        $inicio_curso = date("Y-m-d", strtotime("-6 months", strtotime($diaAtual)));
+    } elseif ($periodo == "9") {
+        $inicio_curso = date("Y-m-d", strtotime("-9 months", strtotime($diaAtual)));
+    } elseif ($periodo == "1") {
+      $inicio_curso = date("Y-m-d", strtotime("-1 year", strtotime($diaAtual)));
+    } else { 
+      // caso nenhum periodo seja definido, o sistema inicia a busca de cursos com a data de inicio
+      // posterior a 1 ano. 
+      $inicio_curso = date("Y-m-d", strtotime("-1 year", strtotime($diaAtual)));
+    }
+   
     $query = "
       SELECT
         o.codofeatvceu
@@ -54,12 +76,13 @@ class Query
             ON c.codcurceu = o.codcurceu
           LEFT JOIN " . $this->EDICAOCURSOOFECEU . " e
             ON o.codcurceu = e.codcurceu AND o.codedicurceu = e.codedicurceu
-      WHERE e.dtainiofeedi >= '$hoje'
+      WHERE e.dtainiofeedi >= '$inicio_curso'
       ORDER BY codofeatvceu 
     ";
 
     return USPDatabase::fetchAll($query);
   }
+
 
   /**
    * Captura os ministrantes das turmas informadas.
