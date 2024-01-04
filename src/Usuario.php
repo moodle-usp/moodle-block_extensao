@@ -189,13 +189,14 @@ class Usuario {
     // Verificar se o usuario ja possui conta no Moodle
     $existeUsuario = $DB->get_record('user', ['username' => $usuario['codpes']]);
     if (!empty($existeUsuario)) {
-        return false; 
+      \core\notification::error(get_string('erro_padrao', 'block_extensao'));
+      return false; 
     }
 
-       // Verifica se o usuario possui e-mail cadastrado no banco de dados, caso nao, a conta nao eh criada.
-       if (empty($usuario['codema'])) {
-        \core\notification::error("O usuário " . $usuario['nompes']. " não possui um endereço de e-mail válido. A matrícula não será realizada.");
-        return false;
+    // Verifica se o usuario possui e-mail cadastrado no banco de dados, caso nao, a conta nao eh criada.
+    if (empty($usuario['codema'])) {
+      \core\notification::error("O usuário " . $usuario['nompes']. " não possui um endereço de e-mail válido. A matrícula não será realizada.");
+      return false;
     }
 
     // Criando objeto do usuario
@@ -231,5 +232,3 @@ class Usuario {
     }
   }
 }
-
- 
