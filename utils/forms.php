@@ -37,6 +37,8 @@ class redirecionamento_criacao_ambiente extends moodleform {
 // OBS: addRule nao esta funcionando...
 class criar_ambiente_moodle extends moodleform {
   public function definition () {
+    global $CFG;
+
     // input hidden com o id da turma no plugin Extensao
     $codofeatvceu = $this->define_campo('codofeatvceu');
     $this->_form->addElement('hidden', 'codofeatvceu', $codofeatvceu);
