@@ -122,23 +122,11 @@ class criar_ambiente_moodle extends moodleform {
       if (isset($ministrantes['apolo'])) {
         foreach ($ministrantes['apolo'] as $ministrante) {
           $codatc = Atuacao::NOMES[$ministrante['papel_usuario']];
-
-          if ($CFG->debugdeveloper) {
-            $this->_form->addElement(
-              'checkbox',
-              "ministrantes_semconta[{$ministrante['codpes']}]",
-              '<span style="text-align: justify; color: #ff0000; font-weight: bold;">Ministrantes sem conta Moodle, ao selecionar esta opção, 
-              uma conta será criada automaticamente.</span>',
-              $ministrante['nompes'] . " [{$codatc}]",
-            );
-          } else {
-            $this->_form->addElement(
-              'checkbox',
-              "ministrantes_semconta[{$ministrante['codpes']}]",
-              '',
-              $ministrante['nompes'] . " [{$codatc}]",
-            );
-          }
+          $this->_form->addElement(
+            'checkbox',
+            "ministrantes_semconta[{$ministrante['codpes']}]",
+            $ministrante['nompes'] . " [{$codatc}]",
+          );
         }
       }
     }

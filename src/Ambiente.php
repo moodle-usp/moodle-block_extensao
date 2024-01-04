@@ -83,6 +83,8 @@ class Ambiente {
         Usuario::matricula_professor($moodle_curso->id, $id_ministrante, $codatc);
         $shortname_adaptado = Atuacao::NOMES[$codatc];
         \core\notification::success('Professor auxiliar ' . $nome . ' matriculado como "' . $shortname_adaptado . '".');
+        Notificacoes::notificacao_inscricao($usuario_moodle, $moodle_curso);
+
       }
     }
     
@@ -92,17 +94,23 @@ class Ambiente {
         $info_ministrante = $Query->info_usuario($id_ministrante);
         if (!isset($info_ministrante['nompes'])) {
           // caso o nome nao esteja definido nas informacoes do usuario
-          \core\notification::error('Nome do professor ausente. Não foi possível cadastrar a conta do professor sem conta Moodle.');
+          \core\notification::error('Erro ao matricular o professor, por favor contate o suporte. ');
           continue;
         }
-  
+        // tratamento para professor sem e-mail no sistema 
+        if (!isset($info_ministrante['codema'])) {
+          // caso o nome nao esteja definido nas informacoes do usuario
+          \core\notification::error('Não foi possivel matricular o professor ' . $info_ministrante['nompes'] . ' como ministrante, por favor contate o suporte.');
+          continue;
+        }
+
         //Nome do professor
         $nome = $info_ministrante['nompes']; 
         //Para criar a conta do professor 
         $ministrante = Usuario::cadastra_usuario($info_ministrante);
         if (!$ministrante) {
           // Caso ocorra um problema ao cadastrar a conta do professor
-          \core\notification::error('Não foi possível cadastrar a conta do professor ' . $nome);
+          \core\notification::error('Não foi possível matricular o professor ' . $nome . ' como ministante adicional. Por favor contate o suporte.');
         }
 
         // Captura o codpes do professor
@@ -114,11 +122,7 @@ class Ambiente {
         $shortname_adaptado = Atuacao::NOMES[$codatc];
         \core\notification::success('Professor auxiliar ' . $nome . ' matriculado como "' . $shortname_adaptado . '".');
         try {
-          // Tente executar a função de notificação de inscrição do usuário
-          Notificacoes::notificacao_inscricao($ministrante);
-          \core\notification::success('Professor auxiliar ' . $nome . ' notificado sobre a inscrição no Moodle, 
-          um e-mail foi enviado.'
-        );
+          Notificacoes::notificacao_inscricao($ministrante, $moodle_curso);
       } catch (Exception $e) {
           // Se ocorrer um erro, ele sera capturado aqui e podemos lidar com ele
           // Por exemplo, podemos exibir uma mensagem de erro ou registrar o erro em um arquivo de log.
