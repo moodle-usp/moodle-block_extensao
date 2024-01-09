@@ -17,6 +17,8 @@ require_once(__DIR__ . '/Turmas.php');
 require_once(__DIR__ . '/Service/Query.php');
 require_once(__DIR__ . '/Usuario.php');
 require_once(__DIR__ . '/Atuacao.php');
+require_once(__DIR__ . '/Service/Sincronizacao.php');
+
 use block_extensao\Service\Query;
 
 class Ambiente {
@@ -65,6 +67,9 @@ class Ambiente {
     // se der certo, eh necessario salvar isso na base
     Turmas::atualizar_id_moodle_turma($info_forms->codofeatvceu, $moodle_curso->id);
     \core\notification::success('Ambiente criado com sucesso!');
+
+    // Por fim eh preenchido o campo sincronizado_apolo com 1 em relacao ao curso que foi criado
+    Sincronizar::sincronizadoApolo($moodle_curso->id);
 
     // inscreve o usuario logado no curso
     Usuario::inscreve_criador($moodle_curso->id);
