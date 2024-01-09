@@ -22,8 +22,10 @@
        </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="codofeatvceu"/>
-        <KEY NAME="idx_id_moodle" TYPE="index" FIELDS="id_moodle"/>
       </KEYS>
+      <INDEXES>
+        <INDEX NAME="idx_id_moodle" UNIQUE="false" FIELDS="id_moodle"/>
+      </INDEXES>
     </TABLE>
     <TABLE NAME="block_extensao_ministrante" COMMENT="Para relacionar os ministrantes com os cursos.">
       <FIELDS>
