@@ -34,8 +34,14 @@ class Notificacoes {
             // Captura a string do assunto
             $assunto = get_string('notificacao_inscricao_assunto', 'block_extensao');
 
+            // Contexto
+            $contexto = [
+                'url'     => (new \moodle_url('/course/'))->out(false),
+                'urlname' => 'Página do curso ' . $moodle_curso->shortname
+            ];
+
             // Faz o envio da notificacao
-            Notificacoes::enviar_notificacao_sistema($usuario->id, $assunto, $msg, $moodle_curso->id);
+            Notificacoes::enviar_notificacao_sistema($usuario->id, $assunto, $msg, $moodle_curso->id, $contexto);
 
         } catch (Exception $e) {
             \core\notification::error(get_string('erro_padrao', 'block_extensao'));
@@ -47,7 +53,7 @@ class Notificacoes {
     /**
      * Metodo estatico para padronizar o envio de e-mails pelo e-mail de no-reply.
      */
-    public static function enviar_notificacao_sistema (int $id_destinatario, string $assunto, string $msg, int $curso_id) {
+    public static function enviar_notificacao_sistema (int $id_destinatario, string $assunto, string $msg, int $curso_id, array $contexto=[]) {
         try {
             // O remetente eh o usuario no-reply padrao.
             $remetente = core_user::get_noreply_user();
@@ -74,9 +80,14 @@ class Notificacoes {
             $mensagem->fullmessage       = $msg;
             $mensagem->fullmessagehtml   = $msg;
             $mensagem->smallmessage      = $msg;
-            $mensagem->notification      = 0;
-            $mensagem->contexturl        = '';
-            $mensagem->contexturlname    = '';
+            $mensagem->notification      = 1;
+            if (empty($contexto)) {
+                $mensagem->contexturl        = '';
+                $mensagem->contexturlname    = '';
+            } else {
+                $mensagem->contexturl        = $contexto['url'];
+                $mensagem->contexturlname    = $contexto['urlname'];
+            }
             $mensagem->courseid          = $curso_id;
     
             // Obtem o e-mail de configuracao padrao do Moodle
