@@ -21,6 +21,7 @@ if ($ADMIN->fulltree) {
 
     $setting = new admin_setting_configtextarea('block_extensao/email_body_new_user', 
             'Corpo do e-mail para novos usuários',
+            'Token de substituição: %profAux, %profTit, %curso e %turma, %data',
             "<p>Prezado(a) %profAux,</p>
     
             <p>Esta é uma notificação da criação do ambiente virtual  em <strong>%data</strong>, do seu curso <strong>%curso</strong>, turma <strong>%turma</strong> na plataforma de 
@@ -30,17 +31,12 @@ if ($ADMIN->fulltree) {
             
             <p>Atenciosamente,</p>
             <p>Equipe Moodle USP Extensão</p>",
-            'Token de substituição: %profAux, %profTit, %curso e %turma, %data',
             PARAM_RAW);
 
     $settings->add($setting);
 
     // Adicionado a configuração que permite a edição do texto através do editor Atto
     $setting->set_updatedcallback('editor::update_definition', array('email', 'block_extensao/email_body_new_user'));
-
-    // Adicionado a configuração ao administrador
-    $ADMIN->add('blocksettings', $setting);
-
 
     // Configuracoes de nomes de tabela
     // Por padrao vem com os valores do replicado
