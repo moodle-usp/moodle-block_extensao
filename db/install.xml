@@ -18,13 +18,8 @@
         <FIELD NAME="nome_curso_apolo" TYPE="text" NOTNULL="true" SEQUENCE="false" COMMENT="Nome do curso no Apolo."/>
         <FIELD NAME="id_moodle" TYPE="int" LENGTH="16" NOTNULL="false" SEQUENCE="false" COMMENT="Identificador do curso no Moodle"/>
         <FIELD NAME="data_importacao" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="Data em que foi importada a turma."/>
-  </FIELDS>
-  <KEYS>
-    <KEY NAME="primary" TYPE="primary" FIELDS="codofeatvceu"/>
-    <KEY NAME="idx_id_moodle" TYPE="index" FIELDS="id_moodle"/>
-  </KEYS>
-</TABLE>
-      </FIELDS>
+        <FIELD NAME="sincronizado_apolo" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" COMMENT="Indica se o curso foi sincronizado do Apolo (0 = Nao, 1 = Sim)"/>
+       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="codofeatvceu"/>
         <KEY NAME="idx_id_moodle" TYPE="index" FIELDS="id_moodle"/>
