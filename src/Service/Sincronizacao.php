@@ -13,6 +13,7 @@
 
 require_once('Query.php');
 use block_extensao\Service\Query;
+use core\notification;
 
 class Sincronizar {
 
@@ -276,7 +277,8 @@ class Sincronizar {
 
     try {
       // Execute a consulta SQL usando o metodo execute() do $DB.
-      $DB->execute($sql, $params); 
+      $DB->execute($sql, $params);
+
       return true; // Indica que a atualizacao foi bem-sucedida.
     } catch (Exception $e) {
         // Em caso de erro, registre-o.
