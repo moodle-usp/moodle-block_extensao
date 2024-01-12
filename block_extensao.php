@@ -27,12 +27,12 @@ class block_extensao extends block_base {
         // Para garantir que o formulario nao se duplique
         if ($this->content != null) return $this->content;
         else $this->content =  new stdClass;
-        
+
         // caso tenha numero USP
-        if (isset($USER->idnumber) and !empty($USER->idnumber)) {
+        if (isset($USER->username) and !empty($USER->username) and is_numeric($USER->username)) {
             // precisamos capturar na base Moodle os cursos nos quais o usuario eh docente e
             // cujo ambiente ainda nao foi criado
-            $cursos = Turmas::cursos_formatados($USER->idnumber);
+            $cursos = Turmas::cursos_formatados($USER->username);
         } else
             $cursos = [];
 

@@ -3,5 +3,6 @@
 {{#sem_cursos}}
   <p>Nenhum curso foi encontrado.</p>
 {{/sem_cursos}}
-
-{{{formulario}}}
+{{^sem_cursos}}
+  {{{formulario}}}
+{{/sem_cursos}}
