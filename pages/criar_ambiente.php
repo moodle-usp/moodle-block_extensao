@@ -41,7 +41,7 @@ $Query = new Query();
 
 if (isset($_SESSION['codofeatvceu'])) {
   // captura os outros ministrantes a partir do codofeatvceu
-  $ministrantes = Usuario::ministrantes_turma($_SESSION['codofeatvceu'], $USER->idnumber);
+  $ministrantes = Usuario::ministrantes_turma($_SESSION['codofeatvceu'], $USER->username);
   // cria o formulario para capturar as informacoes
   $forms = new criar_ambiente_moodle('', array('ministrantes' => $ministrantes));
   $info_forms = $forms->get_data();  
@@ -65,8 +65,7 @@ if (isset($_SESSION['codofeatvceu'])) {
 
 // Eh preciso capturar na base do Moodle os cursos nos quais o usuario eh docente e 
 // cujo ambiente ianda nao foi criado para poder gerar o forms.
-$cursos = Turmas::cursos_formatados($USER->idnumber);
-
+$cursos = Turmas::cursos_formatados($USER->username);
 // Gera o formulario para capturar o codfeatvceu
 $forms = new redirecionamento_criacao_ambiente('', array('cursos'=>$cursos));
 $info_forms = $forms->get_data();
@@ -88,7 +87,7 @@ if (!empty($info_forms)) {
 else $codofeatvceu = $_SESSION['codofeatvceu'];
 
 // Verifica se a turma enviada eh do usuario logado
-if (!Turmas::usuario_docente_turma($USER->idnumber, $codofeatvceu) ) {
+if (!Turmas::usuario_docente_turma($USER->username, $codofeatvceu) ) {
   \core\notification::error('A turma solicitada não está na sua lista de turmas!');
   redirect($_SERVER['HTTP_REFERER']);
 }
@@ -109,7 +108,7 @@ $data_curso = $Query->datas_curso($codofeatvceu);
 $informacoes_turma->inicio = $data_curso->startdate;
 $informacoes_turma->fim = $data_curso->enddate;
 // Lista de ministrantes
-$ministrantes = Usuario::ministrantes_turma($codofeatvceu, $USER->idnumber);
+$ministrantes = Usuario::ministrantes_turma($codofeatvceu, $USER->username);
 
 // Cria o formulario
 $formulario = new criar_ambiente_moodle('', array(

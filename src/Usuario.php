@@ -54,7 +54,7 @@ class Usuario {
     $id_usuario = $USER->id;
 
     // captura o codigo de atuacao
-    $codatc = Usuario::codigo_atuacao_ceu($USER->idnumber);
+    $codatc = Usuario::codigo_atuacao_ceu($USER->username);
 
     // inscreve o usuario logado
     self::matricula_professor($id_curso, $id_usuario, $codatc);
