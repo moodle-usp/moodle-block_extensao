@@ -13,6 +13,7 @@
 
 require_once('src/Service/Query.php');
 require_once('src/Turmas.php');
+require_once('src/Categorias.php');
 require_once('vendor/autoload.php');
 require_once('utils/forms.php');
 
@@ -33,16 +34,22 @@ class block_extensao extends block_base {
             // precisamos capturar na base Moodle os cursos nos quais o usuario eh docente e
             // cujo ambiente ainda nao foi criado
             $cursos = Turmas::cursos_formatados($USER->username);
-        } else
+            
+            // Precisamos tambem saber se o usuario eh gerente de alguma categoria
+            $categorias = Categorias::usuario_gerente_categoria($USER->id);
+        } else {
             $cursos = [];
+            $categorias = [];
+        }
 
         // formulario
         $formulario = (new redirecionamento_criacao_ambiente('/blocks/extensao/pages/criar_ambiente.php', array('cursos'=>$cursos)))->render();
-
         // array da template
         $info = array(
             'sem_cursos' => empty($cursos),
-            'formulario' => $formulario
+            'formulario' => $formulario,
+            'com_categorias' => !empty($categorias),
+            'categorias' => $categorias
         );
         // template
         $this->content->text = $OUTPUT->render_from_template('block_extensao/extensao_block', $info);
