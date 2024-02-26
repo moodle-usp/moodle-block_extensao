@@ -3,4 +3,4 @@
 defined('MOODLE_INTERNAL') || die();
 
 $plugin->component = 'block_extensao';
-$plugin->version = 2024010911;
+$plugin->version = 2024022602;
