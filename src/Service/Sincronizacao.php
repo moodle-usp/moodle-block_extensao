@@ -167,6 +167,8 @@ class Sincronizar {
       $obj = new stdClass;
       $obj->codofeatvceu = $turma['codofeatvceu'];
       $obj->nome_curso_apolo = $turma['nomcurceu'];
+      $obj->codund = $turma['codund'];
+      $obj->codcam = $turma['codcam'];
       return $obj;
     }, $turmas);
   }
