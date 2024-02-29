@@ -33,10 +33,19 @@ class block_extensao extends block_base {
         if (isset($USER->username) and !empty($USER->username) and is_numeric($USER->username)) {
             // precisamos capturar na base Moodle os cursos nos quais o usuario eh docente e
             // cujo ambiente ainda nao foi criado
-            $cursos = Turmas::cursos_formatados($USER->username);
+            $cursos = Turmas::cursos_formatados_usuario($USER->username);
             
             // Precisamos tambem saber se o usuario eh gerente de alguma categoria
             $categorias = Categorias::usuario_gerente_categoria($USER->id);
+
+            if (!empty($categorias)) {
+                foreach ($categorias as $categoria) {
+                    if (!is_null($categoria->idnumber)) {
+                        $cursos_categoria = Turmas::cursos_formatados_categoria($categoria->idnumber);
+                        $cursos = array_merge($cursos, $cursos_categoria);
+                    }
+                }
+            }
         } else {
             $cursos = [];
             $categorias = [];
