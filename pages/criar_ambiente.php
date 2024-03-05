@@ -65,7 +65,7 @@ if (isset($_SESSION['codofeatvceu'])) {
 
 // Eh preciso capturar na base do Moodle os cursos nos quais o usuario eh docente e 
 // cujo ambiente ianda nao foi criado para poder gerar o forms.
-$cursos = Turmas::cursos_formatados($USER->username);
+$cursos = Turmas::cursos_formatados_usuario($USER->username);
 // Gera o formulario para capturar o codfeatvceu
 $forms = new redirecionamento_criacao_ambiente('', array('cursos'=>$cursos));
 $info_forms = $forms->get_data();
