@@ -25,6 +25,7 @@ require_once(__DIR__ . '/../utils/forms.php');
 require_once(__DIR__ . '/../src/Turmas.php');
 require_once(__DIR__ . '/../src/Service/Query.php');
 require_once(__DIR__ . '/../src/Ambiente.php');
+require_once(__DIR__ . '/../src/Categorias.php');
 use block_extensao\Service\Query;
 $Query = new Query();
 
@@ -64,8 +65,19 @@ if (isset($_SESSION['codofeatvceu'])) {
  */
 
 // Eh preciso capturar na base do Moodle os cursos nos quais o usuario eh docente e 
-// cujo ambiente ianda nao foi criado para poder gerar o forms.
-$cursos = Turmas::cursos_formatados($USER->username);
+// cujo ambiente ainda nao foi criado para poder gerar o forms.
+$cursos = Turmas::cursos_formatados_usuario($USER->username);
+
+// Tambem precisa pegar os cursos nos quais o usuario eh gerente
+$categorias = Categorias::usuario_gerente_categoria($USER->id);
+if (!empty($categorias)) {
+  foreach ($categorias as $categoria) {
+    if (!is_null($categoria->idnumber)) {
+      $cursos_categoria = Turmas::cursos_formatados_categoria($categoria->idnumber);
+      $cursos = $cursos + $cursos_categoria;
+    }
+  }
+}
 // Gera o formulario para capturar o codfeatvceu
 $forms = new redirecionamento_criacao_ambiente('', array('cursos'=>$cursos));
 $info_forms = $forms->get_data();
@@ -87,7 +99,7 @@ if (!empty($info_forms)) {
 else $codofeatvceu = $_SESSION['codofeatvceu'];
 
 // Verifica se a turma enviada eh do usuario logado
-if (!Turmas::usuario_docente_turma($USER->username, $codofeatvceu) ) {
+if (!Turmas::usuario_docente_turma($USER->username, $codofeatvceu) && !Categorias::usuario_gerente_turma($USER->id, $codofeatvceu) ) {
   \core\notification::error('A turma solicitada não está na sua lista de turmas!');
   redirect($_SERVER['HTTP_REFERER']);
 }

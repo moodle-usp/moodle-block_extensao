@@ -42,4 +42,25 @@ class Categorias {
 
     return $categorias;
   }
+
+  /**
+   * Verifica se um usuario eh gerente de alguma categoria
+   * que englobe um determinado cursos.
+   */
+  public static function usuario_gerente_turma ($id_usuario, $codofeatvceu) {
+    global $DB;
+
+    // Captura as categorias do usuario
+    $categorias = Categorias::usuario_gerente_categoria($id_usuario);
+
+    // Captura a categoria da turma
+    $query = "SELECT * FROM {block_extensao_turma} WHERE codofeatvceu = $codofeatvceu";
+    $turma = $DB->get_record_sql($query);
+
+    foreach ($categorias as $categoria) {
+      if ($categoria->idnumber == $turma->codcam || $categoria->idnumber == $turma->codund)
+        return true;
+    }
+    return false;
+  }
 }
