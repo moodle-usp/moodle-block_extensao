@@ -189,6 +189,7 @@ class Ambiente {
 
     $info_campus = $infos['campus'];
     $categoria_campus = self::categoria(array(
+      'idnumber'    => $info_campus['codcam'],
       'name'        => $info_campus["nomcam"],
       'parent'      => 0,
       'description' => $info_campus["nomcam"],
@@ -197,7 +198,9 @@ class Ambiente {
 
     // captura a categoria de faculdade dentro do Moodle
     $info_unidade = $infos['unidade'];
+    
     $categoria_faculdade = self::categoria(array(
+      'idnumber'    => $info_curso_apolo->codund,
       'name'        => $info_unidade["sglund"],
       'parent'      => $categoria_campus->id,
       'description' => $info_unidade["nomund"],
@@ -234,6 +237,7 @@ class Ambiente {
     // se estiver vazio, precisa criar a categoria
     if (empty($categoria) or !$categoria) {
       $nova_categoria = new \stdClass();
+      $nova_categoria->idnumber    = $info_categoria['idnumber'];
       $nova_categoria->name        = $info_categoria['name'];
       $nova_categoria->description = $info_categoria['description'];
       $nova_categoria->sortorder   = $info_categoria['sortorder'];

@@ -15,6 +15,30 @@
 class Turmas {
   
   /**
+   * Captura informacoes de turmas informadas a partir de seu codofeatvceu.
+   * 
+   * @param array $turmas Turmas.
+   * 
+   * @return array Turmas com informacoes.
+   */
+  public static function info_turmas ($turmas) {
+    global $DB;
+
+    $turmas_infos = array();
+    foreach ($turmas as $turma) {
+      $busca = $DB->get_record('block_extensao_turma', ['codofeatvceu' => $turma->codofeatvceu]);
+
+      if ($busca->id_moodle) continue;
+
+      $turmas_infos[] = array(
+        'codofeatvceu' => $turma->codofeatvceu,
+        'nome_curso_apolo' => $busca->nome_curso_apolo
+      );
+    }
+    return $turmas_infos;
+  }
+
+  /**
    * Captura as turmas as quais um usuario eh ministrante.
    * 
    * @param string|integer $nusp_docente Numero USP do usuario.
@@ -25,23 +49,32 @@ class Turmas {
     global $DB;
     
     // captura as turmas relacionadas ao usuario
-    $query = "SELECT id, codofeatvceu FROM {block_extensao_ministrante} WHERE codpes = $nusp_docente AND papel_usuario IN (1,2,5)";
-    $usuario_turma = $DB->get_records_sql($query, ['codpes' => $nusp_docente]);
-
-    $cursos_usuario = array();
-    // captura os nomes dos cursos relacionados
-    foreach ($usuario_turma as $turma) {
-      $busca = $DB->get_record('block_extensao_turma', ['codofeatvceu' => $turma->codofeatvceu]);
-
-      if ($busca->id_moodle) continue;
-
-      $cursos_usuario[] = array(
-        'codofeatvceu' => $turma->codofeatvceu,
-        'nome_curso_apolo' => $busca->nome_curso_apolo
-      );
-    }
+    $query = "SELECT id, codofeatvceu FROM {block_extensao_ministrante} WHERE codpes = '$nusp_docente' AND papel_usuario IN (1,2,5)";
+    $usuario_turmas = $DB->get_records_sql($query, ['codpes' => $nusp_docente]);
+    $cursos_usuario = Turmas::info_turmas($usuario_turmas);
     
     return $cursos_usuario;
+  }
+
+  /**
+   * Captura as turmas as quais tem uma categoria informada.
+   * 
+   * @param string|integer $categoria Numero da categoria.
+   * 
+   * @return array Cursos.
+   */
+  public static function categoria_turmas ($categoria) {
+    global $DB;
+
+    // Captura as turmas com codcam ou codund = $categoria
+    $query = "SELECT codofeatvceu FROM {block_extensao_turma} WHERE codcam = $categoria OR codund = $categoria";
+    $turmas = $DB->get_records_sql($query);
+    if (!empty($turmas)) {
+      $turmas_array = Turmas::info_turmas($turmas);
+    }
+    else 
+      $turmas_array = array();
+    return $turmas_array;
   }
 
   /**
@@ -70,7 +103,7 @@ class Turmas {
   public static function usuario_docente_turma ($nusp_usuario, $codofeatvceu) {
     global $DB;
     // agora ve se esta associada ao usuario
-    $query = "SELECT * FROM {block_extensao_ministrante} WHERE codofeatvceu = $codofeatvceu AND codpes = $nusp_usuario";
+    $query = "SELECT * FROM {block_extensao_ministrante} WHERE codofeatvceu = $codofeatvceu AND codpes = '$nusp_usuario'";
     $turma_associada = $DB->get_records_sql($query);
     return !empty($turma_associada);
   }
@@ -148,12 +181,35 @@ class Turmas {
    * 
    * @return array Array de cursos.
    */
-  public static function cursos_formatados ($id_usuario) {
+  public static function cursos_formatados_usuario ($id_usuario) {
     // Captura os cursos a partir do id de usuario
     $cursos_usuario = Turmas::docente_turmas($id_usuario);
     $cursos=[];
     
     foreach ($cursos_usuario as $curso) {
+      // Captura o id da turma no plugin de extensao (codofeatvceu)
+      $codofeatvceu = $curso['codofeatvceu'];
+      // Remove as quebras no nome
+      $nome_curso = str_replace(array("\r", "\n"), '', $curso['nome_curso_apolo']);
+      // salva
+      $cursos[$codofeatvceu] = $nome_curso;
+    }
+    return $cursos;
+  }
+
+  /**
+   * Captura os cursos de um usuario a partir de uma categoria, formata o
+   * nome e retorna no formato de Array indexado pelo codofeatvceu.
+   * 
+   * @param string|integer $categoria Identificador da categoria.
+   * 
+   * @return array Array de cursos.
+   */
+  public static function cursos_formatados_categoria ($categoria) {
+    // Captura os cursos a partir do identificador da categoria
+    $turmas_categoria = Turmas::categoria_turmas($categoria);
+    $cursos=[];
+    foreach ($turmas_categoria as $curso) {
       // Captura o id da turma no plugin de extensao (codofeatvceu)
       $codofeatvceu = $curso['codofeatvceu'];
       // Remove as quebras no nome

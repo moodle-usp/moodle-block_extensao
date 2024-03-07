@@ -51,7 +51,7 @@ class Query
     $diaAtual = date("Y-m-d");
 
     // opcoes para a pesquisa do inicio da busca por curso, coloquei as opcoes de 3, 6, 9 meses 
-    // e 1 ano, no entanto esse valor pode ser alterado caso seja pertinente.
+    // e 1 ano, no entanto, esse valor pode ser alterado caso seja pertinente.
 
     if($periodo == "3"){
         $inicio_curso =  date("Y-m-d", strtotime("-3 months", strtotime($diaAtual)));
@@ -71,11 +71,15 @@ class Query
       SELECT
         o.codofeatvceu
         ,c.nomcurceu
+        ,c.codund
+        ,u.codcam
       FROM " . $this->OFERECIMENTOATIVIDADECEU . " o
           LEFT JOIN " . $this->CURSOCEU . " c
             ON c.codcurceu = o.codcurceu
           LEFT JOIN " . $this->EDICAOCURSOOFECEU . " e
             ON o.codcurceu = e.codcurceu AND o.codedicurceu = e.codedicurceu
+          LEFT JOIN " . $this->UNIDADE . " u
+            ON u.codund = o.codund
       WHERE e.dtainiofeedi >= '$inicio_curso'
       ORDER BY codofeatvceu 
     ";
@@ -254,4 +258,6 @@ class Query
       WHERE codpes = $codpes
     ");
   }
+
+  
 }

@@ -56,6 +56,10 @@ class Usuario {
     // captura o codigo de atuacao
     $codatc = Usuario::codigo_atuacao_ceu($USER->username);
 
+    // Se estiver vazio, provavelmente eh um gerente de categoria
+    // Nesse caso, adiciona como 1 - editingteacher
+    if (empty($codatc)) $codatc = 1;
+
     // inscreve o usuario logado
     self::matricula_professor($id_curso, $id_usuario, $codatc);
   }
@@ -77,7 +81,7 @@ class Usuario {
     $role = $DB->get_record('role', ['shortname' => $shortname_codatc]);
 
     self::inscreve_usuario($id_curso, $id_professor, $role->id);
-  } 
+  }
 
   /**
    * Captura as informacoes de uma lista de usuarios, procurando
