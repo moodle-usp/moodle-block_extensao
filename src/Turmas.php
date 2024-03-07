@@ -49,7 +49,7 @@ class Turmas {
     global $DB;
     
     // captura as turmas relacionadas ao usuario
-    $query = "SELECT id, codofeatvceu FROM {block_extensao_ministrante} WHERE codpes = $nusp_docente AND papel_usuario IN (1,2,5)";
+    $query = "SELECT id, codofeatvceu FROM {block_extensao_ministrante} WHERE codpes = '$nusp_docente' AND papel_usuario IN (1,2,5)";
     $usuario_turmas = $DB->get_records_sql($query, ['codpes' => $nusp_docente]);
     $cursos_usuario = Turmas::info_turmas($usuario_turmas);
     
@@ -103,7 +103,7 @@ class Turmas {
   public static function usuario_docente_turma ($nusp_usuario, $codofeatvceu) {
     global $DB;
     // agora ve se esta associada ao usuario
-    $query = "SELECT * FROM {block_extensao_ministrante} WHERE codofeatvceu = $codofeatvceu AND codpes = $nusp_usuario";
+    $query = "SELECT * FROM {block_extensao_ministrante} WHERE codofeatvceu = $codofeatvceu AND codpes = '$nusp_usuario'";
     $turma_associada = $DB->get_records_sql($query);
     return !empty($turma_associada);
   }

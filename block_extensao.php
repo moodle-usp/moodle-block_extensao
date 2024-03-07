@@ -30,7 +30,7 @@ class block_extensao extends block_base {
         else $this->content =  new stdClass;
 
         // caso tenha numero USP
-        if (isset($USER->username) and !empty($USER->username) and is_numeric($USER->username)) {
+        if (isset($USER->username) and !empty($USER->username)) {
             // precisamos capturar na base Moodle os cursos nos quais o usuario eh docente e
             // cujo ambiente ainda nao foi criado
             $cursos = Turmas::cursos_formatados_usuario($USER->username);
@@ -42,7 +42,7 @@ class block_extensao extends block_base {
                 foreach ($categorias as $categoria) {
                     if (!is_null($categoria->idnumber)) {
                         $cursos_categoria = Turmas::cursos_formatados_categoria($categoria->idnumber);
-                        $cursos = array_merge($cursos, $cursos_categoria);
+                        $cursos = $cursos + $cursos_categoria;
                     }
                 }
             }
