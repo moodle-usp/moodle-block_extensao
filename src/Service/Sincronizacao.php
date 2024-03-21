@@ -13,6 +13,7 @@
 
 require_once('Query.php');
 use block_extensao\Service\Query;
+use core\notification;
 
 class Sincronizar {
 
@@ -166,6 +167,8 @@ class Sincronizar {
       $obj = new stdClass;
       $obj->codofeatvceu = $turma['codofeatvceu'];
       $obj->nome_curso_apolo = $turma['nomcurceu'];
+      $obj->codund = $turma['codund'];
+      $obj->codcam = $turma['codcam'];
       return $obj;
     }, $turmas);
   }
@@ -216,6 +219,10 @@ class Sincronizar {
         $DB->delete_records('block_extensao_ministrante', array('codofeatvceu' => $turma->codofeatvceu));
         $turmas_fora_base[$turma->codofeatvceu] = $turma;
       }
+
+      // Data de importacao
+      date_default_timezone_set('America/Sao_Paulo');
+      $turma->data_importacao = time();
     }
     
     return $turmas_fora_base;
@@ -251,5 +258,34 @@ class Sincronizar {
     $msg = 'XXXXXXX' . PHP_EOL . $aviso . PHP_EOL . $erro . PHP_EOL . 'XXXXXXX' . PHP_EOL;
     if ($parar) die($msg);
     else echo $msg;
+  }
+
+  /**
+   * O objetivo dessa funcao eh verificar se o curso criado eh proveniente do sistema apolo,
+   * logo eh marcado na tabela block_extensao_turma, na coluna sincronizado_apolo, sim (1)
+   * para cursos sincronizados do apolo, e nao (0) para os que advindos de outra forma de criacao.
+   * 
+   * @param int $curso_id, que sinaliza o curso cujo id sera atualizado na tabela para indicar a sua criacao pelo plugin
+   * @return bool a funcao reponde sucesso ou fracasso caso ocorra algum erro  
+   */
+  public static function sincronizadoApolo($curso_id) {
+    global $DB;
+
+    // Defina a consulta SQL para atualizar o campo 'sincronizado_apolo' para 1.
+    $sql = "UPDATE {block_extensao_turma} SET sincronizado_apolo = 1 WHERE id_moodle = :curso_id";
+
+    // Parametros para a consulta SQL.
+    $params = array('curso_id' => $curso_id);
+
+    try {
+      // Execute a consulta SQL usando o metodo execute() do $DB.
+      $DB->execute($sql, $params);
+
+      return true; // Indica que a atualizacao foi bem-sucedida.
+    } catch (Exception $e) {
+        // Em caso de erro, registre-o.
+        error_log("Erro ao atualizar 'sincronizado_apolo' para o curso ID: " . $curso_id . ". Erro: " . $e->getMessage());
+        return false; // Indica que houve um erro.
+    }
   }
 }

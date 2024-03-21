@@ -17,6 +17,8 @@ require_once(__DIR__ . '/Turmas.php');
 require_once(__DIR__ . '/Service/Query.php');
 require_once(__DIR__ . '/Usuario.php');
 require_once(__DIR__ . '/Atuacao.php');
+require_once(__DIR__ . '/Service/Sincronizacao.php');
+
 use block_extensao\Service\Query;
 
 class Ambiente {
@@ -66,6 +68,9 @@ class Ambiente {
     Turmas::atualizar_id_moodle_turma($info_forms->codofeatvceu, $moodle_curso->id);
     \core\notification::success('Ambiente criado com sucesso!');
 
+    // Por fim eh preenchido o campo sincronizado_apolo com 1 em relacao ao curso que foi criado
+    Sincronizar::sincronizadoApolo($moodle_curso->id);
+
     // inscreve o usuario logado no curso
     Usuario::inscreve_criador($moodle_curso->id);
     \core\notification::success('Usuário criador matriculado como "professor".');
@@ -83,6 +88,8 @@ class Ambiente {
         Usuario::matricula_professor($moodle_curso->id, $id_ministrante, $codatc);
         $shortname_adaptado = Atuacao::NOMES[$codatc];
         \core\notification::success('Professor auxiliar ' . $nome . ' matriculado como "' . $shortname_adaptado . '".');
+        Notificacoes::notificacao_inscricao($usuario_moodle, $moodle_curso);
+
       }
     }
     
@@ -92,17 +99,23 @@ class Ambiente {
         $info_ministrante = $Query->info_usuario($id_ministrante);
         if (!isset($info_ministrante['nompes'])) {
           // caso o nome nao esteja definido nas informacoes do usuario
-          \core\notification::error('Nome do professor ausente. Não foi possível cadastrar a conta do professor sem conta Moodle.');
+          \core\notification::error('Erro ao matricular o professor, por favor contate o suporte. ');
           continue;
         }
-  
+        // tratamento para professor sem e-mail no sistema 
+        if (!isset($info_ministrante['codema'])) {
+          // caso o nome nao esteja definido nas informacoes do usuario
+          \core\notification::error('Não foi possivel matricular o professor ' . $info_ministrante['nompes'] . ' como ministrante, por favor contate o suporte.');
+          continue;
+        }
+
         //Nome do professor
         $nome = $info_ministrante['nompes']; 
         //Para criar a conta do professor 
         $ministrante = Usuario::cadastra_usuario($info_ministrante);
         if (!$ministrante) {
           // Caso ocorra um problema ao cadastrar a conta do professor
-          \core\notification::error('Não foi possível cadastrar a conta do professor ' . $nome);
+          \core\notification::error('Não foi possível matricular o professor ' . $nome . ' como ministante adicional. Por favor contate o suporte.');
         }
 
         // Captura o codpes do professor
@@ -114,11 +127,7 @@ class Ambiente {
         $shortname_adaptado = Atuacao::NOMES[$codatc];
         \core\notification::success('Professor auxiliar ' . $nome . ' matriculado como "' . $shortname_adaptado . '".');
         try {
-          // Tente executar a função de notificação de inscrição do usuário
-          Notificacoes::notificacao_inscricao($ministrante);
-          \core\notification::success('Professor auxiliar ' . $nome . ' notificado sobre a inscrição no Moodle, 
-          um e-mail foi enviado.'
-        );
+          Notificacoes::notificacao_inscricao($ministrante, $moodle_curso);
       } catch (Exception $e) {
           // Se ocorrer um erro, ele sera capturado aqui e podemos lidar com ele
           // Por exemplo, podemos exibir uma mensagem de erro ou registrar o erro em um arquivo de log.
@@ -180,6 +189,7 @@ class Ambiente {
 
     $info_campus = $infos['campus'];
     $categoria_campus = self::categoria(array(
+      'idnumber'    => $info_campus['codcam'],
       'name'        => $info_campus["nomcam"],
       'parent'      => 0,
       'description' => $info_campus["nomcam"],
@@ -188,7 +198,9 @@ class Ambiente {
 
     // captura a categoria de faculdade dentro do Moodle
     $info_unidade = $infos['unidade'];
+    
     $categoria_faculdade = self::categoria(array(
+      'idnumber'    => $info_curso_apolo->codund,
       'name'        => $info_unidade["sglund"],
       'parent'      => $categoria_campus->id,
       'description' => $info_unidade["nomund"],
@@ -225,6 +237,7 @@ class Ambiente {
     // se estiver vazio, precisa criar a categoria
     if (empty($categoria) or !$categoria) {
       $nova_categoria = new \stdClass();
+      $nova_categoria->idnumber    = $info_categoria['idnumber'];
       $nova_categoria->name        = $info_categoria['name'];
       $nova_categoria->description = $info_categoria['description'];
       $nova_categoria->sortorder   = $info_categoria['sortorder'];

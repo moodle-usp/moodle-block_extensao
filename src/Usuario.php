@@ -54,7 +54,11 @@ class Usuario {
     $id_usuario = $USER->id;
 
     // captura o codigo de atuacao
-    $codatc = Usuario::codigo_atuacao_ceu($USER->idnumber);
+    $codatc = Usuario::codigo_atuacao_ceu($USER->username);
+
+    // Se estiver vazio, provavelmente eh um gerente de categoria
+    // Nesse caso, adiciona como 1 - editingteacher
+    if (empty($codatc)) $codatc = 1;
 
     // inscreve o usuario logado
     self::matricula_professor($id_curso, $id_usuario, $codatc);
@@ -77,7 +81,7 @@ class Usuario {
     $role = $DB->get_record('role', ['shortname' => $shortname_codatc]);
 
     self::inscreve_usuario($id_curso, $id_professor, $role->id);
-  } 
+  }
 
   /**
    * Captura as informacoes de uma lista de usuarios, procurando
@@ -189,11 +193,18 @@ class Usuario {
     // Verificar se o usuario ja possui conta no Moodle
     $existeUsuario = $DB->get_record('user', ['username' => $usuario['codpes']]);
     if (!empty($existeUsuario)) {
-        \core\notification::warning("O usuário " . $usuario['nompes']. " já possui uma conta no Moodle. O cadastro não sera realizado.");
-        return false; 
+      \core\notification::error(get_string('erro_padrao', 'block_extensao'));
+      return false; 
+    }
+
+    // Verifica se o usuario possui e-mail cadastrado no banco de dados, caso nao, a conta nao eh criada.
+    if (empty($usuario['codema'])) {
+      \core\notification::error("O usuário " . $usuario['nompes']. " não possui um endereço de e-mail válido. A matrícula não será realizada.");
+      return false;
     }
 
     // Criando objeto do usuario
+    //
     $nomeCompleto = $usuario['nompes'];
     $partesNome = explode(' ', $nomeCompleto); 
     $primeiroNome = $partesNome[0];
@@ -202,23 +213,26 @@ class Usuario {
     $novoUsuario = new stdClass();
     $novoUsuario->username = (string) $usuario['codpes'];
     $novoUsuario->idnumber = $usuario['codpes'];
-    $novoUsuario->password = 'A'.md5(date('now')).'*' ;
     $novoUsuario->firstname = $primeiroNome;
     $novoUsuario->lastname = $segundoNome;
     $novoUsuario->email = $usuario['codema'];
-    $novoUsuario->auth = 'manual';
+    $novoUsuario->auth = 'shibboleth';
 
     try {
       // Chama a funcao user_create_user() para cadastrar o novo usuario
       $usuario_id = user_create_user($novoUsuario);
-      $usuarioObj = $DB->get_record("user", ["id" => $usuario_id]);
-      \core\notification::success("O usuário " . $nomeCompleto . " foi cadastrado no Moodle com sucesso!");
-      return $usuarioObj;
-    } catch (\Exception $e) {
-      \core\notification::error("Erro ao cadastrar o usuário: " . $e->getMessage());
-      return false;
+
+      // Verificar se o id do usuario foi criado com exito
+      if ($usuario_id) {
+        $usuarioObj = $DB->get_record("user", ["id" => $usuario_id]);
+        return $usuarioObj;
+    } else {
+        \core\notification::error("Erro ao inscrever o usuário. Por favor contate o suporte.");
+        return false;
+    }
+} catch (\Exception $e) {
+    \core\notification::error("Erro ao cadastrar o usuário: " . $e->getMessage());
+    return false;
     }
   }
 }
-
- 

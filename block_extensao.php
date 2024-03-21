@@ -13,6 +13,7 @@
 
 require_once('src/Service/Query.php');
 require_once('src/Turmas.php');
+require_once('src/Categorias.php');
 require_once('vendor/autoload.php');
 require_once('utils/forms.php');
 
@@ -23,35 +24,45 @@ class block_extensao extends block_base {
 
     public function get_content() {
         global $USER, $OUTPUT;
-        $this->content =  new stdClass;
         
+        // Para garantir que o formulario nao se duplique
+        if ($this->content != null) return $this->content;
+        else $this->content =  new stdClass;
+
         // caso tenha numero USP
-        if (isset($USER->idnumber) and !empty($USER->idnumber)) {
+        if (isset($USER->username) and !empty($USER->username)) {
             // precisamos capturar na base Moodle os cursos nos quais o usuario eh docente e
             // cujo ambiente ainda nao foi criado
-            $cursos_usuario = Turmas::docente_turmas($USER->idnumber);
-    
-            // para cada curso, cria um formulario
-            for ($i = 0; $i < count($cursos_usuario); $i++) {
-                // captura o id da turma no plugin de extensao
-                $codofeatvceu = $cursos_usuario[$i]['codofeatvceu'];
-    
-                // cria um formulario
-                $form = new redirecionamento_criacao_ambiente('/blocks/extensao/pages/criar_ambiente.php', array('codofeatvceu' => $codofeatvceu));
-    
-                $cursos_usuario[$i]['formulario'] = $form->render();
-            }
-        } else
-            $cursos_usuario = []; // para nao dar erro de variavel indefinida
+            $cursos = Turmas::cursos_formatados_usuario($USER->username);
+            
+            // Precisamos tambem saber se o usuario eh gerente de alguma categoria
+            $categorias = Categorias::usuario_gerente_categoria($USER->id);
 
+            if (!empty($categorias)) {
+                foreach ($categorias as $categoria) {
+                    if (!is_null($categoria->idnumber)) {
+                        $cursos_categoria = Turmas::cursos_formatados_categoria($categoria->idnumber);
+                        $cursos = $cursos + $cursos_categoria;
+                    }
+                }
+            }
+        } else {
+            $cursos = [];
+            $categorias = [];
+        }
+
+        // formulario
+        $formulario = (new redirecionamento_criacao_ambiente('/blocks/extensao/pages/criar_ambiente.php', array('cursos'=>$cursos)))->render();
         // array da template
         $info = array(
-            'sem_cursos' => empty($cursos_usuario),
-            'cursos_docente' => $cursos_usuario
+            'sem_cursos' => empty($cursos),
+            'formulario' => $formulario,
+            'com_categorias' => !empty($categorias),
+            'categorias' => $categorias
         );
         // template
         $this->content->text = $OUTPUT->render_from_template('block_extensao/extensao_block', $info);
-        
+
         return $this->content;
     }
 

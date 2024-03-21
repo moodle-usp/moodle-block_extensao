@@ -21,10 +21,22 @@ if ($ADMIN->fulltree) {
 
     $setting = new admin_setting_configtextarea('block_extensao/email_body_new_user', 
             'Corpo do e-mail para novos usuários',
-            'Token de substituição: %firstname, %urlmoodle, %curso e %turma',
-            'Prezado <b>__firstname__</b>,<br>Sua conta foi criada no sistema moodle da USP %urlmoodle. Acesse %urlmoodle para criar uma senha no campo de recuperação de senha. <br>Você é ministrante do curso %curso e turma %turma.',  
+            'Token de substituição: %profAux, %profTit, %curso e %turma, %data',
+            "<p>Prezado(a) %profAux,</p>
+    
+            <p>Esta é uma notificação da criação do ambiente virtual  em <strong>%data</strong>, do seu curso <strong>%curso</strong>, turma <strong>%turma</strong> na plataforma de 
+            Cultura e Extensão da USP. Foi atribuído a você o papel de ministrante nesta plataforma pelo professor 
+            <strong>%profTit</strong>. Para acessá-lo, clique no seguinte link:</p>
+            <p><a href=http://0.0.0.0:8888>Acessar o Ambiente Virtual</a></p>
+            
+            <p>Atenciosamente,</p>
+            <p>Equipe Moodle USP Extensão</p>",
             PARAM_RAW);
+
     $settings->add($setting);
+
+    // Adicionado a configuração que permite a edição do texto através do editor Atto
+    $setting->set_updatedcallback('editor::update_definition', array('email', 'block_extensao/email_body_new_user'));
 
     // Configuracoes de nomes de tabela
     // Por padrao vem com os valores do replicado
@@ -57,5 +69,21 @@ if ($ADMIN->fulltree) {
 
     // Campo para a tabela de "PESSOA"
     $setting = new admin_setting_configtext('block_extensao/tabela_pessoa', 'PESSOA', '', 'PESSOA', PARAM_TEXT);
+    $settings->add($setting);
+
+    // Campo de configuracao para busca de curso
+    $options = array(
+        '3' => '3 meses',
+        '6' => '6 meses',
+        '9' => '9 meses',
+        '1' => '1 ano',
+    );
+    $setting = new admin_setting_configselect(
+    'block_extensao/periodo_curso',
+    'Selecione o período para pesquisa de cursos abertos. ', 
+    'Escolha o período desejado: ', 
+    '3',
+    $options
+);
     $settings->add($setting);
 }
