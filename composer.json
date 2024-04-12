@@ -15,8 +15,5 @@
         "name": "Octavio Augusto Potalej",
         "email": "oapotalej@usp.br"
       }
-  ],
-  "require": {
-      "nesbot/carbon": "^2.64"
-  }
+  ]
 }
