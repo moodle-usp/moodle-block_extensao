@@ -237,7 +237,8 @@ class Ambiente {
     // se estiver vazio, precisa criar a categoria
     if (empty($categoria) or !$categoria) {
       $nova_categoria = new \stdClass();
-      $nova_categoria->idnumber    = $info_categoria['idnumber'];
+      if (isset($info_categoria['idnumber']))
+        $nova_categoria->idnumber    = $info_categoria['idnumber'];
       $nova_categoria->name        = $info_categoria['name'];
       $nova_categoria->description = $info_categoria['description'];
       $nova_categoria->sortorder   = $info_categoria['sortorder'];
