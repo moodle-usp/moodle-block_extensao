@@ -27,7 +27,7 @@ if ($ADMIN->fulltree) {
             <p>Esta é uma notificação da criação do ambiente virtual  em <strong>%data</strong>, do seu curso <strong>%curso</strong>, turma <strong>%turma</strong> na plataforma de 
             Cultura e Extensão da USP. Foi atribuído a você o papel de ministrante nesta plataforma pelo professor 
             <strong>%profTit</strong>. Para acessá-lo, clique no seguinte link:</p>
-            <p><a href=http://0.0.0.0:8888>Acessar o Ambiente Virtual</a></p>
+            <p><a href=https://cursosextensao.usp.br/dashboard/>Acessar o Ambiente Virtual</a></p>
             
             <p>Atenciosamente,</p>
             <p>Equipe Moodle USP Extensão</p>",
