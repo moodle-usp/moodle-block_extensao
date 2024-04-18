@@ -133,15 +133,25 @@ class Query
    * @return stdClass Objeto do curso.
    */
   public function informacoesTurma ($codofeatvceu) {
+    // tratamento para o caso de o codofeatvceu ser nao numerico
+    if (!is_numeric($codofeatvceu)) $query_codofeatvceu = "'$codofeatvceu'";
+    else $query_codofeatvceu = $codofeatvceu;
+    
+    // busca do curso
     $query = "
       SELECT
         codund,
         dtainiofeatv,
         dtafimofeatv
       FROM " . $this->OFERECIMENTOATIVIDADECEU . "
-      WHERE codofeatvceu = $codofeatvceu        
+      WHERE codofeatvceu = $query_codofeatvceu
     ";
     $infos_curso = USPDatabase::fetch($query);
+
+    // se nao encontrar o curso, retorna falso
+    if (!$infos_curso) return false;
+    
+    // se encontrar, cria um objeto de curso com as informacoes desejadas
     $info_curso = new stdClass;
     $info_curso->codund = $infos_curso['codund'];
     $info_curso->codofeatvceu = $codofeatvceu;
@@ -159,14 +169,21 @@ class Query
    * @return object
    */
   public function objetivo_extensao($codofeatvceu) {
+    // tratamento para o caso de o codofeatvceu ser nao numerico
+    if (!is_numeric($codofeatvceu)) $query_codofeatvceu = "'$codofeatvceu'";
+    else $query_codofeatvceu = $codofeatvceu;
+    // busca do curso
     $obj = "
       SELECT 
         c.objcur 
       FROM " . $this->OFERECIMENTOATIVIDADECEU . " o 
       LEFT JOIN " . $this->CURSOCEU . " c 
         ON c.codcurceu = o.codcurceu 
-      WHERE codofeatvceu = $codofeatvceu";
-    return USPDatabase::fetch($obj)['objcur'];
+      WHERE codofeatvceu = $query_codofeatvceu";
+    $curso = USPDatabase::fetch($obj);
+    // tratamento para resultado da busca (caso nao encontre)
+    if (!$curso) return false;
+    return $curso['objcur'];
   }
 
   /**
@@ -177,6 +194,10 @@ class Query
    * @return object
    */
   public function informacoes_unidade ($codund) {
+    // tratamento de erros
+    if (is_numeric($codund)) $query_codund = $codund;
+    else $query_codund = "'$codund'";
+
     // captura a unidade
     $info_unidade = USPDatabase::fetch("
       SELECT
@@ -185,8 +206,11 @@ class Query
         nomund,
         codcam
       FROM " . $this->UNIDADE . "
-      WHERE codund = $codund
+      WHERE codund = $query_codund
     ");
+
+    // se nao encontrar, retorna falso
+    if (!$info_unidade) return false;
 
     // captura o campus
     $info_campus = USPDatabase::fetch("
@@ -210,12 +234,16 @@ class Query
    * @return object
    */
   public function datas_curso ($codofeatvceu){
+    // tratamento de erros
+    if (is_numeric($codofeatvceu)) $query_codofeatvceu = $codofeatvceu;
+    else $query_codofeatvceu = "'$codofeatvceu'";
+    // faz a busca
     $query = "
        SELECT 
         dtainiofeatv, 
         dtafimofeatv 
       FROM " . $this->OFERECIMENTOATIVIDADECEU . " 
-      WHERE codofeatvceu = $codofeatvceu
+      WHERE codofeatvceu = $query_codofeatvceu
       ORDER BY codofeatvceu";
     $info_datas = USPDatabase::fetch($query);
     $datas = new stdClass();
@@ -232,6 +260,9 @@ class Query
    * @return object
    */
   public function info_usuario ($codpes) {
+    // tratamento de erros
+    if (is_numeric($codpes)) $query_codpes = $codpes;
+    else $query_codpes = "'$codpes'";
     return USPDatabase::fetch("
       SELECT
         p.codpes,
@@ -239,7 +270,7 @@ class Query
         e.codema
       FROM " . $this->PESSOA . " p
       LEFT JOIN " . $this->EMAILPESSOA . " e ON p.codpes = e.codpes
-      WHERE p.codpes = $codpes
+      WHERE p.codpes = $query_codpes
    ");
   }
 
@@ -251,13 +282,14 @@ class Query
    * @return object
    */
   public function emails ($codpes) {
+    // tratamento de erros
+    if (is_numeric($codpes)) $query_codpes = $codpes;
+    else $query_codpes = "'$codpes'";
     return USPDatabase::fetchAll("
       SELECT
         codema
       FROM " . $this->EMAILPESSOA . "
-      WHERE codpes = $codpes
+      WHERE codpes = $query_codpes
     ");
   }
-
-  
 }

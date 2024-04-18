@@ -213,7 +213,7 @@ class Turmas {
       // Captura o id da turma no plugin de extensao (codofeatvceu)
       $codofeatvceu = $curso['codofeatvceu'];
       // Remove as quebras no nome
-      $nome_curso = str_replace(array("\r", "\n"), '', $curso['nome_curso_apolo']);
+      $nome_curso = str_replace(array("\r", "\n"), '', $curso['nome_curso_apolo']) . " ($codofeatvceu)";
       // salva
       $cursos[$codofeatvceu] = $nome_curso;
     }
