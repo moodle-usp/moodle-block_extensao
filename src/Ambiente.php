@@ -40,6 +40,10 @@ class Ambiente {
 
     // eh preciso capturar outras informacoes do curso, como a unidade
     $info_curso_apolo = $Query->informacoesTurma($info_forms->codofeatvceu);
+    if (!$info_curso_apolo) {
+      \core\notification::error('O código de oferecimento "' . $info_forms->codofeatvceu . '" não foi encontrado na base. Por favor, entre em contato com a administração.');
+      return -1;
+    }
 
     // transforma o enviado em um objeto de curso
     $curso = self::criar_objeto_curso($info_forms, $info_curso_apolo);
@@ -168,7 +172,9 @@ class Ambiente {
 
     // gera ou captura a categoria
     $categoria = self::turma_categoria($info_curso_apolo);
-    $curso->category = $categoria->id;
+
+    if ($categoria) $curso->category = $categoria->id;
+    else $curso->category = 1;
     
     return $curso;
   }
@@ -186,6 +192,7 @@ class Ambiente {
 
     // captura as informaoces da unidade do curso
     $infos = $Query->informacoes_unidade($info_curso_apolo->codund);
+    if (!$infos) return false;
 
     $info_campus = $infos['campus'];
     $categoria_campus = self::categoria(array(
@@ -237,7 +244,8 @@ class Ambiente {
     // se estiver vazio, precisa criar a categoria
     if (empty($categoria) or !$categoria) {
       $nova_categoria = new \stdClass();
-      $nova_categoria->idnumber    = $info_categoria['idnumber'];
+      if (isset($info_categoria['idnumber']))
+        $nova_categoria->idnumber    = $info_categoria['idnumber'];
       $nova_categoria->name        = $info_categoria['name'];
       $nova_categoria->description = $info_categoria['description'];
       $nova_categoria->sortorder   = $info_categoria['sortorder'];

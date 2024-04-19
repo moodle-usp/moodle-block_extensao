@@ -51,6 +51,9 @@ if (isset($_SESSION['codofeatvceu'])) {
   if ($info_forms) {
     $novo_curso_id = Ambiente::criar_ambiente($info_forms, $ministrantes);
     unset($_SESSION['codofeatvceu']);
+    // se der algum erro, manda para a pagina inicial
+    if ($novo_curso_id == -1) redirect(new moodle_url($CFG->wwwroot));
+    // se nao, segue para a pagina do curso
     redirect(new moodle_url($CFG->wwwroot) . "/course/view.php?id={$novo_curso_id}");
   }
 }
@@ -115,7 +118,8 @@ if (!Turmas::usuario_docente_turma($USER->username, $codofeatvceu) && !Categoria
 // Aqui precisamos capturar as informacoes basicas do curso
 // Foi adicionado o inicio e fim do curso 
 $informacoes_turma = Turmas::info_turma_id_extensao($codofeatvceu);
-$informacoes_turma->objetivo = $Query->objetivo_extensao($codofeatvceu);
+$objetivo_turma = $Query->objetivo_extensao($codofeatvceu);
+$informacoes_turma->objetivo = $objetivo_turma ? $objetivo_turma : ''; 
 $data_curso = $Query->datas_curso($codofeatvceu);
 $informacoes_turma->inicio = $data_curso->startdate;
 $informacoes_turma->fim = $data_curso->enddate;

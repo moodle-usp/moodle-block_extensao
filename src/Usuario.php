@@ -155,7 +155,10 @@ class Usuario {
     if ($codofeatvceu == "")
       $codofeatvceu = $_SESSION['codofeatvceu'];
     $comparacao = $DB->sql_compare_text('codpes') . ' = ' . $DB->sql_compare_text(':codpes_usuario') . " AND " . $DB->sql_compare_text('codofeatvceu') . ' = ' . $DB->sql_compare_text($codofeatvceu);
-    return $DB->get_record_SQL("SELECT papel_usuario FROM {block_extensao_ministrante} WHERE $comparacao", array('codpes_usuario' => $codpes))->papel_usuario;
+    $ministrante = $DB->get_record_SQL("SELECT papel_usuario FROM {block_extensao_ministrante} WHERE $comparacao", array('codpes_usuario' => $codpes));
+    if (!empty($ministrante))
+      return $ministrante->papel_usuario;
+    else [];
   }
 
   /**

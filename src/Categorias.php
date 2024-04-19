@@ -53,8 +53,11 @@ class Categorias {
     // Captura as categorias do usuario
     $categorias = Categorias::usuario_gerente_categoria($id_usuario);
 
+    // tratamento de string vs numero
+    if (is_numeric($codofeatvceu)) $query_codofeatvceu = $codofeatvceu;
+    else $query_codofeatvceu = "'$codofeatvceu'";
     // Captura a categoria da turma
-    $query = "SELECT * FROM {block_extensao_turma} WHERE codofeatvceu = $codofeatvceu";
+    $query = "SELECT * FROM {block_extensao_turma} WHERE codofeatvceu = $query_codofeatvceu";
     $turma = $DB->get_record_sql($query);
 
     foreach ($categorias as $categoria) {
