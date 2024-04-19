@@ -66,8 +66,12 @@ class Turmas {
   public static function categoria_turmas ($categoria) {
     global $DB;
 
+    // tratamento de string vs numero
+    if (is_numeric($categoria)) $query_categoria = $categoria;
+    else $query_categoria = "'$categoria'";
+    
     // Captura as turmas com codcam ou codund = $categoria
-    $query = "SELECT codofeatvceu FROM {block_extensao_turma} WHERE codcam = $categoria OR codund = $categoria";
+    $query = "SELECT codofeatvceu FROM {block_extensao_turma} WHERE codcam = $query_categoria OR codund = $query_categoria";
     $turmas = $DB->get_records_sql($query);
     if (!empty($turmas)) {
       $turmas_array = Turmas::info_turmas($turmas);
@@ -102,8 +106,11 @@ class Turmas {
    */
   public static function usuario_docente_turma ($nusp_usuario, $codofeatvceu) {
     global $DB;
+    // tratamento de string vs numero
+    if (is_numeric($codofeatvceu)) $query_codofeatvceu = $codofeatvceu;
+    else $query_codofeatvceu = "'$codofeatvceu'";
     // agora ve se esta associada ao usuario
-    $query = "SELECT * FROM {block_extensao_ministrante} WHERE codofeatvceu = $codofeatvceu AND codpes = '$nusp_usuario'";
+    $query = "SELECT * FROM {block_extensao_ministrante} WHERE codofeatvceu = $query_codofeatvceu AND codpes = '$nusp_usuario'";
     $turma_associada = $DB->get_records_sql($query);
     return !empty($turma_associada);
   }
@@ -136,7 +143,11 @@ class Turmas {
    */
   public static function atualizar_id_moodle_turma ($codofeatvceu, $id_moodle) {
     global $DB;
-    $query = "UPDATE {block_extensao_turma} SET id_moodle = $id_moodle WHERE codofeatvceu = $codofeatvceu";
+    // tratamento de string vs numero
+    if (is_numeric($codofeatvceu)) $query_codofeatvceu = $codofeatvceu;
+    else $query_codofeatvceu = "'$codofeatvceu'";
+    // busca
+    $query = "UPDATE {block_extensao_turma} SET id_moodle = $id_moodle WHERE codofeatvceu = $query_codofeatvceu";
     $query = $DB->execute($query);
     return $query;
   }
