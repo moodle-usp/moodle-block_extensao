@@ -11,6 +11,7 @@
  * ministrante.
  */
 
+require_once(__DIR__ . '/../../config.php');
 require_once('src/Service/Query.php');
 require_once('src/Turmas.php');
 require_once('src/Categorias.php');
@@ -22,7 +23,7 @@ class block_extensao extends block_base {
     }
 
     public function get_content() {
-        global $USER, $OUTPUT;
+        global $USER, $OUTPUT, $CFG;
         
         // Para garantir que o formulario nao se duplique
         if ($this->content != null) return $this->content;
@@ -51,7 +52,7 @@ class block_extensao extends block_base {
         }
 
         // formulario
-        $formulario = (new redirecionamento_criacao_ambiente('/blocks/extensao/pages/criar_ambiente.php', array('cursos'=>$cursos)))->render();
+        $formulario = (new redirecionamento_criacao_ambiente($CFG->wwwroot . '/blocks/extensao/pages/criar_ambiente.php', array('cursos'=>$cursos)))->render();
         // array da template
         $info = array(
             'sem_cursos' => empty($cursos),
