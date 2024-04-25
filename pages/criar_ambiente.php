@@ -98,8 +98,9 @@ if (!empty($info_forms)) {
   // Caso contrario, salva
   $_SESSION['codofeatvceu'] = $codofeatvceu;
 }
-// Se estiver vazio, tenta pegar via sessao
-else $codofeatvceu = $_SESSION['codofeatvceu'];
+// Bloqueio do acesso direto
+else
+  redirect($CFG->wwwroot);
 
 // Verifica se a turma enviada eh do usuario logado
 if (!Turmas::usuario_docente_turma($USER->username, $codofeatvceu) && !Categorias::usuario_gerente_turma($USER->id, $codofeatvceu) ) {
