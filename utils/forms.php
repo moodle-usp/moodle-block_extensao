@@ -18,8 +18,8 @@ require_once(__DIR__ . '/../src/Atuacao.php');
 require_once(__DIR__ . '/../src/Service/Query.php');
 use block_extensao\Service\Query;
 
-// formulario para os docentes criarem um ambiente para um curso
-class redirecionamento_criacao_ambiente extends moodleform {
+// formulario para os docentes criarem um ambiente para um curso (versao select)
+class redirecionamento_criacao_ambiente_select extends moodleform {
   public function definition () {
     // Captura a lista de cursos
     if (isset($this->_customdata['cursos'])) $cursos = $this->_customdata['cursos'];
@@ -35,8 +35,22 @@ class redirecionamento_criacao_ambiente extends moodleform {
   }
 }
 
+// formulario para os docentes criarem um ambiente para um curso (versao lista com 5 ou menos cursos)
+class redirecionamento_criacao_ambiente_lista extends moodleform {
+  public function definition () {
+    // input hidden com o id da turma no plugin Extensao
+    $codofeatvceu = "";
+    if (isset($this->_customdata['codofeatvceu']))
+      $codofeatvceu = $this->_customdata['codofeatvceu'];  
+    $this->_form->addElement('hidden', 'codofeatvceu', $codofeatvceu);
+    $this->_form->setType('codofeatvceu', PARAM_TEXT);
+    
+    // botao de submit
+    $this->_form->addElement('submit', 'redirecionar_criar_ambiente', 'Criar ambiente');
+  }
+}
+
 // formulario para a criacao de ambientes no Moodle
-// OBS: addRule nao esta funcionando...
 class criar_ambiente_moodle extends moodleform {
   public function definition () {
     global $CFG;
@@ -117,7 +131,7 @@ class criar_ambiente_moodle extends moodleform {
           null,
           $nomeprofessor . " [{$codatc}]",
           array(),
-          array(0, $ministrante->firstname)
+          array(1, $ministrante->firstname)
         );
       }
       // para ministrantes que nao tem conta no Moodle ainda
