@@ -50,19 +50,37 @@ class block_extensao extends block_base {
             $cursos = [];
             $categorias = [];
         }
+        // TRUE se tiver 5 ou menos cursos
+        $formulario_em_lista = (count($cursos) <= 5);
 
-        // formulario
-        $formulario = (new redirecionamento_criacao_ambiente($CFG->wwwroot . '/blocks/extensao/pages/criar_ambiente.php', array('cursos'=>$cursos)))->render();
-        // array da template
-        $info = array(
-            'sem_cursos' => empty($cursos),
-            'formulario' => $formulario,
-            'com_categorias' => !empty($categorias),
-            'categorias' => $categorias
+        // informacoes que serao enviadas ao template
+        $infos = array(
+            'sem_cursos'          => empty($cursos),
+            'formulario_em_lista' => $formulario_em_lista
         );
-        // template
-        $this->content->text = $OUTPUT->render_from_template('block_extensao/extensao_block', $info);
 
+        // formulario dinamico
+        if ($formulario_em_lista) {
+            // se for em lista, precisa criar um formulario para cada turma
+            $cursos_docente = array();
+            foreach ($cursos as $codofeatvceu => $nome_curso) {
+                // cria um formulario
+                $form = new redirecionamento_criacao_ambiente_lista('/blocks/extensao/pages/criar_ambiente.php', array('codofeatvceu' => $codofeatvceu));    
+                $cursos_docente[] = array(
+                    'nome_curso_apolo' => $nome_curso,
+                    'formulario_curso' => $form->render()
+                );
+            }
+            $infos['cursos_docente'] = $cursos_docente;
+        }
+        // Formulario como select
+        else {
+            $formulario = new redirecionamento_criacao_ambiente_select('/blocks/extensao/pages/criar_ambiente.php', array('cursos'=>$cursos));
+            $infos['formulario'] = $formulario->render();
+        }
+
+        // template
+        $this->content->text = $OUTPUT->render_from_template('block_extensao/extensao_block', $infos);
         return $this->content;
     }
 

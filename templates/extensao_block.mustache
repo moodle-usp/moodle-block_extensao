@@ -3,6 +3,20 @@
 {{#sem_cursos}}
   <p>Nenhum curso foi encontrado.</p>
 {{/sem_cursos}}
+
 {{^sem_cursos}}
-  {{{formulario}}}
+  {{#formulario_em_lista}}
+    {{#cursos_docente}}
+      <div class="card">
+        <div class="card-body">
+          <h6 class="card-title">{{ nome_curso_apolo }}</h6>
+          {{{ formulario_curso }}}
+        </div>  
+      </div>
+    {{/cursos_docente}} 
+  {{/formulario_em_lista}}
+  
+  {{^formulario_em_lista}}
+    {{{formulario}}}
+  {{/formulario_em_lista}}
 {{/sem_cursos}}

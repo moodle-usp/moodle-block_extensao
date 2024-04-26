@@ -18,8 +18,8 @@ require_once(__DIR__ . '/../src/Atuacao.php');
 require_once(__DIR__ . '/../src/Service/Query.php');
 use block_extensao\Service\Query;
 
-// formulario para os docentes criarem um ambiente para um curso
-class redirecionamento_criacao_ambiente extends moodleform {
+// formulario para os docentes criarem um ambiente para um curso (versao select)
+class redirecionamento_criacao_ambiente_select extends moodleform {
   public function definition () {
     // Captura a lista de cursos
     if (isset($this->_customdata['cursos'])) $cursos = $this->_customdata['cursos'];
@@ -35,8 +35,22 @@ class redirecionamento_criacao_ambiente extends moodleform {
   }
 }
 
+// formulario para os docentes criarem um ambiente para um curso (versao lista com 5 ou menos cursos)
+class redirecionamento_criacao_ambiente_lista extends moodleform {
+  public function definition () {
+    // input hidden com o id da turma no plugin Extensao
+    $codofeatvceu = "";
+    if (isset($this->_customdata['codofeatvceu']))
+      $codofeatvceu = $this->_customdata['codofeatvceu'];  
+    $this->_form->addElement('hidden', 'codofeatvceu', $codofeatvceu);
+    $this->_form->setType('codofeatvceu', PARAM_TEXT);
+    
+    // botao de submit
+    $this->_form->addElement('submit', 'redirecionar_criar_ambiente', 'Criar ambiente');
+  }
+}
+
 // formulario para a criacao de ambientes no Moodle
-// OBS: addRule nao esta funcionando...
 class criar_ambiente_moodle extends moodleform {
   public function definition () {
     global $CFG;
@@ -62,16 +76,16 @@ class criar_ambiente_moodle extends moodleform {
     $this->_form->setDefault('fullname', "{$fullname} ({$ano_curso})");
     $this->_form->setType('fullname', PARAM_TEXT);
 
-    // data de inicio do curso
-    $init_date_timestamp = strtotime($init_date);
-    $this->_form->addElement('date_selector', 'startdate', 'Data de início do curso');
-    $this->_form->setDefault('startdate', $init_date_timestamp);
-
     // data do fim do curso
     $end_date = $this->define_campo('enddate');
-    $end_date_timestamp = strtotime($end_date);
+    $end_date_timestamp = strtotime("+2 months", strtotime($end_date));
     $this->_form->addElement('date_selector', 'enddate', 'Data do fim do curso');
     $this->_form->setDefault('enddate', $end_date_timestamp);
+
+    // Para definir um estilo 
+    $end_date_formatted = date('d/m/Y', strtotime($end_date));
+    $end_date_element = $this->_form->getElement('enddate');
+    $end_date_element->setLabel('Data do fim do curso <span style="color: #ff0000; font-weight: bold;">' . $end_date_formatted . '</span>');
 
     // Para definir um estilo 
     $end_date_formatted = date('d/m/Y', $end_date_timestamp);
@@ -89,7 +103,7 @@ class criar_ambiente_moodle extends moodleform {
     $this->_form->addElement(
       'select',
       'guest',
-      'Deseja que seu curso seja aberto ao público? Caso não, o conteúdo estará disponível somente aos alunos matriculados na disciplina.',
+      'Deseja que seu curso seja aberto ao público? Se sim, o conteúdo estará disponível na internet para qualquer visitante.',
       $options
     ); 
 
@@ -111,24 +125,28 @@ class criar_ambiente_moodle extends moodleform {
       foreach ($moodle as $ministrante){
         $codatc = Atuacao::NOMES[$ministrante->codatc];
         $nomeprofessor = sprintf('%s %s', $ministrante->firstname, $ministrante->lastname);
+        $namecheckbox = "ministrantes[{$ministrante->id}]";
         $this->_form->addElement(
           'advcheckbox', 
-          "ministrantes[{$ministrante->id}]",
+          $namecheckbox,
           null,
           $nomeprofessor . " [{$codatc}]",
           array(),
-          array(0, $ministrante->firstname)
+          array(1, $ministrante->firstname)
         );
+        $this->_form->setDefault($namecheckbox, true);
       }
       // para ministrantes que nao tem conta no Moodle ainda
       if (isset($ministrantes['apolo'])) {
         foreach ($ministrantes['apolo'] as $ministrante) {
           $codatc = Atuacao::NOMES[$ministrante['papel_usuario']];
+          $namecheckbox = "ministrantes_semconta[{$ministrante['codpes']}]";
           $this->_form->addElement(
             'checkbox',
-            "ministrantes_semconta[{$ministrante['codpes']}]",
+            $namecheckbox,
             $ministrante['nompes'] . " [{$codatc}]",
           );
+          $this->_form->setDefault($namecheckbox, true);
         }
       }
     }

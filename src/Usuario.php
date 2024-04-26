@@ -207,11 +207,10 @@ class Usuario {
     }
 
     // Criando objeto do usuario
-    //
     $nomeCompleto = $usuario['nompes'];
-    $partesNome = explode(' ', $nomeCompleto); 
-    $primeiroNome = $partesNome[0];
-    $segundoNome = end($partesNome);
+    $partesNome = explode(" ", $nomeCompleto);
+    $primeiroNome = array_shift($partesNome);
+    $segundoNome = implode(" ", $partesNome); 
 
     $novoUsuario = new stdClass();
     $novoUsuario->username = (string) $usuario['codpes'];

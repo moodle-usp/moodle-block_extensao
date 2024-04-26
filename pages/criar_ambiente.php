@@ -81,16 +81,21 @@ if (!empty($categorias)) {
     }
   }
 }
-// Gera o formulario para capturar o codfeatvceu
-$forms = new redirecionamento_criacao_ambiente('', array('cursos'=>$cursos));
-$info_forms = $forms->get_data();
-if (!empty($info_forms)) {
+
+// Gera os formularios para capturar o codfeatvceu
+$forms_select = new redirecionamento_criacao_ambiente_select('', array('cursos'=>$cursos));
+$info_forms_select = $forms_select->get_data();
+$forms_lista = new redirecionamento_criacao_ambiente_lista('', array('cursos'=>$cursos));
+$info_forms_lista = $forms_lista->get_data();
+
+// Tenta primeiro com o de select
+if (!empty($info_forms_select)) {
   // Se o select nao estiver definido, deu algum problema e volta para o inicio
-  if (!isset($info_forms->select_ambiente)) {
+  if (!isset($info_forms_select->select_ambiente)) {
     \core\notification::error('Nenhuma turma selecionada');
     redirect($_SERVER['HTTP_REFERER']);
   }
-  $codofeatvceu = $info_forms->select_ambiente;
+  $codofeatvceu = $info_forms_select->select_ambiente;
   
   // Se for vazio, volta para a pagina
   if ($codofeatvceu == 0) redirect($_SERVER['HTTP_REFERER']);
@@ -98,8 +103,19 @@ if (!empty($info_forms)) {
   // Caso contrario, salva
   $_SESSION['codofeatvceu'] = $codofeatvceu;
 }
-// Se estiver vazio, tenta pegar via sessao
-else $codofeatvceu = $_SESSION['codofeatvceu'];
+// Se nao der certo, tenta com o de lista
+else if (!empty($info_forms_lista)) {
+  $codofeatvceu = $info_forms_lista->codofeatvceu;
+
+  // Se for vazio, volta para a pagina
+  if ($codofeatvceu == 0) redirect($_SERVER['HTTP_REFERER']);
+
+  // Caso contrario, salva
+  $_SESSION['codofeatvceu'] = $codofeatvceu;
+}
+// Bloqueio do acesso direto
+else 
+  redirect($CFG->wwwroot);
 
 // Verifica se a turma enviada eh do usuario logado
 if (!Turmas::usuario_docente_turma($USER->username, $codofeatvceu) && !Categorias::usuario_gerente_turma($USER->id, $codofeatvceu) ) {
