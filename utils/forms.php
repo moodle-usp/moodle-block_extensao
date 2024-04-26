@@ -103,7 +103,7 @@ class criar_ambiente_moodle extends moodleform {
     $this->_form->addElement(
       'select',
       'guest',
-      'Deseja que seu curso seja aberto ao público? Caso não, o conteúdo estará disponível somente aos alunos matriculados na disciplina.',
+      'Deseja que seu curso seja aberto ao público? Se sim, o conteúdo estará disponível na internet para qualquer visitante.',
       $options
     ); 
 
