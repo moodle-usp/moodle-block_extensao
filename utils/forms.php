@@ -19,16 +19,32 @@ require_once(__DIR__ . '/../src/Service/Query.php');
 use block_extensao\Service\Query;
 
 // formulario para os docentes criarem um ambiente para um curso (versao select)
+
 class redirecionamento_criacao_ambiente_select extends moodleform {
   public function definition () {
+    global $CFG;
+    $Query = new Query();
     // Captura a lista de cursos
-    if (isset($this->_customdata['cursos'])) $cursos = $this->_customdata['cursos'];
-    else $cursos = [];
+    if (isset($this->_customdata['cursos'])) 
+        $cursos = $this->_customdata['cursos'];
+    else 
+        $cursos = [];
 
-    $options = array(
-      'placeholder' => "Buscar"
-    );
-    $this->_form->addElement('autocomplete', 'select_ambiente', 'Buscar por turma', [0=>''] + $cursos, $options);
+    $options = array();
+    // Para obter a data de inicio do curso a partir
+    foreach ($cursos as $indice => $nome_curso) {
+        $inicioCurso = $Query->informacoesTurma($indice);
+        $dataInicio = $inicioCurso->startdate;
+        // Convertendo o formato da data
+        $Inicio = date('d-m-Y', $dataInicio);
+   
+        // Formatado com a data de inicio entre parenteses;
+        $option_label = "$nome_curso ($Inicio)";
+        $options[$indice] = $option_label;
+    }
+  
+    $options = array('placeholder' => "Buscar") + $options;
+    $this->_form->addElement('autocomplete', 'select_ambiente', 'Buscar por turma', $options);
 
     // botao de submit
     $this->_form->addElement('submit', 'redirecionar_criar_ambiente', 'Criar ambiente');
@@ -38,10 +54,29 @@ class redirecionamento_criacao_ambiente_select extends moodleform {
 // formulario para os docentes criarem um ambiente para um curso (versao lista com 5 ou menos cursos)
 class redirecionamento_criacao_ambiente_lista extends moodleform {
   public function definition () {
+    global $CFG;
+    $Query = new Query();
+
     // input hidden com o id da turma no plugin Extensao
     $codofeatvceu = "";
-    if (isset($this->_customdata['codofeatvceu']))
-      $codofeatvceu = $this->_customdata['codofeatvceu'];  
+    if (isset($this->_customdata['codofeatvceu'])) {
+      $codofeatvceu = $this->_customdata['codofeatvceu'];
+
+      // Obter informações do curso
+      $curso = $Query->informacoesTurma($codofeatvceu);
+      $nomeCurso = $curso->fullname;
+      $dataInicio = $curso->startdate;
+
+      // Formatando a data de início
+      $inicioFormatado = "<span style='color: red; font-weight: bold'>".date('d/m/Y', $dataInicio)."</span>";
+
+      // Construindo o rótulo do curso com a data de início estilizada
+      $labelCurso = "$nomeCurso Inicia em: $inicioFormatado";
+
+      // Adicionando o elemento de texto com o nome do curso e a data de início estilizada
+      $this->_form->addElement('static', 'curso_com_data_inicio', $labelCurso);
+    }
+
     $this->_form->addElement('hidden', 'codofeatvceu', $codofeatvceu);
     $this->_form->setType('codofeatvceu', PARAM_TEXT);
     
@@ -49,6 +84,8 @@ class redirecionamento_criacao_ambiente_lista extends moodleform {
     $this->_form->addElement('submit', 'redirecionar_criar_ambiente', 'Criar ambiente');
   }
 }
+
+
 
 // formulario para a criacao de ambientes no Moodle
 class criar_ambiente_moodle extends moodleform {
@@ -75,6 +112,11 @@ class criar_ambiente_moodle extends moodleform {
     $ano_curso = date('Y', strtotime($init_date));
     $this->_form->setDefault('fullname', "{$fullname} ({$ano_curso})");
     $this->_form->setType('fullname', PARAM_TEXT);
+
+    // data de inicio do curso
+    $init_date_timestamp = strtotime($init_date);
+    $this->_form->addElement('date_selector', 'startdate', 'Data de início do curso');
+    $this->_form->setDefault('startdate', $init_date_timestamp);
 
     // data do fim do curso
     $end_date = $this->define_campo('enddate');
