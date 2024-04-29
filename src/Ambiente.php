@@ -153,18 +153,26 @@ class Ambiente {
    * @return object Objeto de curso.
    */
   public static function criar_objeto_curso ($info_forms, $info_curso_apolo) {
+    global $DB;    
     $curso = new stdClass;
     
     $curso->shortname = $info_forms->shortname;
     $curso->fullname = $info_forms->fullname;
     $curso->idnumber = $info_forms->codofeatvceu;
     $curso->visible = 1;
+
+    // Formato padrao
+    $formato_padrao = $DB->get_record('config_plugins', ['name'=>'format']);
+    if (isset($formato_padrao)) 
+      $curso->format = $formato_padrao->value;
     
-    $curso->format = 'topics'; //?
-    $curso->numsections = ''; //?
+    // Quantidade de secoes padrao
+    $numsec_padrao = $DB->get_record('config_plugins', ['name'=>'numsections']);
+    if (isset($numsec_padrao))
+      $curso->numsections = $numsec_padrao->value;
 
     $curso->summary = $info_forms->summary['text']; 
-    $curso->summaryfomart = FORMAT_HTML;
+    $curso->summaryformat = FORMAT_HTML;
 
     $curso->startdate = $info_forms->startdate;
     $curso->enddate = $info_forms->enddate;
