@@ -87,7 +87,7 @@ class criar_ambiente_moodle extends moodleform {
     $end_date_element = $this->_form->getElement('enddate');
     $end_date_element->setLabel('Data do fim do curso <span style="color: #ff0000; font-weight: bold;">' . $end_date_formatted . '</span>');
 
-    // Para definir um estilo 
+    // Para definir o fim do curso 
     $end_date_formatted = date('d/m/Y', $end_date_timestamp);
     $end_date_element = $this->_form->getElement('enddate');
     $end_date_element->setLabel('Data do fim do curso <span style="color: #ff0000; font-weight: bold;">' . $end_date_formatted . '</span>');
