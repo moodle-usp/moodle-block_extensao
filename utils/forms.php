@@ -19,8 +19,6 @@ require_once(__DIR__ . '/../src/Service/Query.php');
 use block_extensao\Service\Query;
 
 // formulario para os docentes criarem um ambiente para um curso (versao select)
-
-
 class redirecionamento_criacao_ambiente_select extends moodleform {
   public function definition () {
     global $CFG;
@@ -47,19 +45,7 @@ class redirecionamento_criacao_ambiente_select extends moodleform {
   
     $options = array('placeholder' => "Buscar") + $options;
     $this->_form->addElement('autocomplete', 'select_ambiente', 'Buscar por turma', $options);
-    $options = array();
-    // Para obter a data de inicio do curso a partir
-    foreach ($cursos as $indice => $nome_curso) {
-        $inicioCurso = $Query->informacoesTurma($indice);
-        $dataInicio = $inicioCurso->startdate;
-        // Convertendo o formato da data
-        $Inicio = date('d-m-Y', $dataInicio);
-   
-        // Formatado com a data de inicio entre parenteses;
-        $option_label = "$nome_curso ($Inicio)";
-        $options[$indice] = $option_label;
-    }
-  
+    $options = array();  
     $options = array('placeholder' => "Buscar") + $options;
     $this->_form->addElement('autocomplete', 'select_ambiente', 'Buscar por turma', $options);
 
@@ -101,8 +87,6 @@ class redirecionamento_criacao_ambiente_lista extends moodleform {
     $this->_form->addElement('submit', 'redirecionar_criar_ambiente', 'Criar ambiente');
   }
 }
-
-
 
 // formulario para a criacao de ambientes no Moodle
 class criar_ambiente_moodle extends moodleform {
