@@ -25,18 +25,13 @@ class redirecionamento_criacao_ambiente_select extends moodleform {
   public function definition () {
     global $CFG;
     $Query = new Query();
-    global $CFG;
-    $Query = new Query();
+
     // Captura a lista de cursos
     if (isset($this->_customdata['cursos'])) 
         $cursos = $this->_customdata['cursos'];
     else 
         $cursos = [];
-    if (isset($this->_customdata['cursos'])) 
-        $cursos = $this->_customdata['cursos'];
-    else 
-        $cursos = [];
-
+   
     $options = array();
     // Para obter a data de inicio do curso a partir
     foreach ($cursos as $indice => $nome_curso) {
@@ -76,9 +71,6 @@ class redirecionamento_criacao_ambiente_select extends moodleform {
 // formulario para os docentes criarem um ambiente para um curso (versao lista com 5 ou menos cursos)
 class redirecionamento_criacao_ambiente_lista extends moodleform {
   public function definition () {
-    global $CFG;
-    $Query = new Query();
-
     global $CFG;
     $Query = new Query();
 
