@@ -20,8 +20,11 @@ use block_extensao\Service\Query;
 
 // formulario para os docentes criarem um ambiente para um curso (versao select)
 
+
 class redirecionamento_criacao_ambiente_select extends moodleform {
   public function definition () {
+    global $CFG;
+    $Query = new Query();
     global $CFG;
     $Query = new Query();
     // Captura a lista de cursos
@@ -29,7 +32,26 @@ class redirecionamento_criacao_ambiente_select extends moodleform {
         $cursos = $this->_customdata['cursos'];
     else 
         $cursos = [];
+    if (isset($this->_customdata['cursos'])) 
+        $cursos = $this->_customdata['cursos'];
+    else 
+        $cursos = [];
 
+    $options = array();
+    // Para obter a data de inicio do curso a partir
+    foreach ($cursos as $indice => $nome_curso) {
+        $inicioCurso = $Query->informacoesTurma($indice);
+        $dataInicio = $inicioCurso->startdate;
+        // Convertendo o formato da data
+        $Inicio = date('d-m-Y', $dataInicio);
+   
+        // Formatado com a data de inicio entre parenteses;
+        $option_label = "$nome_curso ($Inicio)";
+        $options[$indice] = $option_label;
+    }
+  
+    $options = array('placeholder' => "Buscar") + $options;
+    $this->_form->addElement('autocomplete', 'select_ambiente', 'Buscar por turma', $options);
     $options = array();
     // Para obter a data de inicio do curso a partir
     foreach ($cursos as $indice => $nome_curso) {
@@ -54,6 +76,9 @@ class redirecionamento_criacao_ambiente_select extends moodleform {
 // formulario para os docentes criarem um ambiente para um curso (versao lista com 5 ou menos cursos)
 class redirecionamento_criacao_ambiente_lista extends moodleform {
   public function definition () {
+    global $CFG;
+    $Query = new Query();
+
     global $CFG;
     $Query = new Query();
 
@@ -85,6 +110,8 @@ class redirecionamento_criacao_ambiente_lista extends moodleform {
   }
 }
 
+
+
 // formulario para a criacao de ambientes no Moodle
 class criar_ambiente_moodle extends moodleform {
   public function definition () {
@@ -110,6 +137,11 @@ class criar_ambiente_moodle extends moodleform {
     $ano_curso = date('Y', strtotime($init_date));
     $this->_form->setDefault('fullname', "{$fullname} ({$ano_curso})");
     $this->_form->setType('fullname', PARAM_TEXT);
+
+    // data de inicio do curso
+    $init_date_timestamp = strtotime($init_date);
+    $this->_form->addElement('date_selector', 'startdate', 'Data de início do curso');
+    $this->_form->setDefault('startdate', $init_date_timestamp);
 
     // data de inicio do curso
     $init_date_timestamp = strtotime($init_date);
