@@ -79,6 +79,9 @@ class Ambiente {
     Usuario::inscreve_criador($moodle_curso->id);
     \core\notification::success('Usuário criador matriculado como "professor".');
 
+    // captura as informacoes dos cargos
+    $cargos_atuacao = Atuacao::cargos_atuacao();
+
     // caso tenham sido passados outros usuarios, eh preciso inscreve-los
     if (isset($info_forms_array['ministrantes'])) {
       foreach ($info_forms_array['ministrantes'] as $id_ministrante=>$nome) {
@@ -90,13 +93,21 @@ class Ambiente {
         $codatc = Usuario::codigo_atuacao_ceu($usuario_moodle->idnumber, $info_forms->codofeatvceu);
         // matricula o professor
         Usuario::matricula_professor($moodle_curso->id, $id_ministrante, $codatc);
-        $shortname_adaptado = Atuacao::NOMES[$codatc];
+        // Nome do cargo
+        $shortname_adaptado = "-";
+        if (isset($cargos_atuacao[$codatc]))
+        {$shortname_adaptado = $cargos_atuacao[$codatc];
+        // notificacao
         \core\notification::success('Professor auxiliar ' . $nome . ' matriculado como "' . $shortname_adaptado . '".');
-        Notificacoes::notificacao_inscricao($usuario_moodle, $moodle_curso);
-
+        try { 
+          Notificacoes::notificacao_inscricao($usuario_moodle, $moodle_curso);
+        } catch (Exception $e) {
+          error_log('Erro ao enviar e-mail de notificação: ' . $e->getMessage()); // Mensagem caso nao seja possivel enviar o email
       }
     }
-    
+  }
+}
+      
     // caso seja selecionado um professor sem conta moodle, eh criada a sua conta
     if (isset($info_forms_array['ministrantes_semconta'])) {
       foreach ($info_forms_array['ministrantes_semconta'] as $id_ministrante => $ministrante_semconta) {
@@ -128,16 +139,17 @@ class Ambiente {
         $codatc = Usuario::codigo_atuacao_ceu($usuario_moodle->idnumber, $info_forms->codofeatvceu);
         // matricula o professor
         Usuario::matricula_professor($moodle_curso->id, $ministrante->id, $codatc);
-        $shortname_adaptado = Atuacao::NOMES[$codatc];
+        // nome do cargo
+        $shortname_adaptado = "-";
+        if (isset($cargos_atuacao[$codatc]))
+          $shortname_adaptado = $cargos_atuacao[$codatc];
+        // notificacao
         \core\notification::success('Professor auxiliar ' . $nome . ' matriculado como "' . $shortname_adaptado . '".');
         try {
           Notificacoes::notificacao_inscricao($ministrante, $moodle_curso);
-      } catch (Exception $e) {
-          // Se ocorrer um erro, ele sera capturado aqui e podemos lidar com ele
-          // Por exemplo, podemos exibir uma mensagem de erro ou registrar o erro em um arquivo de log.
-          echo "Ocorreu um erro: " . $e->getMessage();
+        } catch (Exception $e) {
+          error_log('Erro ao enviar e-mail de notificação: ' . $e->getMessage()); // Mensagem caso nao seja possivel enviar o email
       }
-      
       }
     }
 

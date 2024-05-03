@@ -1,26 +1,41 @@
 <?php
 
+require_once(__DIR__ . '/Service/Query.php');
+use block_extensao\Service\Query;
+
 class Atuacao {
-  const NOMES = array(
-    1 => 'Professor USP',
-    2 => 'Especialista',
-    3 => 'Monitor',
-    4 => 'Servidor',
-    5 => 'Professor HC - FM-USP',
-    6 => 'Tutor',
-    7 => 'Docente (S)',
-    8 => 'Preceptor (S)',
-    9 => 'Tutor (S)'
-  );
-  const CORRESPONDENCIA_MOODLE = array(
-    1 => 'editingteacher',
-    2 => 'editingteacher',
-    3 => 'teacher',
-    4 => 'teacher',
-    5 => 'editingteacher',
-    6 => 'teacher',
-    7 => 'editingteacher',
-    8 => 'teacher',
-    9 => 'teacher'
-  );
+  /**
+   * Relacao atual:
+   * 
+   * Professor USP              => editingteacher
+   * Especialista               => editingteacher
+   * Monitor                    => teacher
+   * Servidor                   => teacher
+   * Professor HC - FM-USP      => editingteacher
+   * Tutor                      => teacher
+   * Docente (S)                => teacher
+   * Preceptor (S)              => teacher
+   * Tutor (S)                  => teacher
+   * Coordenador de Estágio (S) => teacher
+   * Corresponsável             => teacher
+   * Responsável                => teacher
+   */
+  const CARGOS_EDITINGTEACHER = array(1,2,5,7);
+
+  static public function correspondencia_moodle ($codatc) {
+    if (array_search($codatc, self::CARGOS_EDITINGTEACHER))
+      return 'editingteacher';
+    else
+      return 'teacher';
+  }
+
+  static public function cargos_atuacao () {
+    $Query = new Query();
+    $cargos_base = $Query->cargos_atuacao();
+    $cargos = array();
+    foreach ($cargos_base as $cargo) {
+      $cargos[$cargo['codatc']] = $cargo['dscatc'];
+    }
+    return $cargos;
+  }
 }

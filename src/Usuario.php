@@ -75,7 +75,7 @@ class Usuario {
     global $DB;
 
     // captura o shortname do codigo de atuacao
-    $shortname_codatc = Atuacao::CORRESPONDENCIA_MOODLE[$codatc];
+    $shortname_codatc = Atuacao::correspondencia_moodle($codatc);
 
     // captura o papel do shortname
     $role = $DB->get_record('role', ['shortname' => $shortname_codatc]);
