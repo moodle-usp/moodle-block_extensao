@@ -54,6 +54,10 @@ if ($ADMIN->fulltree) {
     // Campo para a tabela de "MINISTRANTECEU"
     $setting = new admin_setting_configtext('block_extensao/tabela_ministranteceu', 'MINISTRANTECEU', '', 'MINISTRANTECEU', PARAM_TEXT);
     $settings->add($setting);
+
+    // Campo para a tabela de "ATUACAOCEU"
+    $setting = new admin_setting_configtext('block_extensao/tabela_atuacaoceu', 'ATUACAOCEU', '', 'ATUACAOCEU', PARAM_TEXT);
+    $settings->add($setting);
     
     // Campo para a tabela de "EMAILPESSOA"
     $setting = new admin_setting_configtext('block_extensao/tabela_emailpessoa', 'EMAILPESSOA', '', 'EMAILPESSOA', PARAM_TEXT);

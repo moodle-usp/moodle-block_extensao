@@ -19,7 +19,6 @@ require_once(__DIR__ . '/../src/Service/Query.php');
 use block_extensao\Service\Query;
 
 // formulario para os docentes criarem um ambiente para um curso (versao select)
-
 class redirecionamento_criacao_ambiente_select extends moodleform {
   public function definition () {
     global $CFG;
@@ -28,26 +27,29 @@ class redirecionamento_criacao_ambiente_select extends moodleform {
     if (isset($this->_customdata['cursos'])) 
         $cursos = $this->_customdata['cursos'];
     else 
-        $cursos = [];
-
-    $options = array();
-    foreach ($cursos as $indice => $nome_curso) {
-        $inicioCurso = $Query->informacoesTurma($indice);
-        $dataInicio = $inicioCurso->startdate;
-        // Convertendo o formato da data
-        $Inicio = date('d-m-Y', $dataInicio);
-   
-        // Formatado com a data de inicio entre parenteses;
-        $option_label = "$nome_curso ($Inicio)";
-        $options[$indice] = $option_label;
-    }
-  
-    $options = array('placeholder' => "Buscar") + $options;
-    $this->_form->addElement('autocomplete', 'select_ambiente', 'Buscar por turma', $options);
-
-    // botao de submit
-    $this->_form->addElement('submit', 'redirecionar_criar_ambiente', 'Criar ambiente');
-  }
+      $cursos = [];
+          $options = array();
+      foreach ($cursos as $indice => $nome_curso) {
+          $inicioCurso = $Query->informacoesTurma($indice);
+          $dataInicio = $inicioCurso->startdate;
+          // Convertendo o formato da data
+          $Inicio = date('d-m-Y', $dataInicio);
+      
+          // Para obter o oferecimento do curso
+          $oferecimentoCurso = $Query->informacoesTurma($indice);
+          $oferecimento = $oferecimentoCurso->numseqofeedi;
+      
+          // Formatando o nome do curso com o número de oferecimento
+          $option_label = "$oferecimento - $nome_curso ($Inicio)";
+          $options[$indice] = $option_label;
+      }
+      
+      $options = array('placeholder' => "Buscar") + $options;
+      $this->_form->addElement('autocomplete', 'select_ambiente', 'Buscar por turma', $options);
+      
+      // botao de submit
+      $this->_form->addElement('submit', 'redirecionar_criar_ambiente', 'Criar ambiente');
+}
 }
 
 // formulario para os docentes criarem um ambiente para um curso (versao lista com 5 ou menos cursos)
@@ -60,20 +62,27 @@ class redirecionamento_criacao_ambiente_lista extends moodleform {
     $codofeatvceu = "";
     if (isset($this->_customdata['codofeatvceu'])) {
       $codofeatvceu = $this->_customdata['codofeatvceu'];
-
+ 
       // Obter informacoes do curso
       $curso = $Query->informacoesTurma($codofeatvceu);
       $nomeCurso = $curso->fullname;
       $dataInicio = $curso->startdate;
+      $oferecimento = $curso->numseqofeedi;
 
       // Formatando a data de inicio
       $inicioFormatado = "<span style='color: red; font-weight: bold'>".date('d/m/Y', $dataInicio)."</span>";
 
-      // Construindo o rotulo do curso com a data de início estilizada
+      // Construindo o rotulo do curso com a data de inicio estilizada
       $labelCurso = "$nomeCurso Inicia em: $inicioFormatado";
+
+      // Construindo o rotulo do oferecimento
+      $labelOferecimento = "Oferecimento: <span style='color: blue; font-weight: bold;'>$oferecimento</span>";
 
       // Adicionando o elemento de texto com o nome do curso e a data de inicio estilizada
       $this->_form->addElement('static', 'curso_com_data_inicio', $labelCurso);
+
+     // Adicionando o elemento de texto com o numero de oferecimento do curso
+      $this->_form->addElement('static', 'oferecimento', $labelOferecimento);
     }
 
     $this->_form->addElement('hidden', 'codofeatvceu', $codofeatvceu);
@@ -159,17 +168,23 @@ class criar_ambiente_moodle extends moodleform {
       );
     } 
     else {  
+      // captura as informacoes dos cargos
+      $cargos_atuacao = Atuacao::cargos_atuacao();
+
       // para ministrantes que ja tem conta no Moodle
       $moodle = $ministrantes['moodle'];
       foreach ($moodle as $ministrante){
-        $codatc = Atuacao::NOMES[$ministrante->codatc];
+        $dscatc = "-";
+        if (isset($cargos_atuacao[$ministrante->codatc]))
+          $dscatc = $cargos_atuacao[$ministrante->codatc];
+
         $nomeprofessor = sprintf('%s %s', $ministrante->firstname, $ministrante->lastname);
         $namecheckbox = "ministrantes[{$ministrante->id}]";
         $this->_form->addElement(
           'advcheckbox', 
           $namecheckbox,
           null,
-          $nomeprofessor . " [{$codatc}]",
+          $nomeprofessor . " [{$dscatc}]",
           array(),
           array(1, $ministrante->firstname)
         );
@@ -178,12 +193,15 @@ class criar_ambiente_moodle extends moodleform {
       // para ministrantes que nao tem conta no Moodle ainda
       if (isset($ministrantes['apolo'])) {
         foreach ($ministrantes['apolo'] as $ministrante) {
-          $codatc = Atuacao::NOMES[$ministrante['papel_usuario']];
+          $dscatc = "-";
+          if (isset($cargos_atuacao[$ministrante['papel_usuario']]))
+            $dscatc = $cargos_atuacao[$ministrante['papel_usuario']];
+
           $namecheckbox = "ministrantes_semconta[{$ministrante['codpes']}]";
           $this->_form->addElement(
             'checkbox',
             $namecheckbox,
-            $ministrante['nompes'] . " [{$codatc}]",
+            $ministrante['nompes'] . " [{$dscatc}]",
           );
           $this->_form->setDefault($namecheckbox, true);
         }

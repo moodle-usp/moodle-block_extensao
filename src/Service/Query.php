@@ -25,6 +25,7 @@ class Query
     $this->CURSOCEU                 = get_config('block_extensao', 'tabela_cursoceu');
     $this->EDICAOCURSOOFECEU        = get_config('block_extensao', 'tabela_edicaocursoofeceu');
     $this->MINISTRANTECEU           = get_config('block_extensao', 'tabela_ministranteceu');
+    $this->ATUACAOCEU               = get_config('block_extensao', 'tabela_atuacaoceu');
     $this->EMAILPESSOA              = get_config('block_extensao', 'tabela_emailpessoa');
     $this->UNIDADE                  = get_config('block_extensao', 'tabela_unidade');
     $this->CAMPUS                   = get_config('block_extensao', 'tabela_campus');
@@ -43,7 +44,6 @@ class Query
    * Sao consideradas como turmas abertas somente as turmas com
    * data de encerramento posterior a data de hoje.
    */
-
   
   public function turmasAbertas () {
     
@@ -92,15 +92,18 @@ class Query
    * Captura os ministrantes das turmas informadas.
    * 
    * Os codigos de atuacao (codatc) conforme ATUACAOCEU sao:
-   * 1 - Professor USP
-   * 2 - Especialista
-   * 3 - Monitor
-   * 4 - Servidor
-   * 5 - Professor HC - FM-USP
-   * 6 - Tutor
-   * 7 - Docente (S)
-   * 8 - Preceptor (S)
-   * 9 - Tutor (S)
+   * 1  - Professor USP
+   * 2  - Especialista
+   * 3  - Monitor
+   * 4  - Servidor
+   * 5  - Professor HC - FM-USP
+   * 6  - Tutor
+   * 7  - Docente (S)
+   * 8  - Preceptor (S)
+   * 9  - Tutor (S)
+   * 10 - Coordenador de Estágio (S)
+   * 11 - Corresponsável
+   * 11 - Responsável
    * 
    * @param array $codofeatvceu_turmas Lista de codigos de oferecimento
    * das turmas.
@@ -141,6 +144,7 @@ class Query
     $query = "
       SELECT
         codund,
+        numseqofeedi,
         dtainiofeatv,
         dtafimofeatv
       FROM " . $this->OFERECIMENTOATIVIDADECEU . "
@@ -157,6 +161,7 @@ class Query
     $info_curso->codofeatvceu = $codofeatvceu;
     $info_curso->startdate = strtotime($infos_curso['dtainiofeatv']);
     $info_curso->enddate = strtotime($infos_curso['dtafimofeatv']);
+    $info_curso->numseqofeedi = $infos_curso['numseqofeedi'];
     return $info_curso;
   }
   
@@ -292,4 +297,14 @@ class Query
       WHERE codpes = $query_codpes
     ");
   }
+
+  /**
+   * Captura dos cargos cadastrados na base, para exibir as
+   * descricoes.
+   * 
+   * @return array
+   */
+  public function cargos_atuacao () {
+    return USPDatabase::fetchAll("SELECT * FROM " . $this->ATUACAOCEU);
+  } 
 }
