@@ -159,17 +159,23 @@ class criar_ambiente_moodle extends moodleform {
       );
     } 
     else {  
+      // captura as informacoes dos cargos
+      $cargos_atuacao = Atuacao::cargos_atuacao();
+
       // para ministrantes que ja tem conta no Moodle
       $moodle = $ministrantes['moodle'];
       foreach ($moodle as $ministrante){
-        $codatc = Atuacao::NOMES[$ministrante->codatc];
+        $dscatc = "-";
+        if (isset($cargos_atuacao[$ministrante->codatc]))
+          $dscatc = $cargos_atuacao[$ministrante->codatc];
+
         $nomeprofessor = sprintf('%s %s', $ministrante->firstname, $ministrante->lastname);
         $namecheckbox = "ministrantes[{$ministrante->id}]";
         $this->_form->addElement(
           'advcheckbox', 
           $namecheckbox,
           null,
-          $nomeprofessor . " [{$codatc}]",
+          $nomeprofessor . " [{$dscatc}]",
           array(),
           array(1, $ministrante->firstname)
         );
@@ -178,12 +184,15 @@ class criar_ambiente_moodle extends moodleform {
       // para ministrantes que nao tem conta no Moodle ainda
       if (isset($ministrantes['apolo'])) {
         foreach ($ministrantes['apolo'] as $ministrante) {
-          $codatc = Atuacao::NOMES[$ministrante['papel_usuario']];
+          $dscatc = "-";
+          if (isset($cargos_atuacao[$ministrante['papel_usuario']]))
+            $dscatc = $cargos_atuacao[$ministrante['papel_usuario']];
+
           $namecheckbox = "ministrantes_semconta[{$ministrante['codpes']}]";
           $this->_form->addElement(
             'checkbox',
             $namecheckbox,
-            $ministrante['nompes'] . " [{$codatc}]",
+            $ministrante['nompes'] . " [{$dscatc}]",
           );
           $this->_form->setDefault($namecheckbox, true);
         }
