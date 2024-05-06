@@ -76,11 +76,6 @@ class criar_ambiente_moodle extends moodleform {
     $this->_form->setDefault('fullname', "{$fullname} ({$ano_curso})");
     $this->_form->setType('fullname', PARAM_TEXT);
 
-    // data de inicio do curso
-    $init_date_timestamp = strtotime($init_date);
-    $this->_form->addElement('date_selector', 'startdate', 'Data de início do curso');
-    $this->_form->setDefault('startdate', $init_date_timestamp);
-
     // data do fim do curso
     $end_date = $this->define_campo('enddate');
     $data = get_config('block_extensao', 'periodoAdicional');
