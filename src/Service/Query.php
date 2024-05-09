@@ -44,7 +44,6 @@ class Query
    * data de encerramento posterior a data de hoje.
    */
 
-  
   public function turmasAbertas () {
     
     $periodo = get_config('block_extensao', 'periodo_curso');
@@ -83,10 +82,8 @@ class Query
       WHERE e.dtainiofeedi >= '$inicio_curso'
       ORDER BY codofeatvceu 
     ";
-
     return USPDatabase::fetchAll($query);
   }
-
 
   /**
    * Captura os ministrantes das turmas informadas.
@@ -110,26 +107,26 @@ class Query
     $turmas = implode(', ', $codofeatvceu_turmas);
     $hoje = date("Y-m-d");
     $query = "
-        SELECT
-            m.codofeatvceu,
-            m.codpes,
-            m.codatc,
-            COALESCE(email_preferencial.codema, email_disponivel.codema) AS codema
-        FROM 
-        " . $this->MINISTRANTECEU . "  m
-        LEFT JOIN 
-            (SELECT codpes, codema FROM  " . $this->EMAILPESSOA . "  WHERE stamtr = 'S') AS email_preferencial 
-            ON m.codpes = email_preferencial.codpes
-        LEFT JOIN 
-            (SELECT codpes, codema FROM  " . $this->EMAILPESSOA . " ) AS email_disponivel 
-            ON m.codpes = email_disponivel.codpes
-        WHERE 
-            m.codpes IS NOT NULL
-            AND m.codofeatvceu IN ($turmas)
-            AND m.dtainimisatv >= '$hoje'
-        ORDER BY 
-            codofeatvceu  
-    ";
+      SELECT
+        m.codofeatvceu,
+        m.codpes,
+        m.codatc,
+        COALESCE(email_preferencial.codema, email_disponivel.codema) AS codema
+      FROM 
+      " . $this->MINISTRANTECEU . "  m
+      LEFT JOIN 
+        (SELECT codpes, codema FROM  " . $this->EMAILPESSOA . "  WHERE stamtr = 'S') AS email_preferencial 
+        ON m.codpes = email_preferencial.codpes
+      LEFT JOIN 
+        (SELECT codpes, codema FROM  " . $this->EMAILPESSOA . " ) AS email_disponivel 
+        ON m.codpes = email_disponivel.codpes
+      WHERE 
+        m.codpes IS NOT NULL
+        AND m.codofeatvceu IN ($turmas)
+        AND m.dtainimisatv >= '$hoje'
+      ORDER BY 
+        codofeatvceu  
+  ";
     return USPDatabase::fetchAll($query);
   }
 
