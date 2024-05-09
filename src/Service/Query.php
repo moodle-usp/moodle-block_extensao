@@ -25,6 +25,7 @@ class Query
     $this->CURSOCEU                 = get_config('block_extensao', 'tabela_cursoceu');
     $this->EDICAOCURSOOFECEU        = get_config('block_extensao', 'tabela_edicaocursoofeceu');
     $this->MINISTRANTECEU           = get_config('block_extensao', 'tabela_ministranteceu');
+    $this->ATUACAOCEU               = get_config('block_extensao', 'tabela_atuacaoceu');
     $this->EMAILPESSOA              = get_config('block_extensao', 'tabela_emailpessoa');
     $this->UNIDADE                  = get_config('block_extensao', 'tabela_unidade');
     $this->CAMPUS                   = get_config('block_extensao', 'tabela_campus');
@@ -44,7 +45,6 @@ class Query
    * data de encerramento posterior a data de hoje.
    */
 
-  
   public function turmasAbertas () {
     
     $periodo = get_config('block_extensao', 'periodo_curso');
@@ -74,24 +74,25 @@ class Query
       WHERE e.dtainiofeedi >= '$inicio_curso'
       ORDER BY codofeatvceu 
     ";
-
     return USPDatabase::fetchAll($query);
   }
-
 
   /**
    * Captura os ministrantes das turmas informadas.
    * 
    * Os codigos de atuacao (codatc) conforme ATUACAOCEU sao:
-   * 1 - Professor USP
-   * 2 - Especialista
-   * 3 - Monitor
-   * 4 - Servidor
-   * 5 - Professor HC - FM-USP
-   * 6 - Tutor
-   * 7 - Docente (S)
-   * 8 - Preceptor (S)
-   * 9 - Tutor (S)
+   * 1  - Professor USP
+   * 2  - Especialista
+   * 3  - Monitor
+   * 4  - Servidor
+   * 5  - Professor HC - FM-USP
+   * 6  - Tutor
+   * 7  - Docente (S)
+   * 8  - Preceptor (S)
+   * 9  - Tutor (S)
+   * 10 - Coordenador de Estágio (S)
+   * 11 - Corresponsável
+   * 11 - Responsável
    * 
    * @param array $codofeatvceu_turmas Lista de codigos de oferecimento
    * das turmas.
@@ -104,10 +105,17 @@ class Query
         m.codofeatvceu,
         m.codpes,
         m.codatc,
-        e.codema
-      FROM " . $this->MINISTRANTECEU . " m
-      LEFT JOIN " . $this->EMAILPESSOA . " e ON m.codpes = e.codpes
-      WHERE m.codpes IS NOT NULL
+        COALESCE(email_preferencial.codema, email_disponivel.codema) AS codema
+      FROM 
+      " . $this->MINISTRANTECEU . "  m
+      LEFT JOIN 
+        (SELECT codpes, codema FROM  " . $this->EMAILPESSOA . "  WHERE stamtr = 'S') AS email_preferencial 
+        ON m.codpes = email_preferencial.codpes
+      LEFT JOIN 
+        (SELECT codpes, codema FROM  " . $this->EMAILPESSOA . " ) AS email_disponivel 
+        ON m.codpes = email_disponivel.codpes
+      WHERE 
+        m.codpes IS NOT NULL
         AND m.codofeatvceu IN ($turmas)
       ORDER BY m.codofeatvceu
     ";
@@ -281,4 +289,14 @@ class Query
       WHERE codpes = $query_codpes
     ");
   }
+
+  /**
+   * Captura dos cargos cadastrados na base, para exibir as
+   * descricoes.
+   * 
+   * @return array
+   */
+  public function cargos_atuacao () {
+    return USPDatabase::fetchAll("SELECT * FROM " . $this->ATUACAOCEU);
+  } 
 }
