@@ -38,7 +38,9 @@ Uso:
 
 Opcoes:
   -h --help              Exibe essa ajuda.
-  --pular_ministrantes   Nao sincroniza os ministrantes.
+  --pular_ministrantes   Nao atualiza ministrantes para cursos que ja
+                         estavam na base. Novos cursos terao todos os
+                         ministrantes inseridos.
 ";
 
 // opcoes

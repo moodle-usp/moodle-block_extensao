@@ -52,21 +52,12 @@ class Query
 
     // opcoes para a pesquisa do inicio da busca por curso, coloquei as opcoes de 3, 6, 9 meses 
     // e 1 ano, no entanto, esse valor pode ser alterado caso seja pertinente.
+    if (in_array($periodo, ["3", "6", "9"]))
+      $periodo_str = "-$periodo months";
+    else
+      $periodo_str = "-1 year";
+    $inicio_curso = date("Y-m-d", strtotime($periodo_str, strtotime($diaAtual)));
 
-    if($periodo == "3"){
-        $inicio_curso =  date("Y-m-d", strtotime("-3 months", strtotime($diaAtual)));
-    } elseif ($periodo == "6") {
-        $inicio_curso = date("Y-m-d", strtotime("-6 months", strtotime($diaAtual)));
-    } elseif ($periodo == "9") {
-        $inicio_curso = date("Y-m-d", strtotime("-9 months", strtotime($diaAtual)));
-    } elseif ($periodo == "1") {
-      $inicio_curso = date("Y-m-d", strtotime("-1 year", strtotime($diaAtual)));
-    } else { 
-      // caso nenhum periodo seja definido, o sistema inicia a busca de cursos com a data de inicio
-      // posterior a 1 ano. 
-      $inicio_curso = date("Y-m-d", strtotime("-1 year", strtotime($diaAtual)));
-    }
-   
     $query = "
       SELECT
         o.codofeatvceu
@@ -109,7 +100,6 @@ class Query
    */
   public function ministrantesTurmas ($codofeatvceu_turmas) {
     $turmas = implode(', ', $codofeatvceu_turmas);
-    $hoje = date("Y-m-d");
     $query = "
       SELECT
         m.codofeatvceu,
@@ -127,10 +117,8 @@ class Query
       WHERE 
         m.codpes IS NOT NULL
         AND m.codofeatvceu IN ($turmas)
-        AND m.dtainimisatv >= '$hoje'
-      ORDER BY 
-        codofeatvceu  
-  ";
+      ORDER BY m.codofeatvceu
+    ";
     return USPDatabase::fetchAll($query);
   }
 
