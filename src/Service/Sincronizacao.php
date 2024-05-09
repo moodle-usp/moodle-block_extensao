@@ -52,9 +52,9 @@ class Sincronizar {
    */
   public function sincronizar (array $parametros) {
     cli_writeln(PHP_EOL."/*********************************/");
+    cli_writeln("/    SINCRONIZACAO COM O APOLO    /");    
     cli_writeln("/*********************************/");
-
-    cli_writeln("/    SINCRONIZACAO COM O APOLO    /");
+    
     // Verifica se as credenciais da base foram passadas
     $conexao = $this->conexao_apolo();
     if ($conexao) {
