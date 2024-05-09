@@ -83,11 +83,39 @@ if ($ADMIN->fulltree) {
         '1' => '1 ano',
     );
     $setting = new admin_setting_configselect(
-    'block_extensao/periodo_curso',
-    'Selecione o período para pesquisa de cursos abertos. ', 
-    'Escolha o período desejado: ', 
-    '3',
-    $options
-);
+        'block_extensao/periodo_curso',
+        'Selecione o período para pesquisa de cursos abertos. ', 
+        'Escolha o período desejado: ', 
+        '3',
+        $options
+    );
     $settings->add($setting);
+
+    // Opcao de selecao do periodo adicional do final do curso
+    // O administrador do curso deve poder decidir o tempo adinal para o fim do curso
+
+    // Meses disponiveis
+    $options = array(
+        '1' => '1 mês',
+        '2' => '2 meses',
+        '3' => '3 meses',
+        '4' => '4 meses',
+        '5' => '5 meses',
+        '6' => '6 meses',
+        '7' => '7 meses',
+        '8' => '8 meses',
+        '9' => '9 meses',
+        '10' => '10 meses',
+        '11' => '11 meses',
+        '12' => '12 meses',
+    );
+    $setting = new admin_setting_configselect(
+        'block_extensao/periodoAdicional',
+        'Defina um periodo para prolongamento da data de finalização do curso.',
+        'Escolha o periodo:',
+        '2',
+        $options
+    );
+    $settings->add($setting);
+
 }
