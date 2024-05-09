@@ -38,7 +38,9 @@ Uso:
 
 Opcoes:
   -h --help              Exibe essa ajuda.
-  --pular_ministrantes   Nao sincroniza os ministrantes.
+  --pular_ministrantes   Nao atualiza ministrantes para cursos que ja
+                         estavam na base. Novos cursos terao todos os
+                         ministrantes inseridos.
 ";
 
 // opcoes
@@ -48,7 +50,7 @@ list($opcoes, $nao_reconhecidas) = cli_get_params([
 ], [
   'h' => 'help'
 ]);
-
+echo 'oie';
 // tratamento de parametros informados que sao desconhecidos
 if ($nao_reconhecidas) {
   $nao_reconhecidas = implode(PHP_EOL . '  ', $nao_reconhecidas);
