@@ -65,15 +65,22 @@ class redirecionamento_criacao_ambiente_lista extends moodleform {
       $curso = $Query->informacoesTurma($codofeatvceu);
       $nomeCurso = $curso->fullname;
       $dataInicio = $curso->startdate;
+      $oferecimento = $curso->numseqofeedi;
 
       // Formatando a data de inicio
       $inicioFormatado = "<span style='color: red; font-weight: bold'>".date('d/m/Y', $dataInicio)."</span>";
 
-      // Construindo o rotulo do curso com a data de início estilizada
+      // Construindo o rotulo do curso com a data de inicio estilizada
       $labelCurso = "$nomeCurso Inicia em: $inicioFormatado";
+
+      // Construindo o rotulo do oferecimento
+      $labelOferecimento = "Oferecimento: <span style='color: blue; font-weight: bold;'>$oferecimento</span>";
 
       // Adicionando o elemento de texto com o nome do curso e a data de inicio estilizada
       $this->_form->addElement('static', 'curso_com_data_inicio', $labelCurso);
+
+     // Adicionando o elemento de texto com o numero de oferecimento do curso
+      $this->_form->addElement('static', 'oferecimento', $labelOferecimento);
     }
 
     $this->_form->addElement('hidden', 'codofeatvceu', $codofeatvceu);

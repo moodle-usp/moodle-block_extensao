@@ -138,6 +138,7 @@ class Query
     $query = "
       SELECT
         codund,
+        numseqofeedi,
         dtainiofeatv,
         dtafimofeatv
       FROM " . $this->OFERECIMENTOATIVIDADECEU . "
@@ -154,6 +155,7 @@ class Query
     $info_curso->codofeatvceu = $codofeatvceu;
     $info_curso->startdate = strtotime($infos_curso['dtainiofeatv']);
     $info_curso->enddate = strtotime($infos_curso['dtafimofeatv']);
+    $info_curso->numseqofeedi = $infos_curso['numseqofeedi'];
     return $info_curso;
   }
   
