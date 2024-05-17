@@ -75,6 +75,10 @@ if ($ADMIN->fulltree) {
     $setting = new admin_setting_configtext('block_extensao/tabela_pessoa', 'PESSOA', '', 'PESSOA', PARAM_TEXT);
     $settings->add($setting);
 
+    // Campo para a tabela de "ATIVIDADECEU"
+    $setting = new admin_setting_configtext('block_extensao/tabela_atividadeceu', 'ATIVIDADECEU', '', 'ATIVIDADECEU', PARAM_TEXT);
+    $settings->add($setting);
+
     // Campo de configuracao para busca de curso
     $options = array(
         '3' => '3 meses',

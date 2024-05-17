@@ -30,6 +30,8 @@ class Query
     $this->UNIDADE                  = get_config('block_extensao', 'tabela_unidade');
     $this->CAMPUS                   = get_config('block_extensao', 'tabela_campus');
     $this->PESSOA                   = get_config('block_extensao', 'tabela_pessoa');
+    $this->ATIVIDADECEU             = get_config('block_extensao', 'tabela_atividadeceu');
+
   }
 
   /**
@@ -44,6 +46,7 @@ class Query
    * Sao consideradas como turmas abertas somente as turmas com
    * data de encerramento posterior a data de hoje.
    */
+
   public function turmasAbertas () {
     
     $periodo = get_config('block_extensao', 'periodo_curso');
@@ -300,4 +303,36 @@ class Query
   public function cargos_atuacao () {
     return USPDatabase::fetchAll("SELECT * FROM " . $this->ATUACAOCEU);
   } 
+
+  /**
+   * Para capturar as informacoes referentes nome do curso e nome da atividade
+   * 
+   * @param array $codofeatvceu_turmas 
+   * 
+   * @return array 
+   */
+
+  public function info_atividades($codofeatvceu) {
+    $query = "
+    SELECT 
+      o.codofeatvceu,
+      c.objcur,
+      c.nomcurceu, 
+      c.codund, 
+      a.nomatvceu 
+    FROM " . $this->OFERECIMENTOATIVIDADECEU . " o 
+      LEFT JOIN " . $this->CURSOCEU . " c 
+      ON c.codcurceu = o.codcurceu 
+      LEFT JOIN " . $this->EDICAOCURSOOFECEU . " e 
+      ON o.codcurceu = e.codcurceu 
+      AND o.codedicurceu = e.codedicurceu 
+      LEFT JOIN " . $this->ATIVIDADECEU . " a ON a.codatvceu = o.codatvceu 
+      WHERE o.codofeatvceu =  $codofeatvceu
+      ORDER BY o.codofeatvceu
+    ";    
+    return USPDatabase::fetchAll($query);
+  }
+
+
+
 }
