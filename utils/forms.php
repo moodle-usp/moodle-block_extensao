@@ -19,6 +19,7 @@ require_once(__DIR__ . '/../src/Service/Query.php');
 use block_extensao\Service\Query;
 
 // formulario para os docentes criarem um ambiente para um curso (versao select)
+
 class redirecionamento_criacao_ambiente_select extends moodleform {
   public function definition () {
     global $CFG;
@@ -27,29 +28,26 @@ class redirecionamento_criacao_ambiente_select extends moodleform {
     if (isset($this->_customdata['cursos'])) 
         $cursos = $this->_customdata['cursos'];
     else 
-      $cursos = [];
-          $options = array();
-      foreach ($cursos as $indice => $nome_curso) {
-          $inicioCurso = $Query->informacoesTurma($indice);
-          $dataInicio = $inicioCurso->startdate;
-          // Convertendo o formato da data
-          $Inicio = date('d-m-Y', $dataInicio);
-      
-          // Para obter o oferecimento do curso
-          $oferecimentoCurso = $Query->informacoesTurma($indice);
-          $oferecimento = $oferecimentoCurso->numseqofeedi;
-      
-          // Formatando o nome do curso com o número de oferecimento
-          $option_label = "$oferecimento - $nome_curso ($Inicio)";
-          $options[$indice] = $option_label;
-      }
-      
-      $options = array('placeholder' => "Buscar") + $options;
-      $this->_form->addElement('autocomplete', 'select_ambiente', 'Buscar por turma', $options);
-      
-      // botao de submit
-      $this->_form->addElement('submit', 'redirecionar_criar_ambiente', 'Criar ambiente');
-}
+        $cursos = [];
+
+    $options = array();
+    foreach ($cursos as $indice => $nome_curso) {
+        $inicioCurso = $Query->informacoesTurma($indice);
+        $dataInicio = $inicioCurso->startdate;
+        // Convertendo o formato da data
+        $Inicio = date('d-m-Y', $dataInicio);
+   
+        // Formatado com a data de inicio entre parenteses;
+        $option_label = "$nome_curso ($Inicio)";
+        $options[$indice] = $option_label;
+    }
+  
+    $options = array('placeholder' => "Buscar") + $options;
+    $this->_form->addElement('autocomplete', 'select_ambiente', 'Buscar por turma', $options);
+
+    // botao de submit
+    $this->_form->addElement('submit', 'redirecionar_criar_ambiente', 'Criar ambiente');
+  }
 }
 
 // formulario para os docentes criarem um ambiente para um curso (versao lista com 5 ou menos cursos)
@@ -62,7 +60,7 @@ class redirecionamento_criacao_ambiente_lista extends moodleform {
     $codofeatvceu = "";
     if (isset($this->_customdata['codofeatvceu'])) {
       $codofeatvceu = $this->_customdata['codofeatvceu'];
- 
+
       // Obter informacoes do curso
       $curso = $Query->informacoesTurma($codofeatvceu);
       $nomeCurso = $curso->fullname;

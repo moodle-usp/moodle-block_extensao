@@ -44,6 +44,7 @@ class Query
    * Sao consideradas como turmas abertas somente as turmas com
    * data de encerramento posterior a data de hoje.
    */
+
   public function turmasAbertas () {
     
     $periodo = get_config('block_extensao', 'periodo_curso');
