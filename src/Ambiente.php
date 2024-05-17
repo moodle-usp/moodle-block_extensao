@@ -79,6 +79,9 @@ class Ambiente {
     Usuario::inscreve_criador($moodle_curso->id);
     \core\notification::success('Usuário criador matriculado como "professor".');
 
+    // captura as informacoes dos cargos
+    $cargos_atuacao = Atuacao::cargos_atuacao();
+
     // caso tenham sido passados outros usuarios, eh preciso inscreve-los
     if (isset($info_forms_array['ministrantes'])) {
       foreach ($info_forms_array['ministrantes'] as $id_ministrante=>$nome) {
@@ -90,10 +93,13 @@ class Ambiente {
         $codatc = Usuario::codigo_atuacao_ceu($usuario_moodle->idnumber, $info_forms->codofeatvceu);
         // matricula o professor
         Usuario::matricula_professor($moodle_curso->id, $id_ministrante, $codatc);
-        $shortname_adaptado = Atuacao::NOMES[$codatc];
+        // Nome do cargo
+        $shortname_adaptado = "-";
+        if (isset($cargos_atuacao[$codatc]))
+          $shortname_adaptado = $cargos_atuacao[$codatc];
+        // notificacao
         \core\notification::success('Professor auxiliar ' . $nome . ' matriculado como "' . $shortname_adaptado . '".');
         Notificacoes::notificacao_inscricao($usuario_moodle, $moodle_curso);
-
       }
     }
     
@@ -128,16 +134,19 @@ class Ambiente {
         $codatc = Usuario::codigo_atuacao_ceu($usuario_moodle->idnumber, $info_forms->codofeatvceu);
         // matricula o professor
         Usuario::matricula_professor($moodle_curso->id, $ministrante->id, $codatc);
-        $shortname_adaptado = Atuacao::NOMES[$codatc];
+        // nome do cargo
+        $shortname_adaptado = "-";
+        if (isset($cargos_atuacao[$codatc]))
+          $shortname_adaptado = $cargos_atuacao[$codatc];
+        // notificacao
         \core\notification::success('Professor auxiliar ' . $nome . ' matriculado como "' . $shortname_adaptado . '".');
         try {
           Notificacoes::notificacao_inscricao($ministrante, $moodle_curso);
-      } catch (Exception $e) {
+        } catch (Exception $e) {
           // Se ocorrer um erro, ele sera capturado aqui e podemos lidar com ele
           // Por exemplo, podemos exibir uma mensagem de erro ou registrar o erro em um arquivo de log.
           echo "Ocorreu um erro: " . $e->getMessage();
-      }
-      
+        }
       }
     }
 
@@ -153,18 +162,26 @@ class Ambiente {
    * @return object Objeto de curso.
    */
   public static function criar_objeto_curso ($info_forms, $info_curso_apolo) {
+    global $DB;    
     $curso = new stdClass;
     
     $curso->shortname = $info_forms->shortname;
     $curso->fullname = $info_forms->fullname;
     $curso->idnumber = $info_forms->codofeatvceu;
     $curso->visible = 1;
+
+    // Formato padrao
+    $formato_padrao = $DB->get_record('config_plugins', ['name'=>'format']);
+    if (isset($formato_padrao)) 
+      $curso->format = $formato_padrao->value;
     
-    $curso->format = 'topics'; //?
-    $curso->numsections = ''; //?
+    // Quantidade de secoes padrao
+    $numsec_padrao = $DB->get_record('config_plugins', ['name'=>'numsections']);
+    if (isset($numsec_padrao))
+      $curso->numsections = $numsec_padrao->value;
 
     $curso->summary = $info_forms->summary['text']; 
-    $curso->summaryfomart = FORMAT_HTML;
+    $curso->summaryformat = FORMAT_HTML;
 
     $curso->startdate = $info_forms->startdate;
     $curso->enddate = $info_forms->enddate;
