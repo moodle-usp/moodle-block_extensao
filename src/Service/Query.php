@@ -44,7 +44,6 @@ class Query
    * Sao consideradas como turmas abertas somente as turmas com
    * data de encerramento posterior a data de hoje.
    */
-  
   public function turmasAbertas () {
     
     $periodo = get_config('block_extensao', 'periodo_curso');
@@ -52,21 +51,12 @@ class Query
 
     // opcoes para a pesquisa do inicio da busca por curso, coloquei as opcoes de 3, 6, 9 meses 
     // e 1 ano, no entanto, esse valor pode ser alterado caso seja pertinente.
+    if (in_array($periodo, ["3", "6", "9"]))
+      $periodo_str = "-$periodo months";
+    else
+      $periodo_str = "-1 year";
+    $inicio_curso = date("Y-m-d", strtotime($periodo_str, strtotime($diaAtual)));
 
-    if($periodo == "3"){
-        $inicio_curso =  date("Y-m-d", strtotime("-3 months", strtotime($diaAtual)));
-    } elseif ($periodo == "6") {
-        $inicio_curso = date("Y-m-d", strtotime("-6 months", strtotime($diaAtual)));
-    } elseif ($periodo == "9") {
-        $inicio_curso = date("Y-m-d", strtotime("-9 months", strtotime($diaAtual)));
-    } elseif ($periodo == "1") {
-      $inicio_curso = date("Y-m-d", strtotime("-1 year", strtotime($diaAtual)));
-    } else { 
-      // caso nenhum periodo seja definido, o sistema inicia a busca de cursos com a data de inicio
-      // posterior a 1 ano. 
-      $inicio_curso = date("Y-m-d", strtotime("-1 year", strtotime($diaAtual)));
-    }
-   
     $query = "
       SELECT
         o.codofeatvceu
@@ -83,10 +73,8 @@ class Query
       WHERE e.dtainiofeedi >= '$inicio_curso'
       ORDER BY codofeatvceu 
     ";
-
     return USPDatabase::fetchAll($query);
   }
-
 
   /**
    * Captura os ministrantes das turmas informadas.
@@ -111,18 +99,23 @@ class Query
    */
   public function ministrantesTurmas ($codofeatvceu_turmas) {
     $turmas = implode(', ', $codofeatvceu_turmas);
-    $hoje = date("Y-m-d");
     $query = "
       SELECT
         m.codofeatvceu,
         m.codpes,
         m.codatc,
-        e.codema
-      FROM " . $this->MINISTRANTECEU . " m
-      LEFT JOIN " . $this->EMAILPESSOA . " e ON m.codpes = e.codpes
-      WHERE m.codpes IS NOT NULL
+        COALESCE(email_preferencial.codema, email_disponivel.codema) AS codema
+      FROM 
+      " . $this->MINISTRANTECEU . "  m
+      LEFT JOIN 
+        (SELECT codpes, codema FROM  " . $this->EMAILPESSOA . "  WHERE stamtr = 'S') AS email_preferencial 
+        ON m.codpes = email_preferencial.codpes
+      LEFT JOIN 
+        (SELECT codpes, codema FROM  " . $this->EMAILPESSOA . " ) AS email_disponivel 
+        ON m.codpes = email_disponivel.codpes
+      WHERE 
+        m.codpes IS NOT NULL
         AND m.codofeatvceu IN ($turmas)
-        AND m.dtainimisatv >= '$hoje'
       ORDER BY m.codofeatvceu
     ";
     return USPDatabase::fetchAll($query);
