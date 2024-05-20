@@ -314,4 +314,33 @@ class Sincronizar {
     global $DB;
     $DB->insert_records('block_extensao_ministrante', $ministrantes);
   }
+
+  /**
+   * O objetivo dessa funcao eh verificar se o curso criado eh proveniente do sistema apolo,
+   * logo eh marcado na tabela block_extensao_turma, na coluna sincronizado_apolo, sim (1)
+   * para cursos sincronizados do apolo, e nao (0) para os que advindos de outra forma de criacao.
+   * 
+   * @param int $curso_id, que sinaliza o curso cujo id sera atualizado na tabela para indicar a sua criacao pelo plugin
+   * @return bool a funcao reponde sucesso ou fracasso caso ocorra algum erro  
+   */
+  public static function sincronizadoApolo($curso_id) {
+    global $DB;
+
+    // Defina a consulta SQL para atualizar o campo 'sincronizado_apolo' para 1.
+    $sql = "UPDATE {block_extensao_turma} SET sincronizado_apolo = 1 WHERE id_moodle = :curso_id";
+
+    // Parametros para a consulta SQL.
+    $params = array('curso_id' => $curso_id);
+
+    try {
+      // Execute a consulta SQL usando o metodo execute() do $DB.
+      $DB->execute($sql, $params);
+
+      return true; // Indica que a atualizacao foi bem-sucedida.
+    } catch (Exception $e) {
+        // Em caso de erro, registre-o.
+        error_log("Erro ao atualizar 'sincronizado_apolo' para o curso ID: " . $curso_id . ". Erro: " . $e->getMessage());
+        return false; // Indica que houve um erro.
+    }
+  }
 }
