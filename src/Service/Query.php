@@ -14,6 +14,7 @@ use stdClass;
 
 require_once('USPDatabase.php');
 
+#[\AllowDynamicProperties]
 class Query 
 {
   /**
