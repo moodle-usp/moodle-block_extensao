@@ -30,6 +30,13 @@ class redirecionamento_criacao_ambiente_select extends moodleform {
     else 
         $cursos = [];
 
+    // Se por acaso a base estiver fora do ar, isso nao pode causar erro fatal no plugin
+    try {
+      $Query->testar_conexao();
+    } catch (Exception $e) {
+      $this->_form->addElement('static', 'aviso_base_indisponivel', "Base de dados indisponível. Contate o suporte.");
+      return;
+    }
     $options = array();
     foreach ($cursos as $indice => $nome_curso) {
         $inicioCurso = $Query->informacoesTurma($indice);
@@ -68,7 +75,8 @@ class redirecionamento_criacao_ambiente_lista extends moodleform {
       $oferecimento = $curso->numseqofeedi;
 
       // Formatando a data de inicio
-      $inicioFormatado = "<span style='color: red; font-weight: bold'>".date('d/m/Y', $dataInicio)."</span>";
+      $dataInicioFormatada = is_null($dataInicio) ? '-' : date('d/m/Y', $dataInicio);
+      $inicioFormatado = "<span style='color: red; font-weight: bold'>".$dataInicioFormatada."</span>";
 
       // Construindo o rotulo do curso com a data de inicio estilizada
       $labelCurso = "$nomeCurso Inicia em: $inicioFormatado";
@@ -82,7 +90,7 @@ class redirecionamento_criacao_ambiente_lista extends moodleform {
      // Adicionando o elemento de texto com o numero de oferecimento do curso
       $this->_form->addElement('static', 'oferecimento', $labelOferecimento);
     }
-
+    die();
     $this->_form->addElement('hidden', 'codofeatvceu', $codofeatvceu);
     $this->_form->setType('codofeatvceu', PARAM_TEXT);
     
@@ -107,9 +115,6 @@ class criar_ambiente_moodle extends moodleform {
     $this->_form->setDefault('shortname', $shortname);
     $this->_form->setType('shortname', PARAM_TEXT);
     
-    // data de inicio do curso
-    $init_date = $this->define_campo('startdate');
-
     // nome completo do curso
     $fullname = $this->define_campo('fullname');
     $this->_form->addElement('text', 'fullname', 'Nome completo do curso', array('readonly' => 'true'));
@@ -118,6 +123,7 @@ class criar_ambiente_moodle extends moodleform {
     $this->_form->setType('fullname', PARAM_TEXT);
 
     // data de inicio do curso
+    $init_date = $this->define_campo('startdate');
     $init_date_timestamp = strtotime($init_date);
     $this->_form->addElement('date_selector', 'startdate', 'Data de início do curso');
     $this->_form->setDefault('startdate', $init_date_timestamp);

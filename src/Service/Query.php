@@ -154,8 +154,12 @@ class Query
     $info_curso = new stdClass;
     $info_curso->codund = $infos_curso['codund'];
     $info_curso->codofeatvceu = $codofeatvceu;
-    $info_curso->startdate = strtotime($infos_curso['dtainiofeatv']);
-    $info_curso->enddate = strtotime($infos_curso['dtafimofeatv']);
+    $info_curso->startdate = null;
+    $info_curso->enddate = null;
+    if (!is_null($infos_curso['dtainiofeatv']))
+      $info_curso->startdate = strtotime($infos_curso['dtainiofeatv']);
+    if (!is_null($infos_curso['dtafimofeatv']))
+      $info_curso->startdate = strtotime($infos_curso['dtafimofeatv']);
     $info_curso->numseqofeedi = $infos_curso['numseqofeedi'];
     return $info_curso;
   }

@@ -45,7 +45,7 @@ class USPDatabase
     {
         array_walk_recursive($array, function (&$item, $key) {
             if (!mb_detect_encoding($item ?? '', 'utf-8', true)) {
-                $item = mb_convert_encoding($item, 'utf-8');
+                $item = mb_convert_encoding($item, 'utf-8', 'ISO-8859-1');
             }
         });
         return $array;
