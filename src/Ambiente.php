@@ -14,12 +14,10 @@
 require_once(__DIR__ . '/../../../config.php');
 require_once($CFG->dirroot.'/course/lib.php'); // biblioteca de cursos
 require_once(__DIR__ . '/Turmas.php');
-require_once(__DIR__ . '/Service/Query.php');
+// require_once(__DIR__ . '/Service/Query.php');
 require_once(__DIR__ . '/Usuario.php');
 require_once(__DIR__ . '/Atuacao.php');
 require_once(__DIR__ . '/Service/Sincronizacao.php');
-
-use block_extensao\Service\Query;
 
 class Ambiente {
 
@@ -33,13 +31,12 @@ class Ambiente {
    */
   public static function criar_ambiente ($info_forms, $ministrantes) {
     global $USER, $DB;
-    $Query = new Query();
 
     // faz uma versao em array dos dados do forms
     $info_forms_array = json_decode(json_encode($info_forms), true);
 
     // eh preciso capturar outras informacoes do curso, como a unidade
-    $info_curso_apolo = $Query->informacoesTurma($info_forms->codofeatvceu);
+    $info_curso_apolo = Turmas::info_turmas([$info_forms]);
     if (!$info_curso_apolo) {
       \core\notification::error('O código de oferecimento "' . $info_forms->codofeatvceu . '" não foi encontrado na base. Por favor, entre em contato com a administração.');
       return -1;

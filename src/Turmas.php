@@ -195,17 +195,7 @@ class Turmas {
   public static function cursos_formatados_usuario ($id_usuario) {
     // Captura os cursos a partir do id de usuario
     $cursos_usuario = Turmas::docente_turmas($id_usuario);
-    $cursos=[];
-    
-    foreach ($cursos_usuario as $curso) {
-      // Captura o id da turma no plugin de extensao (codofeatvceu)
-      $codofeatvceu = $curso['codofeatvceu'];
-      // Remove as quebras no nome
-      $nome_curso = str_replace(array("\r", "\n"), '', $curso['nome_curso_apolo']);
-      // salva
-      $cursos[$codofeatvceu] = $nome_curso;
-    }
-    return $cursos;
+    return Turmas::turmas_formatar_array($cursos_usuario);
   }
 
   /**
@@ -219,15 +209,19 @@ class Turmas {
   public static function cursos_formatados_categoria ($categoria) {
     // Captura os cursos a partir do identificador da categoria
     $turmas_categoria = Turmas::categoria_turmas($categoria);
-    $cursos=[];
-    foreach ($turmas_categoria as $curso) {
+    return Turmas::turmas_formatar_array($turmas_categoria);
+  }
+
+  public static function turmas_formatar_array (array $turmas_array) {
+    $turmas = [];
+    foreach ($turmas_array as $turma) {
       // Captura o id da turma no plugin de extensao (codofeatvceu)
-      $codofeatvceu = $curso['codofeatvceu'];
+      $codofeatvceu = $turma['codofeatvceu'];
       // Remove as quebras no nome
-      $nome_curso = str_replace(array("\r", "\n"), '', $curso['nome_curso_apolo']) . " ($codofeatvceu)";
+      $nome_turma = str_replace(array("\r", "\n"), '', $turma['nome_curso_apolo']) . " ($codofeatvceu)";
       // salva
-      $cursos[$codofeatvceu] = $nome_curso;
+      $turmas[$codofeatvceu] = $nome_turma;
     }
-    return $cursos;
+    return $turmas;
   }
 }

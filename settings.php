@@ -43,6 +43,10 @@ if ($ADMIN->fulltree) {
     $setting = new admin_setting_configtext('block_extensao/tabela_oferecimentoatividadeceu', 'OFERECIMENTOATIVIDADECEU', '', 'OFERECIMENTOATIVIDADECEU', PARAM_TEXT);
     $settings->add($setting);
 
+    // Campo para tabela de "ATIVIDADECEU"
+    $setting = new admin_setting_configtext('block_extensao/tabela_atividadeceu', 'ATIVIDADECEU', '', 'ATIVIDADECEU', PARAM_TEXT);
+    $settings->add($setting);
+
     // Campo para tabela de "CURSOCEU"
     $setting = new admin_setting_configtext('block_extensao/tabela_cursoceu', 'CURSOCEU', '', 'CURSOCEU', PARAM_TEXT);
     $settings->add($setting);

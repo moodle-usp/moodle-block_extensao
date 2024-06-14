@@ -23,11 +23,8 @@ require_login();
 
 require_once(__DIR__ . '/../utils/forms.php');
 require_once(__DIR__ . '/../src/Turmas.php');
-require_once(__DIR__ . '/../src/Service/Query.php');
 require_once(__DIR__ . '/../src/Ambiente.php');
 require_once(__DIR__ . '/../src/Categorias.php');
-use block_extensao\Service\Query;
-$Query = new Query();
 
 /**
  * Tratamento do formulario de criacao de curso
@@ -134,11 +131,7 @@ if (!Turmas::usuario_docente_turma($USER->username, $codofeatvceu) && !Categoria
 // Aqui precisamos capturar as informacoes basicas do curso
 // Foi adicionado o inicio e fim do curso 
 $informacoes_turma = Turmas::info_turma_id_extensao($codofeatvceu);
-$objetivo_turma = $Query->objetivo_extensao($codofeatvceu);
-$informacoes_turma->objetivo = $objetivo_turma ? $objetivo_turma : ''; 
-$data_curso = $Query->datas_curso($codofeatvceu);
-$informacoes_turma->inicio = $data_curso->startdate;
-$informacoes_turma->fim = $data_curso->enddate;
+
 // Lista de ministrantes
 $ministrantes = Usuario::ministrantes_turma($codofeatvceu, $USER->username);
 
@@ -147,9 +140,9 @@ $formulario = new criar_ambiente_moodle('', array(
   'codofeatvceu' => $codofeatvceu,
   'shortname' => $codofeatvceu,
   'fullname' => $informacoes_turma->nome_curso_apolo,
-  'summary' => $informacoes_turma->objetivo,
-  'startdate' => $informacoes_turma->inicio,
-  'enddate' => $informacoes_turma->fim,
+  'summary' => $informacoes_turma->objcur ?? '',
+  'startdate' => $informacoes_turma->dtainiofeatv,
+  'enddate' => $informacoes_turma->dtafimofeatv,
   'ministrantes' => $ministrantes
 ));
 

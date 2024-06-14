@@ -23,6 +23,7 @@ class Query
    */
   public function __construct() {
     $this->OFERECIMENTOATIVIDADECEU = get_config('block_extensao', 'tabela_oferecimentoatividadeceu');
+    $this->ATIVIDADECEU             = get_config('block_extensao', 'tabela_atividadeceu');
     $this->CURSOCEU                 = get_config('block_extensao', 'tabela_cursoceu');
     $this->EDICAOCURSOOFECEU        = get_config('block_extensao', 'tabela_edicaocursoofeceu');
     $this->MINISTRANTECEU           = get_config('block_extensao', 'tabela_ministranteceu');
@@ -60,18 +61,28 @@ class Query
     $inicio_curso = date("Y-m-d", strtotime($periodo_str, strtotime($diaAtual)));
 
     $query = "
-      SELECT
-        o.codofeatvceu
-        ,c.nomcurceu
-        ,c.codund
-        ,u.codcam
+      SELECT 
+        o.codofeatvceu,
+        c.nomcurceu,
+        c.codund,
+        u.codcam,
+        c.objcur,
+        a.nomatvceu,
+        a.codatvceu,
+        o.numseqofeedi,
+        o.dtainiofeatv,
+        o.dtafimofeatv
       FROM " . $this->OFERECIMENTOATIVIDADECEU . " o
-          LEFT JOIN " . $this->CURSOCEU . " c
-            ON c.codcurceu = o.codcurceu
-          LEFT JOIN " . $this->EDICAOCURSOOFECEU . " e
-            ON o.codcurceu = e.codcurceu AND o.codedicurceu = e.codedicurceu
-          LEFT JOIN " . $this->UNIDADE . " u
-            ON u.codund = o.codund
+      LEFT JOIN " . $this->CURSOCEU . " c
+        ON c.codcurceu = o.codcurceu 
+      LEFT JOIN " . $this->EDICAOCURSOOFECEU . " e
+        ON o.codcurceu = e.codcurceu 
+        AND o.codedicurceu = e.codedicurceu 
+      LEFT JOIN " . $this->ATIVIDADECEU . " a
+        ON a.codatvceu = o.codatvceu 
+        AND a.codund = o.codund
+      LEFT JOIN " . $this->UNIDADE . " u
+        ON u.codund = o.codund
       WHERE e.dtainiofeedi >= '$inicio_curso'
       ORDER BY codofeatvceu 
     ";
@@ -124,73 +135,6 @@ class Query
   }
 
   /**
-   * A partir do codofeatvceu, captura as informacoes de uma
-   * turma, como a data de inicio e tal.
-   * 
-   * @param int|string $codofeatvceu Codigo de oferecimento da atividade.
-   * @return stdClass Objeto do curso.
-   */
-  public function informacoesTurma ($codofeatvceu) {
-    // tratamento para o caso de o codofeatvceu ser nao numerico
-    if (!is_numeric($codofeatvceu)) $query_codofeatvceu = "'$codofeatvceu'";
-    else $query_codofeatvceu = $codofeatvceu;
-    
-    // busca do curso
-    $query = "
-      SELECT
-        codund,
-        numseqofeedi,
-        dtainiofeatv,
-        dtafimofeatv
-      FROM " . $this->OFERECIMENTOATIVIDADECEU . "
-      WHERE codofeatvceu = $query_codofeatvceu
-    ";
-    $infos_curso = USPDatabase::fetch($query);
-
-    // se nao encontrar o curso, retorna falso
-    if (!$infos_curso) return false;
-    
-    // se encontrar, cria um objeto de curso com as informacoes desejadas
-    $info_curso = new stdClass;
-    $info_curso->codund = $infos_curso['codund'];
-    $info_curso->codofeatvceu = $codofeatvceu;
-    $info_curso->startdate = null;
-    $info_curso->enddate = null;
-    if (!is_null($infos_curso['dtainiofeatv']))
-      $info_curso->startdate = strtotime($infos_curso['dtainiofeatv']);
-    if (!is_null($infos_curso['dtafimofeatv']))
-      $info_curso->startdate = strtotime($infos_curso['dtafimofeatv']);
-    $info_curso->numseqofeedi = $infos_curso['numseqofeedi'];
-    return $info_curso;
-  }
-  
-  /**
-   * Obtem o objetivo de um curso a partir de seu codigo
-   * de oferecimento.
-   * 
-   * @param int|string $codofeatvceu Codigo de oferecimento da atividade.
-   * 
-   * @return object
-   */
-  public function objetivo_extensao($codofeatvceu) {
-    // tratamento para o caso de o codofeatvceu ser nao numerico
-    if (!is_numeric($codofeatvceu)) $query_codofeatvceu = "'$codofeatvceu'";
-    else $query_codofeatvceu = $codofeatvceu;
-    // busca do curso
-    $obj = "
-      SELECT 
-        c.objcur 
-      FROM " . $this->OFERECIMENTOATIVIDADECEU . " o 
-      LEFT JOIN " . $this->CURSOCEU . " c 
-        ON c.codcurceu = o.codcurceu 
-      WHERE codofeatvceu = $query_codofeatvceu";
-    $curso = USPDatabase::fetch($obj);
-    // tratamento para resultado da busca (caso nao encontre)
-    if (!$curso) return false;
-    return $curso['objcur'];
-  }
-
-  /**
    * Obtem as informacoes de uma unidade a partir de seu codigo.
    * 
    * @param int|string $codund Codigo da unidade.
@@ -228,32 +172,6 @@ class Query
       'unidade' => $info_unidade,
       'campus' => $info_campus
     );
-  }
-
-  /**
-   * Obtem as datas de inicio e final dos cursos.
-   * 
-   * @param int|string $codofeatvceu Codigo de oferecimento da atividade.
-   * 
-   * @return object
-   */
-  public function datas_curso ($codofeatvceu){
-    // tratamento de erros
-    if (is_numeric($codofeatvceu)) $query_codofeatvceu = $codofeatvceu;
-    else $query_codofeatvceu = "'$codofeatvceu'";
-    // faz a busca
-    $query = "
-       SELECT 
-        dtainiofeatv, 
-        dtafimofeatv 
-      FROM " . $this->OFERECIMENTOATIVIDADECEU . " 
-      WHERE codofeatvceu = $query_codofeatvceu
-      ORDER BY codofeatvceu";
-    $info_datas = USPDatabase::fetch($query);
-    $datas = new stdClass();
-    $datas->startdate = $info_datas['dtainiofeatv'];
-    $datas->enddate = $info_datas['dtafimofeatv'];
-    return $datas;
   }
   
   /**

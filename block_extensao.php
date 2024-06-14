@@ -12,7 +12,6 @@
  */
 
 require_once(__DIR__ . '/../../config.php');
-require_once('src/Service/Query.php');
 require_once('src/Turmas.php');
 require_once('src/Categorias.php');
 require_once('utils/forms.php');

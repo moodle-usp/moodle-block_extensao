@@ -15,38 +15,28 @@ require_once($CFG->libdir . '/formslib.php');
 require_once(__DIR__ . '/../src/Ambiente.php');
 require_once(__DIR__ . '/../src/Turmas.php');
 require_once(__DIR__ . '/../src/Atuacao.php');
-require_once(__DIR__ . '/../src/Service/Query.php');
-use block_extensao\Service\Query;
 
 // formulario para os docentes criarem um ambiente para um curso (versao select)
 
 class redirecionamento_criacao_ambiente_select extends moodleform {
   public function definition () {
-    global $CFG;
-    $Query = new Query();
+    global $CFG, $DB;
     // Captura a lista de cursos
     if (isset($this->_customdata['cursos'])) 
         $cursos = $this->_customdata['cursos'];
     else 
         $cursos = [];
 
-    // Se por acaso a base estiver fora do ar, isso nao pode causar erro fatal no plugin
-    try {
-      $Query->testar_conexao();
-    } catch (Exception $e) {
-      $this->_form->addElement('static', 'aviso_base_indisponivel', "Base de dados indisponível. Contate o suporte.");
-      return;
-    }
     $options = array();
     foreach ($cursos as $indice => $nome_curso) {
-        $inicioCurso = $Query->informacoesTurma($indice);
-        $dataInicio = $inicioCurso->startdate;
-        // Convertendo o formato da data
-        $Inicio = date('d-m-Y', $dataInicio);
-   
-        // Formatado com a data de inicio entre parenteses;
-        $option_label = "$nome_curso ($Inicio)";
-        $options[$indice] = $option_label;
+      $turma = $DB->get_record('block_extensao_turma', ['codofeatvceu'=>$indice]);
+  
+      // Convertendo o formato da data
+      $Inicio = !is_null($turma->dtainiofeatv) ? "(".date('d-m-Y', $turma->dtainiofeatv).")" : '';
+  
+      // Formatado com a data de inicio entre parenteses;
+      $option_label = "$nome_curso $Inicio";
+      $options[$indice] = $option_label;
     }
   
     $options = array('placeholder' => "Buscar") + $options;
@@ -60,8 +50,7 @@ class redirecionamento_criacao_ambiente_select extends moodleform {
 // formulario para os docentes criarem um ambiente para um curso (versao lista com 5 ou menos cursos)
 class redirecionamento_criacao_ambiente_lista extends moodleform {
   public function definition () {
-    global $CFG;
-    $Query = new Query();
+    global $CFG, $DB;
 
     // input hidden com o id da turma no plugin Extensao
     $codofeatvceu = "";
@@ -69,28 +58,20 @@ class redirecionamento_criacao_ambiente_lista extends moodleform {
       $codofeatvceu = $this->_customdata['codofeatvceu'];
 
       // Obter informacoes do curso
-      $curso = $Query->informacoesTurma($codofeatvceu);
-      $nomeCurso = $curso->fullname;
-      $dataInicio = $curso->startdate;
-      $oferecimento = $curso->numseqofeedi;
+      $curso = Turmas::info_turma_id_extensao($codofeatvceu);
+      $nomeCurso = $curso->nome_curso_apolo;
+      $dataInicio = $curso->dtainiofeatv;
 
       // Formatando a data de inicio
       $dataInicioFormatada = is_null($dataInicio) ? '-' : date('d/m/Y', $dataInicio);
       $inicioFormatado = "<span style='color: red; font-weight: bold'>".$dataInicioFormatada."</span>";
 
       // Construindo o rotulo do curso com a data de inicio estilizada
-      $labelCurso = "$nomeCurso Inicia em: $inicioFormatado";
-
-      // Construindo o rotulo do oferecimento
-      $labelOferecimento = "Oferecimento: <span style='color: blue; font-weight: bold;'>$oferecimento</span>";
+      $labelCurso = "Inicia em: $inicioFormatado";
 
       // Adicionando o elemento de texto com o nome do curso e a data de inicio estilizada
       $this->_form->addElement('static', 'curso_com_data_inicio', $labelCurso);
-
-     // Adicionando o elemento de texto com o numero de oferecimento do curso
-      $this->_form->addElement('static', 'oferecimento', $labelOferecimento);
     }
-    die();
     $this->_form->addElement('hidden', 'codofeatvceu', $codofeatvceu);
     $this->_form->setType('codofeatvceu', PARAM_TEXT);
     
@@ -118,27 +99,24 @@ class criar_ambiente_moodle extends moodleform {
     // nome completo do curso
     $fullname = $this->define_campo('fullname');
     $this->_form->addElement('text', 'fullname', 'Nome completo do curso', array('readonly' => 'true'));
-    $ano_curso = date('Y', strtotime($init_date));
+    
+    $init_date = $this->define_campo('startdate');
+    $init_date_timestamp = strtotime($init_date ?? '');
+    $ano_curso = date('Y', $init_date_timestamp);
+
     $this->_form->setDefault('fullname', "{$fullname} ({$ano_curso})");
     $this->_form->setType('fullname', PARAM_TEXT);
 
     // data de inicio do curso
-    $init_date = $this->define_campo('startdate');
-    $init_date_timestamp = strtotime($init_date);
     $this->_form->addElement('date_selector', 'startdate', 'Data de início do curso');
     $this->_form->setDefault('startdate', $init_date_timestamp);
 
     // data do fim do curso
     $end_date = $this->define_campo('enddate');
     $data = get_config('block_extensao', 'periodoAdicional');
-    $end_date_timestamp = strtotime("+$data months", strtotime($end_date));
+    $end_date_timestamp = strtotime("+$data months", strtotime($end_date ?? ''));
     $this->_form->addElement('date_selector', 'enddate', 'Data do fim do curso');
     $this->_form->setDefault('enddate', $end_date_timestamp);
-
-    // Para definir um estilo 
-    $end_date_formatted = date('d/m/Y', strtotime($end_date));
-    $end_date_element = $this->_form->getElement('enddate');
-    $end_date_element->setLabel('Data do fim do curso <span style="color: #ff0000; font-weight: bold;">' . $end_date_formatted . '</span>');
 
     // Para definir um estilo 
     $end_date_formatted = date('d/m/Y', $end_date_timestamp);
