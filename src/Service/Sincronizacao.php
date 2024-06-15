@@ -302,7 +302,9 @@ class Sincronizar {
       $obj = new stdClass;
       $obj->codofeatvceu = $ministrante['codofeatvceu'];
       $obj->codpes = $ministrante['codpes'];
-      $obj->papel_usuario = $ministrante['codatc'];
+      $obj->codatc = $ministrante['codatc'];
+      $obj->nompes = $ministrante['nompes'];
+      $obj->dscatc = $ministrante['dscatc'];
       return $obj;
     }, $ministrantes);
   }

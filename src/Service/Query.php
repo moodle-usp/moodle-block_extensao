@@ -117,6 +117,8 @@ class Query
         m.codofeatvceu,
         m.codpes,
         m.codatc,
+        a.dscatc,
+        p.nompes,
         COALESCE(email_preferencial.codema, email_disponivel.codema) AS codema
       FROM 
       " . $this->MINISTRANTECEU . "  m
@@ -126,6 +128,12 @@ class Query
       LEFT JOIN 
         (SELECT codpes, codema FROM  " . $this->EMAILPESSOA . " ) AS email_disponivel 
         ON m.codpes = email_disponivel.codpes
+      LEFT JOIN
+        ATUACAOCEU a
+        ON a.codatc = m.codatc
+      LEFT join
+        PESSOA p
+        ON p.codpes = m.codpes
       WHERE 
         m.codpes IS NOT NULL
         AND m.codofeatvceu IN ($turmas)

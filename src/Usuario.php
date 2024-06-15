@@ -16,7 +16,6 @@ require_once(__DIR__ . '/Service/Query.php');
 require_once(__DIR__ . '/Notificacoes.php');
 require_once(__DIR__ . '/Atuacao.php');
 
-
 use block_extensao\Service\Query;
 use core\message\message;
 
@@ -46,19 +45,21 @@ class Usuario {
    * Para inscrever o usuario logado como "editingteacher".
    * 
    * @param integer $id_curso Identificador do curso.
+   * @param string $codofeatvceu Codigo de oferecimento da atividade..
    */
-  public static function inscreve_criador ($id_curso) {
+  public static function inscreve_criador ($id_curso, $codofeatvceu) {
     global $DB, $USER;
 
     // captura o usuario que esta logado
     $id_usuario = $USER->id;
 
     // captura o codigo de atuacao
-    $codatc = Usuario::codigo_atuacao_ceu($USER->username);
+    $atuacao = self::atuacao_ceu($USER->username, $codofeatvceu);
 
     // Se estiver vazio, provavelmente eh um gerente de categoria
     // Nesse caso, adiciona como 1 - editingteacher
-    if (empty($codatc)) $codatc = 1;
+    if (empty($atuacao)) $codatc = 1;
+    else $codatc = $atuacao->codatc;
 
     // inscreve o usuario logado
     self::matricula_professor($id_curso, $id_usuario, $codatc);
@@ -109,8 +110,9 @@ class Usuario {
       $info_usuario = $DB->get_record('user', ['idnumber' => $usuario->codpes]);
       if ($info_usuario) {
         // Se achar, captura o codatc no mdl_block_extensao_ministrante e salva
-        $codatc = Usuario::codigo_atuacao_ceu($usuario->codpes);
-        $info_usuario->codatc = $codatc;
+        $atuacao = self::atuacao_ceu($usuario->codpes, $usuario->codofeatvceu);
+        $info_usuario->codatc = $atuacao->codatc;
+        $info_usuario->dscatc = $atuacao->dscatc;
         $usuarios['moodle'][] = $info_usuario;
       }
       else {
@@ -125,8 +127,7 @@ class Usuario {
           $info_usuario = $DB->get_record_sql($sql);
           // verifica se encontrou algo e se o encontrado nao eh o usuario logado
           if ($info_usuario && $info_usuario->idnumber != $logado) {
-            $codatc = Usuario::codigo_atuacao_ceu($usuario->codpes);
-            $info_usuario->codatc = $codatc;
+            $info_usuario->codatc = $info_usuario->codatc;
             $usuarios['moodle'][] = $info_usuario;
           }
         }
@@ -134,8 +135,9 @@ class Usuario {
         $info_usuario = $Query->info_usuario($usuario->codpes);
         if ($info_usuario) {
           // captura o papel de usuario
-          $codatc = Usuario::codigo_atuacao_ceu($usuario->codpes);
-          $info_usuario['papel_usuario'] = $codatc;
+          $atuacao = Usuario::atuacao_ceu($usuario->codpes, $usuario->codofeatvceu);
+          $info_usuario['codatc'] = $atuacao->codatc;
+          $info_usuario['dscatc'] = $atuacao->dscatc;
           $usuarios['apolo'][] = $info_usuario;
         }
       }
@@ -144,20 +146,27 @@ class Usuario {
   }
 
   /**
-   * Captura o codatc na tabela {block_extensao_ministrante}
-   * Necessario fazer funcao separada devido ao sql_compare_text.
+   * Captura a atuacao na tabela {block_extensao_ministrante} nos campos
+   * `codatc` e `dscatc`.
    * 
    * @param string $codpes Codigo de pessoa USP (NUSP)
+   * @param string $codofeatvceu Codigo de oferecimento da atividade.
    * @return object Info do usuario correspondente.
    */
-  public static function codigo_atuacao_ceu ($codpes, $codofeatvceu="") {
+  public static function atuacao_ceu (string $codpes, string $codofeatvceu="") {
     global $DB;
-    if ($codofeatvceu == "")
-      $codofeatvceu = $_SESSION['codofeatvceu'];
-    $comparacao = $DB->sql_compare_text('codpes') . ' = ' . $DB->sql_compare_text(':codpes_usuario') . " AND " . $DB->sql_compare_text('codofeatvceu') . ' = ' . $DB->sql_compare_text($codofeatvceu);
-    $ministrante = $DB->get_record_SQL("SELECT papel_usuario FROM {block_extensao_ministrante} WHERE $comparacao", array('codpes_usuario' => $codpes));
+    if ($codofeatvceu == "") $codofeatvceu = $_SESSION['codofeatvceu'];
+    $comparacao  = $DB->sql_compare_text('codpes');
+    $comparacao .= ' = ';
+    $comparacao .= $DB->sql_compare_text(':codpes_usuario');
+    $comparacao .= " AND ";
+    $comparacao .= $DB->sql_compare_text('codofeatvceu');
+    $comparacao .= " = ";
+    $comparacao .= $DB->sql_compare_text($codofeatvceu);
+    
+    $ministrante = $DB->get_record_SQL("SELECT codatc, dscatc FROM {block_extensao_ministrante} WHERE $comparacao", array('codpes_usuario'=>$codpes));
     if (!empty($ministrante))
-      return $ministrante->papel_usuario;
+      return $ministrante;
     else [];
   }
 
@@ -180,7 +189,7 @@ class Usuario {
 
     // captura as infos caso a lista nao seja vazia
     if (count($ministrantes) > 0)
-      $ministrantes = self::informacoes_usuarios($ministrantes, $logado);
+      $ministrantes = self::informacoes_usuarios($ministrantes, $logado, $codofeatvceu);
     
     return $ministrantes;
   }
@@ -228,13 +237,13 @@ class Usuario {
       if ($usuario_id) {
         $usuarioObj = $DB->get_record("user", ["id" => $usuario_id]);
         return $usuarioObj;
-    } else {
-        \core\notification::error("Erro ao inscrever o usuário. Por favor contate o suporte.");
-        return false;
-    }
-} catch (\Exception $e) {
-    \core\notification::error("Erro ao cadastrar o usuário: " . $e->getMessage());
-    return false;
+      } else {
+          \core\notification::error("Erro ao inscrever o usuário. Por favor contate o suporte.");
+          return false;
+      }
+    } catch (\Exception $e) {
+      \core\notification::error("Erro ao cadastrar o usuário: " . $e->getMessage());
+      return false;
     }
   }
 }

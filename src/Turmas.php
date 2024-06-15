@@ -31,8 +31,10 @@ class Turmas {
       if ($busca->id_moodle) continue;
 
       $turmas_infos[] = array(
-        'codofeatvceu' => $turma->codofeatvceu,
-        'nome_curso_apolo' => $busca->nome_curso_apolo
+        'codofeatvceu'     => $turma->codofeatvceu,
+        'nome_curso_apolo' => $busca->nome_curso_apolo,
+        'codund'           => $busca->codund,
+        'startdate'         => $busca->dtainiofeatv
       );
     }
     return $turmas_infos;
@@ -49,7 +51,7 @@ class Turmas {
     global $DB;
     
     // captura as turmas relacionadas ao usuario
-    $query = "SELECT id, codofeatvceu FROM {block_extensao_ministrante} WHERE codpes = '$nusp_docente' AND papel_usuario IN (1,2,5)";
+    $query = "SELECT id, codofeatvceu FROM {block_extensao_ministrante} WHERE codpes = '$nusp_docente' AND codatc IN (1,2,5)";
     $usuario_turmas = $DB->get_records_sql($query, ['codpes' => $nusp_docente]);
     $cursos_usuario = Turmas::info_turmas($usuario_turmas);
     

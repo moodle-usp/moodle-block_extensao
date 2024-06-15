@@ -37,7 +37,9 @@
         <FIELD NAME="id" TYPE="int" LENGTH="16" NOTNULL="true" SEQUENCE="true"/>
         <FIELD NAME="codpes" TYPE="text" NOTNULL="true" SEQUENCE="false" COMMENT="Numero USP do usuario."/>
         <FIELD NAME="codofeatvceu" TYPE="INT" LENGTH="16" NOTNULL="true" SEQUENCE="false" COMMENT="Codigo de oferecimento da atividade no Apolo."/>
-        <FIELD NAME="papel_usuario" TYPE="int" LENGTH="16" NOTNULL="true" SEQUENCE="false" COMMENT="Papel do usuario (i.e., se eh docente, monitor, etc)."/>
+        <FIELD NAME="codatc" TYPE="int" LENGTH="16" NOTNULL="true" SEQUENCE="false" COMMENT="Codigo de papel do usuario (i.e., se eh docente, monitor, etc)."/>
+        <FIELD NAME="dscatc" TYPE="text" NOTNULL="true" SEQUENCE="false" COMMENT="Descricao do papel do usuario (i.e., se eh docente, monitor, etc)."/>
+        <FIELD NAME="nompes" TYPE="text" NOTNULL="true" SEQUENCE="false" COMMENT="Nome do docente."/>
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>

@@ -100,26 +100,25 @@ class criar_ambiente_moodle extends moodleform {
     $fullname = $this->define_campo('fullname');
     $this->_form->addElement('text', 'fullname', 'Nome completo do curso', array('readonly' => 'true'));
     
-    $init_date = $this->define_campo('startdate');
-    $init_date_timestamp = strtotime($init_date ?? '');
-    $ano_curso = date('Y', $init_date_timestamp);
+    $init_date = (int) $this->define_campo('startdate');
+    $ano_curso = date('Y', $init_date);
 
     $this->_form->setDefault('fullname', "{$fullname} ({$ano_curso})");
     $this->_form->setType('fullname', PARAM_TEXT);
 
     // data de inicio do curso
     $this->_form->addElement('date_selector', 'startdate', 'Data de início do curso');
-    $this->_form->setDefault('startdate', $init_date_timestamp);
+    $this->_form->setDefault('startdate', $init_date);
 
     // data do fim do curso
-    $end_date = $this->define_campo('enddate');
-    $data = get_config('block_extensao', 'periodoAdicional');
-    $end_date_timestamp = strtotime("+$data months", strtotime($end_date ?? ''));
+    $end_date = (int) $this->define_campo('enddate');
+    $periodo_adicional = get_config('block_extensao', 'periodoAdicional');
+    $end_date = strtotime("+$periodo_adicional months", $end_date);
     $this->_form->addElement('date_selector', 'enddate', 'Data do fim do curso');
-    $this->_form->setDefault('enddate', $end_date_timestamp);
+    $this->_form->setDefault('enddate', $end_date);
 
     // Para definir um estilo 
-    $end_date_formatted = date('d/m/Y', $end_date_timestamp);
+    $end_date_formatted = date('d/m/Y', $end_date);
     $end_date_element = $this->_form->getElement('enddate');
     $end_date_element->setLabel('Data do fim do curso <span style="color: #ff0000; font-weight: bold;">' . $end_date_formatted . '</span>');
 
@@ -151,15 +150,10 @@ class criar_ambiente_moodle extends moodleform {
       );
     } 
     else {  
-      // captura as informacoes dos cargos
-      $cargos_atuacao = Atuacao::cargos_atuacao();
-
       // para ministrantes que ja tem conta no Moodle
       $moodle = $ministrantes['moodle'];
       foreach ($moodle as $ministrante){
-        $dscatc = "-";
-        if (isset($cargos_atuacao[$ministrante->codatc]))
-          $dscatc = $cargos_atuacao[$ministrante->codatc];
+        $dscatc = $ministrante->dscatc;
 
         $nomeprofessor = sprintf('%s %s', $ministrante->firstname, $ministrante->lastname);
         $namecheckbox = "ministrantes[{$ministrante->id}]";
@@ -176,9 +170,7 @@ class criar_ambiente_moodle extends moodleform {
       // para ministrantes que nao tem conta no Moodle ainda
       if (isset($ministrantes['apolo'])) {
         foreach ($ministrantes['apolo'] as $ministrante) {
-          $dscatc = "-";
-          if (isset($cargos_atuacao[$ministrante['papel_usuario']]))
-            $dscatc = $cargos_atuacao[$ministrante['papel_usuario']];
+          $dscatc = $ministrante['dscatc'];
 
           $namecheckbox = "ministrantes_semconta[{$ministrante['codpes']}]";
           $this->_form->addElement(

@@ -14,10 +14,11 @@
 require_once(__DIR__ . '/../../../config.php');
 require_once($CFG->dirroot.'/course/lib.php'); // biblioteca de cursos
 require_once(__DIR__ . '/Turmas.php');
-// require_once(__DIR__ . '/Service/Query.php');
 require_once(__DIR__ . '/Usuario.php');
-require_once(__DIR__ . '/Atuacao.php');
 require_once(__DIR__ . '/Service/Sincronizacao.php');
+require_once(__DIR__ . '/Service/Query.php');
+
+use block_extensao\Service\Query;
 
 class Ambiente {
 
@@ -32,11 +33,13 @@ class Ambiente {
   public static function criar_ambiente ($info_forms, $ministrantes) {
     global $USER, $DB;
 
+    $Query = new Query();
+
     // faz uma versao em array dos dados do forms
     $info_forms_array = json_decode(json_encode($info_forms), true);
 
     // eh preciso capturar outras informacoes do curso, como a unidade
-    $info_curso_apolo = Turmas::info_turmas([$info_forms]);
+    $info_curso_apolo = Turmas::info_turmas([$info_forms])[0];
     if (!$info_curso_apolo) {
       \core\notification::error('O código de oferecimento "' . $info_forms->codofeatvceu . '" não foi encontrado na base. Por favor, entre em contato com a administração.');
       return -1;
@@ -73,11 +76,8 @@ class Ambiente {
     Sincronizar::sincronizadoApolo($moodle_curso->id);
 
     // inscreve o usuario logado no curso
-    Usuario::inscreve_criador($moodle_curso->id);
+    Usuario::inscreve_criador($moodle_curso->id, $info_forms->codofeatvceu);
     \core\notification::success('Usuário criador matriculado como "professor".');
-
-    // captura as informacoes dos cargos
-    $cargos_atuacao = Atuacao::cargos_atuacao();
 
     // caso tenham sido passados outros usuarios, eh preciso inscreve-los
     if (isset($info_forms_array['ministrantes'])) {
@@ -87,13 +87,11 @@ class Ambiente {
         // Captura o codpes do professor
         $usuario_moodle = $DB->get_record('user', ['id' => $id_ministrante]);
         // captura o papel do professor
-        $codatc = Usuario::codigo_atuacao_ceu($usuario_moodle->idnumber, $info_forms->codofeatvceu);
+        $atuacao = Usuario::atuacao_ceu($usuario_moodle->idnumber, $info_forms->codofeatvceu);
         // matricula o professor
-        Usuario::matricula_professor($moodle_curso->id, $id_ministrante, $codatc);
+        Usuario::matricula_professor($moodle_curso->id, $id_ministrante, $atuacao->codatc);
         // Nome do cargo
-        $shortname_adaptado = "-";
-        if (isset($cargos_atuacao[$codatc]))
-          $shortname_adaptado = $cargos_atuacao[$codatc];
+        $shortname_adaptado = $atuacao->dscatc;
         // notificacao
         \core\notification::success('Professor auxiliar ' . $nome . ' matriculado como "' . $shortname_adaptado . '".');
         Notificacoes::notificacao_inscricao($usuario_moodle, $moodle_curso);
@@ -127,14 +125,11 @@ class Ambiente {
 
         // Captura o codpes do professor
         $usuario_moodle = $DB->get_record('user', ['id' => $ministrante->id]);
-        // captura o papel do professor
-        $codatc = Usuario::codigo_atuacao_ceu($usuario_moodle->idnumber, $info_forms->codofeatvceu);
+        $atuacao = Usuario::atuacao_ceu($usuario_moodle->idnumber, $info_forms->codofeatvceu);
         // matricula o professor
-        Usuario::matricula_professor($moodle_curso->id, $ministrante->id, $codatc);
+        Usuario::matricula_professor($moodle_curso->id, $ministrante->id, $atuacao->codatc);
         // nome do cargo
-        $shortname_adaptado = "-";
-        if (isset($cargos_atuacao[$codatc]))
-          $shortname_adaptado = $cargos_atuacao[$codatc];
+        $shortname_adaptado = $atuacao->dscatc;
         // notificacao
         \core\notification::success('Professor auxiliar ' . $nome . ' matriculado como "' . $shortname_adaptado . '".');
         try {
@@ -204,8 +199,9 @@ class Ambiente {
     global $DB;
     $Query = new Query();
 
-    // captura as informaoces da unidade do curso
-    $infos = $Query->informacoes_unidade($info_curso_apolo->codund);
+    // captura as informaoces da unidade do curso  
+    $infos = $Query->informacoes_unidade($info_curso_apolo['codund']);
+    
     if (!$infos) return false;
 
     $info_campus = $infos['campus'];
@@ -221,7 +217,7 @@ class Ambiente {
     $info_unidade = $infos['unidade'];
     
     $categoria_faculdade = self::categoria(array(
-      'idnumber'    => $info_curso_apolo->codund,
+      'idnumber'    => $info_curso_apolo['codund'],
       'name'        => $info_unidade["sglund"],
       'parent'      => $categoria_campus->id,
       'description' => $info_unidade["nomund"],
@@ -229,7 +225,7 @@ class Ambiente {
     ));
 
     // agora a categoria do ano
-    $ano = date('Y', $info_curso_apolo->startdate);
+    $ano = date('Y', $info_curso_apolo['startdate']);
     
     $categoria_ano = self::categoria(array(
       'name'        => $ano,

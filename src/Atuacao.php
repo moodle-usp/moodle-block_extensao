@@ -28,14 +28,4 @@ class Atuacao {
     else
       return 'teacher';
   }
-
-  static public function cargos_atuacao () {
-    $Query = new Query();
-    $cargos_base = $Query->cargos_atuacao();
-    $cargos = array();
-    foreach ($cargos_base as $cargo) {
-      $cargos[$cargo['codatc']] = $cargo['dscatc'];
-    }
-    return $cargos;
-  }
 }
