@@ -12,11 +12,9 @@
 require_once(__DIR__ . '/../../../config.php');
 require_once($CFG->dirroot . '/user/lib.php');
 require_once(__DIR__ . '/Turmas.php');
-require_once(__DIR__ . '/Service/Query.php');
 require_once(__DIR__ . '/Notificacoes.php');
 require_once(__DIR__ . '/Atuacao.php');
 
-use block_extensao\Service\Query;
 use core\message\message;
 
 class Usuario {
@@ -99,8 +97,6 @@ class Usuario {
   public static function informacoes_usuarios ($lista_usuarios, $logado="") {
     global $DB;
 
-    $Query = new Query();
-
     // para separar usuarios que estao no Moodle dos que nao estao
     $usuarios = array('moodle' => array(), 'apolo' => array());
 
@@ -117,28 +113,22 @@ class Usuario {
       }
       else {
         // buscando se existe usuario pelos emails
-        $emails = $Query->emails($usuario->codpes);
-        if($emails) {
-          // pega os e-mails
-          $emails = array_column($emails, 'codema');
-          $emails = implode("','",$emails);
+        if(!is_null($usuario->codema)) {
           // faz a query
-          $sql = "SELECT * FROM {user} WHERE email IN ('{$emails}')"; 
+          $sql = "SELECT * FROM {user} WHERE email = '{$usuario->codema}'"; 
           $info_usuario = $DB->get_record_sql($sql);
           // verifica se encontrou algo e se o encontrado nao eh o usuario logado
           if ($info_usuario && $info_usuario->idnumber != $logado) {
-            $info_usuario->codatc = $info_usuario->codatc;
             $usuarios['moodle'][] = $info_usuario;
           }
+          else {
+            // se nao achar pelo codpes nem pelo codema, entao cria
+            $usuarios['apolo'][] = $usuario;
+          }
         }
-        // se nao existir, precisa buscar no Apolo
-        $info_usuario = $Query->info_usuario($usuario->codpes);
-        if ($info_usuario) {
-          // captura o papel de usuario
-          $atuacao = Usuario::atuacao_ceu($usuario->codpes, $usuario->codofeatvceu);
-          $info_usuario['codatc'] = $atuacao->codatc;
-          $info_usuario['dscatc'] = $atuacao->dscatc;
-          $usuarios['apolo'][] = $info_usuario;
+        else {
+          // se nao achar pelo codpes nem pelo codema, entao cria
+          $usuarios['apolo'][] = $usuario;
         }
       }
     }
@@ -203,30 +193,30 @@ class Usuario {
     global $DB;
  
     // Verificar se o usuario ja possui conta no Moodle
-    $existeUsuario = $DB->get_record('user', ['username' => $usuario['codpes']]);
+    $existeUsuario = $DB->get_record('user', ['username' => $usuario->codpes]);
     if (!empty($existeUsuario)) {
       \core\notification::error(get_string('erro_padrao', 'block_extensao'));
       return false; 
     }
 
     // Verifica se o usuario possui e-mail cadastrado no banco de dados, caso nao, a conta nao eh criada.
-    if (empty($usuario['codema'])) {
-      \core\notification::error("O usuário " . $usuario['nompes']. " não possui um endereço de e-mail válido. A matrícula não será realizada.");
+    if (empty($usuario->codema)) {
+      \core\notification::error("O usuário " . $usuario->nompes. " não possui um endereço de e-mail válido. A matrícula não será realizada.");
       return false;
     }
 
     // Criando objeto do usuario
-    $nomeCompleto = $usuario['nompes'];
+    $nomeCompleto = $usuario->nompes;
     $partesNome = explode(" ", $nomeCompleto);
     $primeiroNome = array_shift($partesNome);
     $segundoNome = implode(" ", $partesNome); 
 
     $novoUsuario = new stdClass();
-    $novoUsuario->username = (string) $usuario['codpes'];
-    $novoUsuario->idnumber = $usuario['codpes'];
+    $novoUsuario->username = (string) $usuario->codpes;
+    $novoUsuario->idnumber = $usuario->codpes;
     $novoUsuario->firstname = $primeiroNome;
     $novoUsuario->lastname = $segundoNome;
-    $novoUsuario->email = $usuario['codema'];
+    $novoUsuario->email = $usuario->codema;
     $novoUsuario->auth = 'shibboleth';
 
     try {

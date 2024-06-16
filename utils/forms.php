@@ -170,13 +170,13 @@ class criar_ambiente_moodle extends moodleform {
       // para ministrantes que nao tem conta no Moodle ainda
       if (isset($ministrantes['apolo'])) {
         foreach ($ministrantes['apolo'] as $ministrante) {
-          $dscatc = $ministrante['dscatc'];
+          $dscatc = $ministrante->dscatc;
 
-          $namecheckbox = "ministrantes_semconta[{$ministrante['codpes']}]";
+          $namecheckbox = "ministrantes_semconta[{$ministrante->codpes}]";
           $this->_form->addElement(
             'checkbox',
             $namecheckbox,
-            $ministrante['nompes'] . " [{$dscatc}]",
+            $ministrante->nompes . " [{$dscatc}]",
           );
           $this->_form->setDefault($namecheckbox, true);
         }

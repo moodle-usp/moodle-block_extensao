@@ -33,8 +33,6 @@ class Ambiente {
   public static function criar_ambiente ($info_forms, $ministrantes) {
     global $USER, $DB;
 
-    $Query = new Query();
-
     // faz uma versao em array dos dados do forms
     $info_forms_array = json_decode(json_encode($info_forms), true);
 
@@ -94,28 +92,28 @@ class Ambiente {
         $shortname_adaptado = $atuacao->dscatc;
         // notificacao
         \core\notification::success('Professor auxiliar ' . $nome . ' matriculado como "' . $shortname_adaptado . '".');
-        Notificacoes::notificacao_inscricao($usuario_moodle, $moodle_curso);
+        // Notificacoes::notificacao_inscricao($usuario_moodle, $moodle_curso);
       }
     }
     
     // caso seja selecionado um professor sem conta moodle, eh criada a sua conta
     if (isset($info_forms_array['ministrantes_semconta'])) {
       foreach ($info_forms_array['ministrantes_semconta'] as $id_ministrante => $ministrante_semconta) {
-        $info_ministrante = $Query->info_usuario($id_ministrante);
-        if (!isset($info_ministrante['nompes'])) {
+        $info_ministrante = Turmas::ministrante_turma($id_ministrante, $info_forms->codofeatvceu);
+        if (!isset($info_ministrante->nompes)) {
           // caso o nome nao esteja definido nas informacoes do usuario
           \core\notification::error('Erro ao matricular o professor, por favor contate o suporte. ');
           continue;
         }
         // tratamento para professor sem e-mail no sistema 
-        if (!isset($info_ministrante['codema'])) {
+        if (!isset($info_ministrante->codema)) {
           // caso o nome nao esteja definido nas informacoes do usuario
-          \core\notification::error('Não foi possivel matricular o professor ' . $info_ministrante['nompes'] . ' como ministrante, por favor contate o suporte.');
+          \core\notification::error('Não foi possivel matricular o professor ' . $info_ministrante->nompes . ' como ministrante, por favor contate o suporte.');
           continue;
         }
 
         //Nome do professor
-        $nome = $info_ministrante['nompes']; 
+        $nome = $info_ministrante->nompes; 
         //Para criar a conta do professor 
         $ministrante = Usuario::cadastra_usuario($info_ministrante);
         if (!$ministrante) {
@@ -133,7 +131,7 @@ class Ambiente {
         // notificacao
         \core\notification::success('Professor auxiliar ' . $nome . ' matriculado como "' . $shortname_adaptado . '".');
         try {
-          Notificacoes::notificacao_inscricao($ministrante, $moodle_curso);
+          // Notificacoes::notificacao_inscricao($ministrante, $moodle_curso);
         } catch (Exception $e) {
           // Se ocorrer um erro, ele sera capturado aqui e podemos lidar com ele
           // Por exemplo, podemos exibir uma mensagem de erro ou registrar o erro em um arquivo de log.

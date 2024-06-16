@@ -10,8 +10,6 @@
  * depender da funcao.
  */
 
-// require_once('../../../config.php');
-
 class Turmas {
   
   /**
@@ -98,6 +96,25 @@ class Turmas {
   }
 
   /**
+   * Captura as informacoes de um ministrante na tabela extensao_ministrante a
+   * partir do $codpes e do $codofeatvceu.
+   * 
+   * @param string $codpes       Numero USP do usuario.
+   * @param string $codofeatvceu Codigo de oferecimento da atividade.
+   * @return object Registro na base.
+   */
+  public static function ministrante_turma (string $codpes, string $codofeatvceu) {
+    global $DB;
+    // tratamento de string vs numero
+    if (is_numeric($codofeatvceu)) $query_codofeatvceu = $codofeatvceu;
+    else $query_codofeatvceu = "'$codofeatvceu'";
+    // agora ve se esta associada ao usuario
+    $query = "SELECT * FROM {block_extensao_ministrante} WHERE codofeatvceu = $query_codofeatvceu AND codpes = '$codpes'";
+    $retorno = $DB->get_record_sql($query);
+    return $retorno ?: [];
+  }
+
+  /**
    * Verifica se um usuario esta registrado como docente de uma turma.
    * 
    * @param integer|string $nusp_usuario Numero USP do usuario.
@@ -107,14 +124,8 @@ class Turmas {
    *              falso caso contrario.
    */
   public static function usuario_docente_turma ($nusp_usuario, $codofeatvceu) {
-    global $DB;
-    // tratamento de string vs numero
-    if (is_numeric($codofeatvceu)) $query_codofeatvceu = $codofeatvceu;
-    else $query_codofeatvceu = "'$codofeatvceu'";
-    // agora ve se esta associada ao usuario
-    $query = "SELECT * FROM {block_extensao_ministrante} WHERE codofeatvceu = $query_codofeatvceu AND codpes = '$nusp_usuario'";
-    $turma_associada = $DB->get_records_sql($query);
-    return !empty($turma_associada);
+    $registro = self::ministrante_turma($nusp_usuario, $codofeatvceu);
+    return !empty($registro);
   }
 
   /**

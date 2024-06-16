@@ -1,8 +1,5 @@
 <?php
 
-require_once(__DIR__ . '/Service/Query.php');
-use block_extensao\Service\Query;
-
 class Atuacao {
   /**
    * Relacao atual:

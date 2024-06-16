@@ -40,6 +40,7 @@
         <FIELD NAME="codatc" TYPE="int" LENGTH="16" NOTNULL="true" SEQUENCE="false" COMMENT="Codigo de papel do usuario (i.e., se eh docente, monitor, etc)."/>
         <FIELD NAME="dscatc" TYPE="text" NOTNULL="true" SEQUENCE="false" COMMENT="Descricao do papel do usuario (i.e., se eh docente, monitor, etc)."/>
         <FIELD NAME="nompes" TYPE="text" NOTNULL="true" SEQUENCE="false" COMMENT="Nome do docente."/>
+        <FIELD NAME="codema" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="E-mail do docente."/>
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>

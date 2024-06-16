@@ -305,6 +305,7 @@ class Sincronizar {
       $obj->codatc = $ministrante['codatc'];
       $obj->nompes = $ministrante['nompes'];
       $obj->dscatc = $ministrante['dscatc'];
+      $obj->codema = $ministrante['codema'];
       return $obj;
     }, $ministrantes);
   }
