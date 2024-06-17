@@ -129,10 +129,10 @@ class Query
         (SELECT codpes, codema FROM  " . $this->EMAILPESSOA . " ) AS email_disponivel 
         ON m.codpes = email_disponivel.codpes
       LEFT JOIN
-        ATUACAOCEU a
+        " . $this->ATUACAOCEU . " a
         ON a.codatc = m.codatc
       LEFT join
-        PESSOA p
+        " . $this->PESSOA . " p
         ON p.codpes = m.codpes
       WHERE 
         m.codpes IS NOT NULL
