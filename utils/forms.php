@@ -113,6 +113,7 @@ class criar_ambiente_moodle extends moodleform {
     // data do fim do curso
     $end_date = (int) $this->define_campo('enddate');
     $periodo_adicional = get_config('block_extensao', 'periodoAdicional');
+    $first_enddate = date('d/m/Y', $end_date);
     $end_date = strtotime("+$periodo_adicional months", $end_date);
     $this->_form->addElement('date_selector', 'enddate', 'Data do fim do curso');
     $this->_form->setDefault('enddate', $end_date);
@@ -120,7 +121,7 @@ class criar_ambiente_moodle extends moodleform {
     // Para definir um estilo 
     $end_date_formatted = date('d/m/Y', $end_date);
     $end_date_element = $this->_form->getElement('enddate');
-    $end_date_element->setLabel('Data do fim do curso <span style="color: #ff0000; font-weight: bold;">' . $end_date_formatted . '</span>');
+    $end_date_element->setLabel('Data do fim do curso <span style="color: #ff0000; font-weight: bold;">' . $first_enddate . '</span>');
 
     // sumario (descricao) do curso
     $summary = $this->define_campo('summary');
