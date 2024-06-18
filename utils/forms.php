@@ -42,6 +42,10 @@ class redirecionamento_criacao_ambiente_select extends moodleform {
     $options = array('placeholder' => "Buscar") + $options;
     $this->_form->addElement('autocomplete', 'select_ambiente', 'Buscar por turma', $options);
 
+    // botao de ajuda com os cursos disponiveis para o ministrante 
+    $this->_form->addHelpButton('select_ambiente',  'cursos_disponiveis', 'block_extensao');
+
+
     // botao de submit
     $this->_form->addElement('submit', 'redirecionar_criar_ambiente', 'Criar ambiente');
   }
@@ -74,7 +78,7 @@ class redirecionamento_criacao_ambiente_lista extends moodleform {
     }
     $this->_form->addElement('hidden', 'codofeatvceu', $codofeatvceu);
     $this->_form->setType('codofeatvceu', PARAM_TEXT);
-    
+
     // botao de submit
     $this->_form->addElement('submit', 'redirecionar_criar_ambiente', 'Criar ambiente');
   }
@@ -113,19 +117,28 @@ class criar_ambiente_moodle extends moodleform {
     // data do fim do curso
     $end_date = (int) $this->define_campo('enddate');
     $periodo_adicional = get_config('block_extensao', 'periodoAdicional');
+    $first_enddate = date('d/m/Y', $end_date);
     $end_date = strtotime("+$periodo_adicional months", $end_date);
+
+    // Adiciona o seletor de data ao formulário
     $this->_form->addElement('date_selector', 'enddate', 'Data do fim do curso');
     $this->_form->setDefault('enddate', $end_date);
+
+    // Adiciona o botao de ajuda ao campo 'enddate'
+    $this->_form->addHelpButton('enddate', 'periodo_adicional', 'block_extensao');
 
     // Para definir um estilo 
     $end_date_formatted = date('d/m/Y', $end_date);
     $end_date_element = $this->_form->getElement('enddate');
-    $end_date_element->setLabel('Data do fim do curso <span style="color: #ff0000; font-weight: bold;">' . $end_date_formatted . '</span>');
+    $end_date_element->setLabel('Data do fim do curso <span style="color: #ff0000; font-weight: bold;">' . $first_enddate . '</span>');
 
     // sumario (descricao) do curso
     $summary = $this->define_campo('summary');
     $this->_form->addElement('editor', 'summary', 'Descrição do curso')->setValue(array('text'=>$summary));
     $this->_form->setType('summary', PARAM_RAW);
+
+    // Adiciona o botao de ajuda ao campo  summary
+    $this->_form->addHelpButton('summary', 'descricao_curso', 'block_extensao');
 
     // opcao para acesso de visitantes
     $guest = $this->define_campo('guest');
@@ -138,9 +151,14 @@ class criar_ambiente_moodle extends moodleform {
     ); 
 
     // opcao para inscrever outros ministrantes
+    // Define o campo para inscrever outros ministrantes
     $ministrantes = $this->define_campo('ministrantes');
-    
+    // Adiciona um cabecalho ao formulario para a secao de outros ministrantes
     $this->_form->addElement('header', 'header_ministrantes', 'Outros ministrantes');
+
+    // Adiciona um botao de ajuda ao cabecalho de 'Outros ministrantes' 
+    $this->_form->addHelpButton('header_ministrantes',  'outros_ministrantes', 'block_extensao');
+
 
     if (!isset($ministrantes['moodle']) or $ministrantes == "") {
       $this->_form->addElement(
