@@ -75,15 +75,12 @@ class Query
       FROM " . $this->OFERECIMENTOATIVIDADECEU . " o
       LEFT JOIN " . $this->CURSOCEU . " c
         ON c.codcurceu = o.codcurceu 
-      LEFT JOIN " . $this->EDICAOCURSOOFECEU . " e
-        ON o.codcurceu = e.codcurceu 
-        AND o.codedicurceu = e.codedicurceu 
       LEFT JOIN " . $this->ATIVIDADECEU . " a
         ON a.codatvceu = o.codatvceu 
         AND a.codund = o.codund
       LEFT JOIN " . $this->UNIDADE . " u
         ON u.codund = o.codund
-      WHERE e.dtainiofeedi >= '$inicio_curso'
+      WHERE o.dtainiofeatv >= '$inicio_curso'
       ORDER BY codofeatvceu 
     ";
     return USPDatabase::fetchAll($query);
