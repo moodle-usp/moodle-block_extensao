@@ -32,7 +32,7 @@ class Turmas {
         'codofeatvceu'     => $turma->codofeatvceu,
         'nome_curso_apolo' => $busca->nome_curso_apolo,
         'codund'           => $busca->codund,
-        'startdate'         => $busca->dtainiofeatv
+        'startdate'         => $busca->dtainiofeedi
       );
     }
     return $turmas_infos;

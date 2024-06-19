@@ -32,7 +32,7 @@ class redirecionamento_criacao_ambiente_select extends moodleform {
       $turma = $DB->get_record('block_extensao_turma', ['codofeatvceu'=>$indice]);
   
       // Convertendo o formato da data
-      $Inicio = !is_null($turma->dtainiofeatv) ? "(".date('d-m-Y', $turma->dtainiofeatv).")" : '';
+      $Inicio = !is_null($turma->dtainiofeedi) ? "(".date('d-m-Y', $turma->dtainiofeedi).")" : '';
   
       // Formatado com a data de inicio entre parenteses;
       $option_label = "$nome_curso $Inicio";
@@ -60,7 +60,7 @@ class redirecionamento_criacao_ambiente_lista extends moodleform {
       // Obter informacoes do curso
       $curso = Turmas::info_turma_id_extensao($codofeatvceu);
       $nomeCurso = $curso->nome_curso_apolo;
-      $dataInicio = $curso->dtainiofeatv;
+      $dataInicio = $curso->dtainiofeedi;
 
       // Formatando a data de inicio
       $dataInicioFormatada = is_null($dataInicio) ? '-' : date('d/m/Y', $dataInicio);

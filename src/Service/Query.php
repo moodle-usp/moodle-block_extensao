@@ -70,8 +70,8 @@ class Query
         a.nomatvceu,
         a.codatvceu,
         o.numseqofeedi,
-        o.dtainiofeatv,
-        o.dtafimofeatv
+        e.dtainiofeedi,
+        e.dtafimofeedi 
       FROM " . $this->OFERECIMENTOATIVIDADECEU . " o
       LEFT JOIN " . $this->CURSOCEU . " c
         ON c.codcurceu = o.codcurceu 

@@ -164,8 +164,8 @@ class Sincronizar {
       $obj->codund = $turma['codund'];
       $obj->codcam = $turma['codcam'];
       $obj->objcur = $turma['objcur'];
-      $obj->dtainiofeatv = is_null($turma['dtainiofeatv']) ? $turma['dtainiofeatv'] : strtotime($turma['dtainiofeatv']);
-      $obj->dtafimofeatv = is_null($turma['dtafimofeatv']) ? $turma['dtafimofeatv'] : strtotime($turma['dtafimofeatv']);
+      $obj->dtainiofeedi = is_null($turma['dtainiofeedi']) ? $turma['dtainiofeedi'] : strtotime($turma['dtainiofeedi']);
+      $obj->dtafimofeedi = is_null($turma['dtafimofeedi']) ? $turma['dtafimofeedi'] : strtotime($turma['dtafimofeedi']);
       $obj->data_importacao = time(); // Data de importacao
       $turmas_objetos[$obj->codofeatvceu] = $obj;
     }

@@ -141,8 +141,8 @@ $formulario = new criar_ambiente_moodle('', array(
   'shortname' => $codofeatvceu,
   'fullname' => $informacoes_turma->nome_curso_apolo,
   'summary' => $informacoes_turma->objcur ?? '',
-  'startdate' => $informacoes_turma->dtainiofeatv,
-  'enddate' => $informacoes_turma->dtafimofeatv,
+  'startdate' => $informacoes_turma->dtainiofeedi,
+  'enddate' => $informacoes_turma->dtafimofeedi,
   'ministrantes' => $ministrantes
 ));
 

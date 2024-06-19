@@ -22,8 +22,8 @@
         <FIELD NAME="codcam" TYPE="text" LENGTH="20" NOTNULL="true" SEQUENCE="false" COMMENT="Nome do campus o local onde ocorrera o curso."/>
         <FIELD NAME="codund" TYPE="text" LENGTH="20" NOTNULL="true" SEQUENCE="false" COMMENT="Nome da unidade e o onde curso sera ministrado."/>
         <FIELD NAME="objcur" TYPE="text" NOTNULL="true" SEQUENCE="false" COMMENT="Objetivo do curso."/>
-        <FIELD NAME="dtainiofeatv" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="Data de inicio do oferecimento da atividade."/>
-        <FIELD NAME="dtafimofeatv" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="Data de termino do oferecimento da atividade."/>
+        <FIELD NAME="dtainiofeedi" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="Data de inicio do oferecimento da atividade."/>
+        <FIELD NAME="dtafimofeedi" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="Data de termino do oferecimento da atividade."/>
        </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="codofeatvceu"/>
