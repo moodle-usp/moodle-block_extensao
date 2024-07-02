@@ -79,6 +79,10 @@ if ($ADMIN->fulltree) {
     $setting = new admin_setting_configtext('block_extensao/tabela_pessoa', 'PESSOA', '', 'PESSOA', PARAM_TEXT);
     $settings->add($setting);
 
+    // Campo para a tabela de "RESPONSAVELEDICAOCEU"
+    $setting = new admin_setting_configtext('block_extensao/tabela_responsaveledicaoceu', 'RESPONSAVELEDICAOCEU', '', 'RESPONSAVELEDICAOCEU', PARAM_TEXT);
+    $settings->add($setting);
+
     // Campo de configuracao para busca de curso
     $options = array(
         '3' => '3 meses',

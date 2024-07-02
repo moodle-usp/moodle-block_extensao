@@ -32,6 +32,7 @@ class Query
     $this->UNIDADE                  = get_config('block_extensao', 'tabela_unidade');
     $this->CAMPUS                   = get_config('block_extensao', 'tabela_campus');
     $this->PESSOA                   = get_config('block_extensao', 'tabela_pessoa');
+    $this->RESPONSAVELEDICAOCEU     = get_config('block_extensao', 'tabela_responsaveledicaoceu');
   }
 
   /**
@@ -41,7 +42,10 @@ class Query
     return USPDatabase::fetch("SELECT 1");
   }
 
-  /**
+    /**
+   * Captura um docente e verifica se ele eh responsavel pela edicao de algum curso de extensao
+   * @param int $codpes 
+   * @return array
    * Captura as turmas abertas.
    * Sao consideradas como turmas abertas somente as turmas com
    * data de encerramento posterior a data de hoje.
@@ -229,4 +233,59 @@ class Query
   public function cargos_atuacao () {
     return USPDatabase::fetchAll("SELECT * FROM " . $this->ATUACAOCEU);
   } 
+
+  /**
+   * Captura um docente e verifica se ele eh responsavel pela edicao de algum curso de extensao
+   * @param int $codpes 
+   * @return array
+   */
+
+    public function responsavelEdicao ($codpes) {
+     
+      $periodo = get_config('block_extensao', 'periodo_curso');
+      $diaAtual = date("Y-m-d");
+  
+      // opcoes para a pesquisa do inicio da busca por curso, coloquei as opcoes de 3, 6, 9 meses 
+      // e 1 ano, no entanto, esse valor pode ser alterado caso seja pertinente.
+      if (in_array($periodo, ["3", "6", "9"]))
+        $periodo_str = "-$periodo months";
+      else
+        $periodo_str = "-1 year";
+      $inicio_curso = date("Y-m-d", strtotime($periodo_str, strtotime($diaAtual)));
+      
+      $query = " 
+        SELECT 
+            r.codpes, 
+            o.codofeatvceu,
+            o.numseqofeedi,
+            o.dtainiofeatv,
+            o.dtafimofeatv,
+            a.nomatvceu,
+            a.codatvceu,
+            o.codedicurceu,
+            o.codcurceu,
+            c.codund,
+            c.nomcurceu,
+            u.codcam,
+            c.objcur
+        FROM " . $this->OFERECIMENTOATIVIDADECEU . " o
+        LEFT JOIN " . $this->ATIVIDADECEU . " a
+            ON a.codatvceu = o.codatvceu 
+            AND a.codund = o.codund
+        LEFT JOIN " . $this->RESPONSAVELEDICAOCEU . " r
+            ON r.codcurceu = o.codcurceu
+            AND r.codedicurceu = o.codedicurceu
+        LEFT JOIN " . $this->PESSOA . " p
+            ON p.codpes = r.codpes
+        LEFT JOIN " . $this->CURSOCEU . " c 
+            ON c.codcurceu = o.codcurceu 
+        LEFT JOIN " . $this->UNIDADE . " u
+            ON u.codund = c.codund
+        WHERE r.codpes = $codpes
+        AND o.dtainiofeatv >= '$inicio_curso'
+        ORDER BY o.codofeatvceu
+      ";
+    return USPDatabase::fetchAll($query);
+  }
+
 }
