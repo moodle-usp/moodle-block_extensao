@@ -18,6 +18,7 @@ function xmldb_block_extensao_upgrade($versaoAnterior) {
 
     // Criar a tabela 'block_extensao'
     if ($versaoAnterior < 2024061501) {
+        // Criacao da tabela mdl_block_extensao
         $tabela = new xmldb_table('block_extensao');
 
         // Adicionar os campos a tabela
@@ -29,12 +30,7 @@ function xmldb_block_extensao_upgrade($versaoAnterior) {
             $dbman->create_table($tabela);
         }
 
-        // Registrar o ponto de salvamento apos a criacao da tabela
-        upgrade_plugin_savepoint(true, 2024061501, 'block', 'extensao');
-    }
-
-    // Criar a tabela 'block_extensao_turma'
-    if ($versaoAnterior < 2024061502) {
+        // Agora cria a tabela mdl_block_extensao_turma
         $tabela = new xmldb_table('block_extensao_turma');
 
         // Adicionar campos a tabela
@@ -60,12 +56,7 @@ function xmldb_block_extensao_upgrade($versaoAnterior) {
             $dbman->create_table($tabela);
         }
 
-        // Registrar o ponto de salvamento apos a criacao da tabela
-        upgrade_plugin_savepoint(true, 2024061502, 'block', 'extensao');
-    }
-
-    // Criar a tabela 'block_extensao_ministrante'
-    if ($versaoAnterior < 2024061503) {
+        // E agora a tabela mdl_block_extensao_ministrante
         $tabela = new xmldb_table('block_extensao_ministrante');
 
         // Adicionar campos a tabela
@@ -87,8 +78,24 @@ function xmldb_block_extensao_upgrade($versaoAnterior) {
         }
 
         // Registrar o ponto de salvamento apos a criacao da tabela
-        upgrade_plugin_savepoint(true, 2024061503, 'block', 'extensao');
+        upgrade_plugin_savepoint(true, 2024061501, 'block', 'extensao');
     }
+
+    // Adiciona o campo "responsavel" na tabela mdl_block_extensao_ministrante
+    // e torna o campo "codatc" passivel de ser nulo
+    if ($versaoAnterior <= 2024070301) {
+        $tabela = new xmldb_table('block_extensao_ministrante');
+
+        // Muda "codatc" para NOTNULL=FALSE
+        $campo_codatc = new xmldb_field('codatc', XMLDB_TYPE_INTEGER, '16', null, null, null, null);
+        $dbman->change_field_notnull($tabela, $campo_codatc, $continue = true, $feedback = true);
+
+        // Agora adiciona o campo "responsavel"
+        $campo_responsavel = new xmldb_field('responsavel', XMLDB_TYPE_INTEGER, '16', null, XMLDB_NOTNULL, null, 0);
+        $dbman->add_field($tabela, $campo_responsavel, $continue = true, $feedback = true);
+
+    }
+
     \core\notification::success('O USP Extensão foi atualizado com sucesso!');
     return true;
 

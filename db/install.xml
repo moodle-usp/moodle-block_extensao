@@ -14,16 +14,16 @@
     </TABLE>
     <TABLE NAME="block_extensao_turma" COMMENT="Para armazenar informacoes de turma e curso.">
       <FIELDS>
-        <FIELD NAME="codofeatvceu" TYPE="int" LENGTH="16" NOTNULL="true" SEQUENCE="false" COMMENT="Codigo de oferecimento da atividade no Apolo."/>
-        <FIELD NAME="nome_curso_apolo" TYPE="text" NOTNULL="true" SEQUENCE="false" COMMENT="Nome do curso no Apolo."/>
-        <FIELD NAME="id_moodle" TYPE="int" LENGTH="16" NOTNULL="false" SEQUENCE="false" COMMENT="Identificador do curso no Moodle"/>
-        <FIELD NAME="data_importacao" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="Data em que foi importada a turma."/>
-        <FIELD NAME="sincronizado_apolo" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" COMMENT="Indica se o curso foi sincronizado do Apolo (0 = Nao, 1 = Sim)"/>
-        <FIELD NAME="codcam" TYPE="text" LENGTH="20" NOTNULL="true" SEQUENCE="false" COMMENT="Nome do campus o local onde ocorrera o curso."/>
-        <FIELD NAME="codund" TYPE="text" LENGTH="20" NOTNULL="true" SEQUENCE="false" COMMENT="Nome da unidade e o onde curso sera ministrado."/>
-        <FIELD NAME="objcur" TYPE="text" NOTNULL="true" SEQUENCE="false" COMMENT="Objetivo do curso."/>
-        <FIELD NAME="dtainiofeatv" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="Data de inicio do oferecimento da atividade."/>
-        <FIELD NAME="dtafimofeatv" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="Data de termino do oferecimento da atividade."/>
+        <FIELD NAME="codofeatvceu"       TYPE="int"  LENGTH="16" NOTNULL="true"  SEQUENCE="false" COMMENT="Codigo de oferecimento da atividade no Apolo."/>
+        <FIELD NAME="nome_curso_apolo"   TYPE="text"             NOTNULL="true"  SEQUENCE="false" COMMENT="Nome do curso no Apolo."/>
+        <FIELD NAME="id_moodle"          TYPE="int"  LENGTH="16" NOTNULL="false" SEQUENCE="false" COMMENT="Identificador do curso no Moodle"/>
+        <FIELD NAME="data_importacao"    TYPE="int"  LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="Data em que foi importada a turma."/>
+        <FIELD NAME="sincronizado_apolo" TYPE="int"  LENGTH="1"  NOTNULL="true"  SEQUENCE="false" COMMENT="Indica se o curso foi sincronizado do Apolo (0 = Nao, 1 = Sim)" DEFAULT="0"/>
+        <FIELD NAME="codcam"             TYPE="text" LENGTH="20" NOTNULL="true"  SEQUENCE="false" COMMENT="Nome do campus o local onde ocorrera o curso."/>
+        <FIELD NAME="codund"             TYPE="text" LENGTH="20" NOTNULL="true"  SEQUENCE="false" COMMENT="Nome da unidade e o onde curso sera ministrado."/>
+        <FIELD NAME="objcur"             TYPE="text"             NOTNULL="true"  SEQUENCE="false" COMMENT="Objetivo do curso."/>
+        <FIELD NAME="dtainiofeatv"       TYPE="int"  LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="Data de inicio do oferecimento da atividade."/>
+        <FIELD NAME="dtafimofeatv"       TYPE="int"  LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="Data de termino do oferecimento da atividade."/>
        </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="codofeatvceu"/>
@@ -34,13 +34,14 @@
     </TABLE>
     <TABLE NAME="block_extensao_ministrante" COMMENT="Para relacionar os ministrantes com os cursos.">
       <FIELDS>
-        <FIELD NAME="id" TYPE="int" LENGTH="16" NOTNULL="true" SEQUENCE="true"/>
-        <FIELD NAME="codpes" TYPE="text" NOTNULL="true" SEQUENCE="false" COMMENT="Numero USP do usuario."/>
-        <FIELD NAME="codofeatvceu" TYPE="INT" LENGTH="16" NOTNULL="true" SEQUENCE="false" COMMENT="Codigo de oferecimento da atividade no Apolo."/>
-        <FIELD NAME="codatc" TYPE="int" LENGTH="16" NOTNULL="true" SEQUENCE="false" COMMENT="Codigo de papel do usuario (i.e., se eh docente, monitor, etc)."/>
-        <FIELD NAME="dscatc" TYPE="text" NOTNULL="true" SEQUENCE="false" COMMENT="Descricao do papel do usuario (i.e., se eh docente, monitor, etc)."/>
-        <FIELD NAME="nompes" TYPE="text" NOTNULL="true" SEQUENCE="false" COMMENT="Nome do docente."/>
-        <FIELD NAME="codema" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="E-mail do docente."/>
+        <FIELD NAME="id"           TYPE="int"  LENGTH="16" NOTNULL="true"  SEQUENCE="true"/>
+        <FIELD NAME="codpes"       TYPE="text"             NOTNULL="true"  SEQUENCE="false" COMMENT="Numero USP do usuario."/>
+        <FIELD NAME="codofeatvceu" TYPE="int"  LENGTH="16" NOTNULL="true"  SEQUENCE="false" COMMENT="Codigo de oferecimento da atividade no Apolo."/>
+        <FIELD NAME="codatc"       TYPE="int"  LENGTH="16" NOTNULL="false" SEQUENCE="false" COMMENT="Codigo de papel do usuario (i.e., se eh docente, monitor, etc)."/>
+        <FIELD NAME="dscatc"       TYPE="text"             NOTNULL="true"  SEQUENCE="false" COMMENT="Descricao do papel do usuario (i.e., se eh docente, monitor, etc)."/>
+        <FIELD NAME="nompes"       TYPE="text"             NOTNULL="true"  SEQUENCE="false" COMMENT="Nome do docente."/>
+        <FIELD NAME="codema"       TYPE="text"             NOTNULL="false" SEQUENCE="false" COMMENT="E-mail do docente."/>
+        <FIELD NAME="responsavel"  TYPE="int"              NOTNULL="false" SEQUENCE="false" COMMENT="Se o docente eh responsavel ou nao pelo curso.." DEFAULT="0"/>
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>

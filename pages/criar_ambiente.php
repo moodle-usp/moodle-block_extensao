@@ -26,6 +26,14 @@ require_once(__DIR__ . '/../src/Turmas.php');
 require_once(__DIR__ . '/../src/Ambiente.php');
 require_once(__DIR__ . '/../src/Categorias.php');
 
+
+//var_dump(Edicao::cursosResponsavel(109838));
+echo("<pre>");
+$teste = Edicao::testar_informacoes(1243003);
+print_r($teste);
+
+die();
+/*
 /**
  * Tratamento do formulario de criacao de curso
  * 
@@ -113,6 +121,8 @@ else if (!empty($info_forms_lista)) {
 // Bloqueio do acesso direto
 else 
   redirect($CFG->wwwroot);
+
+
 
   // Verifica se a turma enviada eh do usuario logado
   if (!Turmas::usuario_docente_turma($USER->username, $codofeatvceu) && !Categorias::usuario_gerente_turma($USER->id, $codofeatvceu)
