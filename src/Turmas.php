@@ -54,6 +54,7 @@ class Turmas {
     $query1 = "SELECT id, codofeatvceu FROM {block_extensao_ministrante} WHERE codpes = :nusp_docente AND codatc IN (1,2,5)";
     $usuario_turmas = $DB->get_records_sql($query1, ['nusp_docente' => $nusp_docente]);
 
+
     // Captura as turmas onde o usuario a responsavel pela edição
     $cursosEdicao = Edicao::responsavelEdicao($nusp_docente);
 
