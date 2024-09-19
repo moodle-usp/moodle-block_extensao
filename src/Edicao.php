@@ -34,7 +34,7 @@ class Edicao {
             // Cria array para armazenar os cursos de responsabilidade do docente
             $cursosResponsavel = [];
             foreach ($cursos as $curso) {
-                // Verifica se os dados necessários estão presentes
+                // Verifica se os dados necessarios estao presentes
                 if (isset($curso['codofeatvceu'], $curso['codpes'])) {
                     $cursosResponsavel[] = [
                         'codofeatvceu'  => $curso['codofeatvceu'],
@@ -43,7 +43,7 @@ class Edicao {
                 }
             }
         
-            // Verifica se o array resultante está vazio após o loop
+            // Verifica se o array resultante esta vazio apos o loop
             if (empty($cursosResponsavel)) {
                 return false;
             }
@@ -52,8 +52,6 @@ class Edicao {
             return $cursosResponsavel;
         }
         
-
-
     /**
      * O objetivo da funcao eh consultar se o usuario eh responsavel pela edicao
      * de algum curso a partir do seu codofeatvceu.
@@ -100,85 +98,6 @@ class Edicao {
 
     return $cursosResponsavel;
 }
-public static function atribuiEdicao($codofeatvceu) {
-    global $DB;
-    $Query = new Query();
-    
-    // Obtem a lista de turmas que o usuario pode editar
-    $turmas = self::cursosResponsavel($codofeatvceu);
-    
-    foreach ($turmas as $turma) {
-
-        // Verificar se o registro ja existe com esse codofeatvceu e codpes
-        $registro = $DB->get_record('block_extensao_ministrante', ['codpes' => $turma['codpes'], 'codofeatvceu' => $codofeatvceu]);
-    
-        // Se não houver registro, procurar outro registro para o mesmo codpes
-        if (!$registro) {
-            //cli_writeln("Registro não encontrado. Buscando registro existente para {$turma['codpes']}...");
-            $registro_existente = $DB->get_record('block_extensao_ministrante', ['codpes' => $turma['codpes']]);
-    
-            if ($registro_existente) {
-                try {
-                    //cli_writeln("Registro existente encontrado. Copiando dados...");
-                    // Copiar os dados do registro existente
-                    $novos_dados = [
-                        'codpes'       => $turma['codpes'],
-                        'codofeatvceu' => $codofeatvceu,
-                        'codatc'       => $registro_existente->codatc,
-                        'dscatc'       => $registro_existente->dscatc,
-                        'nompes'       => $registro_existente->nompes,
-                        'codema'       => $registro_existente->codema,
-                        'responsavel'  => 1
-                    ];
-                    
-                    // Inserir o novo registro na tabela
-                    $DB->insert_record('block_extensao_ministrante', $novos_dados);
-                   // cli_writeln("Registro copiado com sucesso.");
-                } catch (Exception $e) {
-                    cli_writeln("Erro ao adicionar o usuario {$turma['codpes']}: " . $e->getTraceAsString());
-                }
-            } else {
-              //  cli_writeln("Registro existente não encontrado. Buscando informações adicionais...");
-                // Tenta buscar informacoes adicionais do usuario usando a funcao info_usuario
-                $ministrante = $Query->informacoesUsuario($turma['codpes']);
-                try {                    
-                    if ($ministrante) {
-                        // Adicionar o novo registro diretamente se encontrar informacoes do usuario
-                        $DB->insert_record('block_extensao_ministrante', [
-                            'codpes'       => $turma['codpes'],
-                            'codofeatvceu' => $codofeatvceu,
-                            'nompes'       => $ministrante['nompes'],
-                            'codatc'       => 0,
-                            'dscatc'       => 'Responsável',
-                            'codema'       => $ministrante['codema'],
-                            'responsavel'  => 1
-                        ]);
-                    } else {
-                        cli_writeln("Usuario {$turma['codpes']} está pendente, não foi possível obter informações.");
-                    }
-                } catch (Exception $e) {
-                    cli_writeln("Erro ao obter informações do usuario {$turma['codpes']}: {$e->getMessage()}");
-                }
-            }
-        } else {
-            //cli_writeln("Registro já existe. Atualizando o campo 'responsavel'...");
-            try {
-                // Se o registro ja existe, apenas atualiza o campo `responsavel`
-                $sql = "UPDATE {block_extensao_ministrante} 
-                        SET responsavel = 1 
-                        WHERE codofeatvceu = ? AND codpes = ?";
-                $DB->execute($sql, [$codofeatvceu, $turma['codpes']]);
-                //cli_writeln("Campo 'responsavel' atualizado com sucesso.");
-            } catch (Exception $e) {
-               // cli_writeln("Erro ao atualizar o usuario {$turma['nompes']}: {$e->getMessage()}");
-            }
-        }
-    }
-}
-
-
-
-
     /**
      * Da a um individuo a partir do codofeatvceu a resonsabilidade 
      * de um curso.
@@ -186,87 +105,74 @@ public static function atribuiEdicao($codofeatvceu) {
      * @param int $codofeatvceu da turma.
      * @return void
      */
-    /*
-        public static function atribuiEdicao($codofeatvceu) {
-            global $DB;
-            $Query = new Query();
+
+    public static function atribuiEdicao($codofeatvceu) {
+        global $DB;
+        $Query = new Query();
         
-            // Obtem a lista de turmas que o usuario pode editar
-            $turmas = self::cursosResponsavel($codofeatvceu);
-            
-            foreach ($turmas as $turma) {
-                // Verificar se o registro ja existe com esse codofeatvceu e codpes
-                $registro = $DB->get_record('block_extensao_ministrante', ['codpes' => $turma['codpes'], 'codofeatvceu' => $codofeatvceu]);
+        // Obtem a lista de turmas que o usuario pode editar
+        $turmas = self::cursosResponsavel($codofeatvceu);
         
-                // Se não houver registro, procurar outro registro para o mesmo codpes
-                if (!$registro) {
-                    // Buscar outro registro do mesmo codpes para copiar as informações
-                    $registro_existente = $DB->get_record('block_extensao_ministrante', ['codpes' => $turma['codpes']]);
+        foreach ($turmas as $turma) {
+
+            // Verificar se o registro ja existe com esse codofeatvceu e codpes
+            $registro = $DB->get_record('block_extensao_ministrante', ['codpes' => $turma['codpes'], 'codofeatvceu' => $codofeatvceu]);
         
-                    if ($registro_existente) {
-                        try {
-                            // Copiar os dados do registro existente
-                            $novos_dados = [
-                                'codpes'       => $turma['codpes'],
-                                'codofeatvceu' => $codofeatvceu,
-                                'codatc'       => $registro_existente->codatc,
-                                'dscatc'       => $registro_existente->dscatc,
-                                'nompes'       => $registro_existente->nompes,
-                                'codema'       => $registro_existente->codema,
-                                'responsavel'  => 1
-                            ];
-                            
-                            // Inserir o novo registro na tabela
-                            $DB->insert_record('block_extensao_ministrante', $novos_dados);
-                        } catch (Exception $e) {
-                           cli_writeln("Erro ao adicionar o usuario {$turma['codpes']}: {$e->getMessage()}");
-                        }
-                    } else {
-                        // Tenta buscar informacoes adicionais do usuario usando a funcao info_usuario
-                        try {
-                            $ministrante = $Query->info   }
-                }
-            }
-        }rmacoesUsuario($turma['codpes']);
-                            
-                            if ($ministrante) {
-                                // Adicionar o novo registro diretamente se encontrar informacoes do usuario
-                                $DB->insert_record('block_extensao_ministrante', [
-                                    'codpes'       => $turma['codpes'],
-                                    'codofeatvceu' => $codofeatvceu,
-                                    'nompes'       => $ministrante->nompes,
-                                    'codatc'       => 0,
-                                    'dscatc'       => 'Responsável',
-                                    'codema'       => $ministrante->codema,
-                                    'responsavel'  => 1
-                                ]);
-                            } else {
-                                cli_writeln("Usuario {$turma['codpes']} está pendente, não foi possível obter informações.");
-                            }
-                        } catch (Exception $e) {
-                           cli_writeln("Erro ao obter informações do usuario {$turma['codpes']}: {$e->getMessage()}");
-                        }
+            // Se nao houver registro, procurar outro registro para o mesmo codpes
+            if (!$registro) {
+                $registro_existente = $DB->get_record('block_extensao_ministrante', ['codpes' => $turma['codpes']]);
+        
+                if ($registro_existente) {
+                    try {
+                        // Copiar os dados do registro existente
+                        $novos_dados = [
+                            'codpes'       => $turma['codpes'],
+                            'codofeatvceu' => $codofeatvceu,
+                            'codatc'       => $registro_existente->codatc,
+                            'dscatc'       => $registro_existente->dscatc,
+                            'nompes'       => $registro_existente->nompes,
+                            'codema'       => $registro_existente->codema,
+                            'responsavel'  => 1
+                        ];
+                        
+                        // Inserir o novo registro na tabela
+                        $DB->insert_record('block_extensao_ministrante', $novos_dados);
+                    } catch (Exception $e) {
+                        cli_writeln("Erro ao adicionar o usuario {$turma['codpes']}: " . $e->getTraceAsString());
                     }
                 } else {
-                    try {
-                        // Se o registro ja existe, apenas atualiza o campo `responsavel`
-                        $sql = "UPDATE {block_extensao_ministrante} 
-                                SET responsavel = 1 
-                                WHERE codofeatvceu = ? AND codpes = ?";
-                        $DB->execute($sql, [$codofeatvceu, $turma['codpes']]);
+                    // Tenta buscar informacoes adicionais do usuario usando a funcao info_usuario
+                    $ministrante = $Query->informacoesUsuario($turma['codpes']);
+                    try {                    
+                        if ($ministrante) {
+                            // Adicionar o novo registro diretamente se encontrar informacoes do usuario
+                            $DB->insert_record('block_extensao_ministrante', [
+                                'codpes'       => $turma['codpes'],
+                                'codofeatvceu' => $codofeatvceu,
+                                'nompes'       => $ministrante['nompes'],
+                                'codatc'       => 0,
+                                'dscatc'       => 'Responsável',
+                                'codema'       => $ministrante['codema'],
+                                'responsavel'  => 1
+                            ]);
+                        } else {
+                            cli_writeln("Usuario {$turma['codpes']} está pendente, não foi possível obter informações.");
+                        }
                     } catch (Exception $e) {
-                        cli_writeln("Erro ao atualizar o usuario {$turma['nompes']}: {$e->getMessage()}");
+                        cli_writeln("Erro ao obter informações do usuario {$turma['codpes']}: {$e->getMessage()}");
                     }
+                }
+            } else {
+                try {
+                    // Se o registro ja existe, apenas atualiza o campo `responsavel`
+                    $sql = "UPDATE {block_extensao_ministrante} 
+                            SET responsavel = 1 
+                            WHERE codofeatvceu = ? AND codpes = ?";
+                    $DB->execute($sql, [$codofeatvceu, $turma['codpes']]);
+                } catch (Exception $e) {
                 }
             }
         }
-        */
-
-        public static function testar_informacoes ($codpes) {
-            $Query = new Query();
-            $ministrante = $Query->informacoesUsuario($codpes);
-            return $ministrante;
-
-        }
-        
+    }
+       
     }        
