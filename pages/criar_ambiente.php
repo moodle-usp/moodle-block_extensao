@@ -26,6 +26,7 @@ require_once(__DIR__ . '/../src/Turmas.php');
 require_once(__DIR__ . '/../src/Ambiente.php');
 require_once(__DIR__ . '/../src/Categorias.php');
 
+ /*
 /**
  * Tratamento do formulario de criacao de curso
  * 
@@ -54,7 +55,6 @@ if (isset($_SESSION['codofeatvceu'])) {
     redirect(new moodle_url($CFG->wwwroot) . "/course/view.php?id={$novo_curso_id}");
   }
 }
-
 
 /**
  * Tratamento do formulario do bloco inicial
@@ -113,13 +113,12 @@ else if (!empty($info_forms_lista)) {
 // Bloqueio do acesso direto
 else 
   redirect($CFG->wwwroot);
-
-// Verifica se a turma enviada eh do usuario logado
-if (!Turmas::usuario_docente_turma($USER->username, $codofeatvceu) && !Categorias::usuario_gerente_turma($USER->id, $codofeatvceu) ) {
-  \core\notification::error('A turma solicitada não está na sua lista de turmas!');
-  redirect($_SERVER['HTTP_REFERER']);
-}
-
+  // Verifica se a turma enviada eh do usuario logado
+  if (!Turmas::usuario_docente_turma($USER->username, $codofeatvceu) && !Categorias::usuario_gerente_turma($USER->id, $codofeatvceu)
+  && !Edicao::usuario_responsavel_edicao($USER->username, $codofeatvceu)) {
+    \core\notification::error('A turma solicitada não está na sua lista de turmas!');
+    redirect($_SERVER['HTTP_REFERER']);
+  }
 
 /**
  * Visualizacao do formulario

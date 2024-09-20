@@ -32,6 +32,7 @@ class Query
     $this->UNIDADE                  = get_config('block_extensao', 'tabela_unidade');
     $this->CAMPUS                   = get_config('block_extensao', 'tabela_campus');
     $this->PESSOA                   = get_config('block_extensao', 'tabela_pessoa');
+    $this->RESPONSAVELEDICAOCEU     = get_config('block_extensao', 'tabela_responsaveledicaoceu');
   }
 
   /**
@@ -41,7 +42,10 @@ class Query
     return USPDatabase::fetch("SELECT 1");
   }
 
-  /**
+    /**
+   * Captura um docente e verifica se ele eh responsavel pela edicao de algum curso de extensao
+   * @param int $codpes 
+   * @return array
    * Captura as turmas abertas.
    * Sao consideradas como turmas abertas somente as turmas com
    * data de encerramento posterior a data de hoje.
@@ -186,20 +190,25 @@ class Query
    * 
    * @return object
    */
-  public function info_usuario ($codpes) {
-    // tratamento de erros
-    if (is_numeric($codpes)) $query_codpes = $codpes;
-    else $query_codpes = "'$codpes'";
-    return USPDatabase::fetch("
-      SELECT
+  public function informacoesUsuario($codpes) {
+    $query = 
+    "SELECT
         p.codpes,
         p.nompes,
-        e.codema
-      FROM " . $this->PESSOA . " p
-      LEFT JOIN " . $this->EMAILPESSOA . " e ON p.codpes = e.codpes
-      WHERE p.codpes = $query_codpes
-   ");
-  }
+          COALESCE(email_preferencial.codema, email_disponivel.codema) AS codema
+      FROM " . $this->PESSOA . "  p
+          LEFT JOIN
+          (SELECT codpes, codema FROM " . $this->EMAILPESSOA . " WHERE stamtr = 'S') AS email_preferencial 
+          ON p.codpes = email_preferencial.codpes
+      LEFT JOIN 
+          (SELECT codpes, codema FROM " . $this->EMAILPESSOA . ") AS email_disponivel
+          ON p.codpes = email_disponivel.codpes
+      WHERE 
+        p.codpes = $codpes";
+     // Retornar a consulta
+    return USPDatabase::fetch($query);
+}
+
 
   /**
    * Captura emails de uma pessoa dado um 'codpes'
@@ -229,4 +238,39 @@ class Query
   public function cargos_atuacao () {
     return USPDatabase::fetchAll("SELECT * FROM " . $this->ATUACAOCEU);
   } 
+
+  /**
+   * Captura um docente e verifica se ele eh responsavel pela edicao de algum curso de extensao
+   * @param int $codpes 
+   * @return array
+   */
+  public function responsavelEdicao ($codofeatvceu) {
+    
+    $periodo = get_config('block_extensao', 'periodo_curso');
+    $diaAtual = date("Y-m-d");
+
+    // opcoes para a pesquisa do inicio da busca por curso, coloquei as opcoes de 3, 6, 9 meses 
+    // e 1 ano, no entanto, esse valor pode ser alterado caso seja pertinente.
+    if (in_array($periodo, ["3", "6", "9"]))
+      $periodo_str = "-$periodo months";
+    else
+      $periodo_str = "-1 year";
+    $inicio_curso = date("Y-m-d", strtotime($periodo_str, strtotime($diaAtual)));
+    
+    $query = " 
+      SELECT 
+          r.codpes, 
+          o.codofeatvceu
+      FROM " . $this->OFERECIMENTOATIVIDADECEU . " o
+      LEFT JOIN  " . $this->RESPONSAVELEDICAOCEU . " r
+        ON r.codcurceu = o.codcurceu
+        AND r.codedicurceu = o.codedicurceu
+        AND r.codund = o.codund
+      WHERE o.codofeatvceu = $codofeatvceu
+        AND o.dtainiofeatv >= '$inicio_curso'
+      ORDER BY o.codofeatvceu
+    ";
+    return USPDatabase::fetchAll($query);
+  }
+
 }
