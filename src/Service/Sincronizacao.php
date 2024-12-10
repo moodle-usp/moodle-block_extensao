@@ -132,7 +132,7 @@ class Sincronizar {
     // Agora adiciona todas as turmas
     cli_writeln("# Salvando turmas...");
     try {
-      $this->salvarTurmasExtensao($objetos_turmas);
+      $this->salvarTurmasExtensao($turmas_novas);
       cli_writeln("* Turmas sincronizadas!");
       // Se tiver removido os ministrantes, precisa retornar todas as turmas
       if ($remover_ministrantes)
