@@ -64,7 +64,8 @@ class block_extensao extends block_base {
             $cursos_docente = array();
             foreach ($cursos as $codofeatvceu => $nome_curso) {
                 // cria um formulario
-                $form = new redirecionamento_criacao_ambiente_lista('/blocks/extensao/pages/criar_ambiente.php', array('codofeatvceu' => $codofeatvceu));    
+                $formurl = new moodle_url('/blocks/extensao/pages/criar_ambiente.php');
+                $form = new redirecionamento_criacao_ambiente_lista($formurl, array('codofeatvceu' => $codofeatvceu));    
                 $cursos_docente[] = array(
                     'nome_curso_apolo' => $nome_curso,
                     'formulario_curso' => $form->render()
@@ -74,7 +75,8 @@ class block_extensao extends block_base {
         }
         // Formulario como select
         else {
-            $formulario = new redirecionamento_criacao_ambiente_select('/blocks/extensao/pages/criar_ambiente.php', array('cursos'=>$cursos));
+            $formurl = new moodle_url('/blocks/extensao/pages/criar_ambiente.php');
+            $formulario = new redirecionamento_criacao_ambiente_select($formurl, array('cursos'=>$cursos));
             $infos['formulario'] = $formulario->render();
         }
 

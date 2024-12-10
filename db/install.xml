@@ -41,7 +41,7 @@
         <FIELD NAME="dscatc"       TYPE="text"             NOTNULL="true"  SEQUENCE="false" COMMENT="Descricao do papel do usuario (i.e., se eh docente, monitor, etc)."/>
         <FIELD NAME="nompes"       TYPE="text"             NOTNULL="true"  SEQUENCE="false" COMMENT="Nome do docente."/>
         <FIELD NAME="codema"       TYPE="text"             NOTNULL="false" SEQUENCE="false" COMMENT="E-mail do docente."/>
-        <FIELD NAME="responsavel"  TYPE="int"              NOTNULL="false" SEQUENCE="false" COMMENT="Se o docente eh responsavel ou nao pelo curso.." DEFAULT="0"/>
+        <FIELD NAME="responsavel"  TYPE="int"  LENGTH="16" NOTNULL="false" SEQUENCE="false" COMMENT="Se o docente eh responsavel ou nao pelo curso.." DEFAULT="0"/>
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
