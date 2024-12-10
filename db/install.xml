@@ -35,7 +35,7 @@
     <TABLE NAME="block_extensao_ministrante" COMMENT="Para relacionar os ministrantes com os cursos.">
       <FIELDS>
         <FIELD NAME="id"           TYPE="int"  LENGTH="16" NOTNULL="true"  SEQUENCE="true"/>
-        <FIELD NAME="codpes"       TYPE="text"             NOTNULL="true"  SEQUENCE="false" COMMENT="Numero USP do usuario."/>
+        <FIELD NAME="codpes"       TYPE="int"  LENGTH="16" NOTNULL="true"  SEQUENCE="false" COMMENT="Numero USP do usuario."/>
         <FIELD NAME="codofeatvceu" TYPE="int"  LENGTH="16" NOTNULL="true"  SEQUENCE="false" COMMENT="Codigo de oferecimento da atividade no Apolo."/>
         <FIELD NAME="codatc"       TYPE="int"  LENGTH="16" NOTNULL="false" SEQUENCE="false" COMMENT="Codigo de papel do usuario (i.e., se eh docente, monitor, etc)."/>
         <FIELD NAME="dscatc"       TYPE="text"             NOTNULL="true"  SEQUENCE="false" COMMENT="Descricao do papel do usuario (i.e., se eh docente, monitor, etc)."/>
