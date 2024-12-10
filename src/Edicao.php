@@ -120,7 +120,8 @@ class Edicao {
         
             // Se nao houver registro, procurar outro registro para o mesmo codpes
             if (!$registro) {
-                $registro_existente = $DB->get_record('block_extensao_ministrante', ['codpes' => $turma['codpes']]);
+                $registros_existentes = $DB->get_records('block_extensao_ministrante', ['codpes' => $turma['codpes']]);
+                $registro_existente = array_pop($registros_existentes);
         
                 if ($registro_existente) {
                     try {
