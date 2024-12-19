@@ -205,8 +205,10 @@ class Sincronizar {
     }
 
     // Agora remove os ministrantes das turmas antigas
-    $query = "codofeatvceu IN (" . implode(',', array_map('intval', array_keys($turmas_novas))) . ")";
-    $DB->delete_records_select('block_extensao_ministrante', $query);
+    if ($remover_ministrantes) {
+      $query = "codofeatvceu IN (" . implode(',', array_map('intval', array_keys($turmas_novas))) . ")";
+      $DB->delete_records_select('block_extensao_ministrante', $query);
+    }
 
     return $turmas_novas;
   }
