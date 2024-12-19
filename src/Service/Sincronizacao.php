@@ -177,8 +177,8 @@ class Sincronizar {
    * Remocao de turmas sem ambiente
    * 
    * Dado um array de objetos de turmas, cada turma que constar na tabela de turmas
-   * do plugin mas nao tiver um ambiente criado associado (i.e., `id_moodle=NULL`).
-   * Somente as turmas no array informado serao verificadas.
+   * do plugin mas nao tiver um ambiente criado associado (i.e., `id_moodle=NULL`)
+   * sera removida.
    * 
    * O array informado deve ser uma lista de objetos de turmas, e cada objeto deve
    * ter a propriedade `codofeatvceu` (codigo de oferecimento).
@@ -189,29 +189,25 @@ class Sincronizar {
    */
   private function removerTurmasSemAmbiente(array $turmas, bool $remover_ministrantes) {
     global $DB;
-    $turmas_novas = array();
-    // Percorre a lista de turmas e vai procurando cada uma
-    foreach ($turmas as $turma) {
-      // Procura pela turma na base
-      $query_where = array('codofeatvceu'=>$turma->codofeatvceu);
-      $resultado_busca = $DB->get_record('block_extensao_turma', $query_where);
 
-      // Se nao estiver na base, segue 
-      if (!$resultado_busca) {
+    // Remove todas as turmas sem ambiente
+    $DB->delete_records('block_extensao_turma', array('id_moodle'=>NULL));
+
+    // Agora seleciona todas as turmas na base (com ambiente)
+    $turmas_na_base = $DB->get_records('block_extensao_turma');
+
+    // Entao seleciona entre as turmas capturadas aquelas que nao estao na base
+    $turmas_novas = array();
+    foreach ($turmas as $turma) {
+      // Se nao estiver na base, eh uma turma nova
+      if (!array_key_exists($turma->codofeatvceu, $turmas_na_base))
         $turmas_novas[$turma->codofeatvceu] = $turma;
-        continue;
-      } 
-      
-      // Se o campo `id_moodle` for NULL, remove
-      else if (is_null($resultado_busca->id_moodle)) {
-        // Apaga os registros
-        $DB->delete_records('block_extensao_turma', $query_where);
-        // Se quiser apagar os ministrantes tambem
-        if ($remover_ministrantes) {
-          $DB->delete_records('block_extensao_ministrante', $query_where);
-        }
-      }
     }
+
+    // Agora remove os ministrantes das turmas antigas
+    $query = "codofeatvceu IN (" . implode(',', array_map('intval', array_keys($turmas_novas))) . ")";
+    $DB->delete_records_select('block_extensao_ministrante', $query);
+
     return $turmas_novas;
   }
 
