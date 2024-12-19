@@ -262,15 +262,11 @@ class Sincronizar {
         $this->salvarMinistrantes($ministrantes);
         cli_writeln("* Ministrantes sincronizados!");
 
-        // Atribui permissoes de responsavel pela edicao ministrante responsaveis pela edicao
-        cli_writeln("# Atribuindo permissões de edição...");
-        foreach ($turmas as $turma_codofeatvceu) {
-            Edicao::atribuiEdicao($turma_codofeatvceu);
-            // } else {
-            //     cli_writeln('Erro: Turma sem codofeatvceu.');
-            //     var_dump($turma);
-            // }
-        }
+        // // Atribui permissoes de responsavel pela edicao ministrante responsaveis pela edicao
+        // cli_writeln("# Atribuindo permissões de edição...");
+        // foreach ($turmas as $turma_codofeatvceu) {
+        //     Edicao::atribuiEdicao($turma_codofeatvceu);
+        // }
         return TRUE;
 
     } catch (Exception $e) {
